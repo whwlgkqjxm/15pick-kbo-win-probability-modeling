@@ -1,373 +1,310 @@
-# MyPick — A Data-Driven KBO Fantasy Sports & Player Valuation
+# MyPick — KBO Sports Analytics & Fan Engagement Platform
 
-MyPick is a full-stack sports analytics platform that transforms raw KBO baseball records into fantasy scores, dynamic player valuations, user rankings, and point-based prediction experiences.
+**MyPick is a production-deployed KBO sports analytics and fan engagement platform that turns complex baseball records into fantasy scores, player rankings, dynamic price movements, team competition, friend rankings, and point-based prediction experiences.**
 
-The project was built to explore how structured sports data can be converted into an interactive product that helps fans understand player value, compare performance, build fantasy teams, and engage with daily KBO games.
+MyPick was built around one idea:
 
----
+> Sports data becomes more valuable when it helps fans understand, decide, compete, and participate.
 
-## Live Demo
+Instead of only displaying KBO records, MyPick translates player performance into easier-to-read indicators and connects those indicators to fantasy team building, ranking competition, player value strategy, and daily game predictions.
 
-- Live Website: https://mypickkbo.com
-- Project Type: Full-stack sports analytics web application
-- Domain: Sports analytics, fantasy sports, player valuation, data products
-- Status: Portfolio-safe repository version
+[Live Site](https://mypickkbo.com) · [Documentation](docs/) · [Tech Stack](#tech-stack) · [System Architecture](#system-architecture)
 
-> This repository does not include production database files, environment secrets, logs, backups, or private deployment credentials.
-
----
-
-## Project Overview
-
-Baseball produces a large amount of structured statistical data, but raw game records and traditional stat tables are often difficult for casual fans to interpret.
-
-MyPick addresses this gap by converting KBO records into a user-facing fantasy sports experience. Instead of simply displaying historical records, the platform reinterprets player performance through custom scoring, dynamic pricing, ranking, team-building, and prediction systems.
-
-The goal is to make player value easier to understand and make daily KBO games more interactive for fans.
+![Python](https://img.shields.io/badge/Python-3.x-blue)
+![Flask](https://img.shields.io/badge/Backend-Flask-lightgrey)
+![SQLite](https://img.shields.io/badge/Database-SQLite-blue)
+![Deployment](https://img.shields.io/badge/Deployment-AWS%20Lightsail-orange)
+![Status](https://img.shields.io/badge/Status-Portfolio--safe-green)
 
 ---
 
-## Problem Statement
+## Table of Contents
 
-Most sports data platforms focus on displaying statistics, schedules, and rankings. While useful, these formats often leave users with questions such as:
-
-- Which players are actually valuable right now?
-- How can recent performance be compared across different roles?
-- How can raw baseball records become an interactive fan experience?
-- How can a platform combine sports analytics, user participation, and live operations?
-
-MyPick was designed as a data product that turns raw KBO records into interpretable fantasy scores, player prices, rankings, and prediction-based interactions.
+- [Overview](#overview)
+- [Why This Project Matters](#why-this-project-matters)
+- [Key Highlights](#key-highlights)
+- [Product Features](#product-features)
+- [What Makes MyPick Different](#what-makes-mypick-different)
+- [Analytics & Data System](#analytics--data-system)
+- [System Architecture](#system-architecture)
+- [Core Modules](#core-modules)
+- [Data Pipeline](#data-pipeline)
+- [Tech Stack](#tech-stack)
+- [Deployment & Operations](#deployment--operations)
+- [Validation & Data Quality](#validation--data-quality)
+- [Screenshots](#screenshots)
+- [Security & Privacy](#security--privacy)
+- [Roadmap](#roadmap)
+- [Korean Summary](#korean-summary)
+- [Author](#author)
 
 ---
 
-## Key Features
+## Overview
 
-### 1. KBO Data Pipeline
+Baseball is a data-rich sport, but raw records are not always easy for casual fans to interpret.
 
-MyPick processes KBO game information through a daily data pipeline.
+KBO games produce many different statistics across batters, starting pitchers, bullpen pitchers, team results, and recent player performance. For users who are new to baseball or who do not want to analyze every box score manually, it can be difficult to quickly understand questions like:
 
-Core pipeline responsibilities include:
+- Which players are performing well right now?
+- Which players are rising or falling?
+- How should batters and pitchers be compared?
+- Which players are valuable for building a fantasy team?
+- How can game data become something fans can actively participate in?
 
-- Collecting daily KBO game records
-- Storing raw batter and pitcher statistics
-- Separating batter, starting pitcher, and bullpen pitcher logic
-- Calculating fantasy daily scores
-- Updating player totals and rankings
-- Updating dynamic player prices
-- Refreshing fantasy team rankings
-- Preparing game prediction markets
-- Running validation checks for data consistency
+MyPick addresses this by converting KBO records into fan-friendly indicators:
 
-### 2. Fantasy Scoring System
+- **Fantasy scores** summarize player performance.
+- **Batter and pitcher rankings** make comparison easier.
+- **Dynamic player prices** reflect value changes over time.
+- **Price movements** help users notice hot streaks, slumps, and potential upside.
+- **Fantasy teams, rankings, friend rankings, and point-based predictions** turn sports data into participatory content.
 
-The platform converts raw baseball performance into fantasy points.
+The goal is not just to show baseball data. The goal is to make baseball easier to understand and more enjoyable to follow.
 
-The scoring system is designed to:
+---
 
-- Evaluate batters, starting pitchers, and bullpen pitchers differently
-- Reflect role-specific performance patterns
-- Support daily player scores
-- Aggregate player scores into fantasy team scores
-- Apply captain-based scoring logic
-- Support user rankings based on team performance
+## Why This Project Matters
 
-This turns traditional baseball records into a more intuitive performance layer for users.
+Many sports websites present schedules, results, standings, and raw player statistics. Those are useful, but they often assume that users already know how to interpret the numbers.
 
-### 3. Dynamic Player Pricing Model
+MyPick starts from a different perspective:
 
-MyPick includes a custom player valuation system that updates player prices based on performance and role.
+> What if baseball records could be transformed into a more accessible and participatory fan experience?
 
-The pricing model is designed to:
+The platform turns complex KBO data into simplified but meaningful signals. Users do not need to know every advanced baseball statistic to understand player performance. They can look at fantasy points, rankings, price levels, and price changes to understand a player’s current form, consistency, value, and trend.
 
-- Represent player value as an interpretable number
-- React to recent performance
-- Separate valuation logic by player type
-- Reduce unstable price movement
-- Support fantasy team construction under budget constraints
+From there, users can make decisions:
 
-This creates a market-like layer where users can evaluate player value, roster strategy, and team-building decisions.
+- Build their own fantasy team
+- Choose players under budget constraints
+- Compare their team with other users
+- Compete in overall rankings
+- Compare with friends through friend rankings
+- Predict daily KBO game outcomes using points
+- Think strategically about player upside and release profit
 
-### 4. Fantasy Team Management
+This makes MyPick both a sports analytics project and a fan engagement product.
 
-Users can build fantasy teams using KBO players.
+---
 
-Team management features include:
+## Key Highlights
 
-- Budget-based roster construction
-- Position-aware roster slots
-- Batter and pitcher role separation
-- Captain selection
-- Team score aggregation
-- User ranking comparison
-- Team performance history
+- Built a full-stack KBO sports analytics web application with Python, Flask, SQLite, Jinja templates, CSS, and JavaScript
+- Designed a role-aware fantasy scoring system for batters, starting pitchers, and bullpen pitchers
+- Implemented dynamic player pricing to reflect player performance, value movement, hot streaks, and slumps
+- Built fantasy team construction with budget constraints, roster slots, captain selection, and team confirmation logic
+- Added overall user rankings and friend-based rankings to support both public competition and social competition
+- Developed a point-based prediction system with market creation, bet placement, settlement, payouts, and betting history
+- Added release-profit logic so users can benefit from identifying undervalued or rising players
+- Automated daily data updates using Python scripts and scheduled server jobs
+- Deployed the service with AWS Lightsail, Ubuntu, Gunicorn, Nginx, HTTPS, and production-safe configuration
+- Prepared this repository as a portfolio-safe version without production database files, secrets, logs, backups, or private credentials
 
-The team system connects individual player analytics to user-level competition.
+---
 
-### 5. User Rankings
+## Product Features
 
-MyPick tracks and ranks users based on fantasy team performance.
+| Feature | Purpose |
+|---|---|
+| Fantasy Scores | Converts raw player records into easy-to-read performance indicators |
+| Batter / Pitcher Rankings | Helps users compare players without manually analyzing every raw statistic |
+| Dynamic Player Prices | Shows player value movement, hot streaks, slumps, and market-like trends |
+| Price Change Tracking | Makes rising and falling players easier to notice at a glance |
+| Fantasy Team Management | Lets users build a team using KBO players under budget and roster constraints |
+| Captain System | Adds strategic weight to team construction |
+| Overall User Rankings | Gives all users a shared ranking ecosystem and long-term motivation |
+| Friend Features | Allows users to add friends and compare performance socially |
+| Friend Rankings | Preserves the private-group competition of traditional fantasy sports |
+| Point-Based Predictions | Lets users participate in daily KBO games through prediction-based engagement |
+| Release Profit Logic | Rewards users for identifying undervalued or rising players before their value increases |
+| Mobile UI | Supports a more accessible experience across desktop and mobile layouts |
 
-Ranking features include:
+---
 
-- Daily team rankings
-- Monthly team rankings
-- Season-level user performance
-- Team score aggregation
-- User comparison through fantasy points and portfolio-style performance
+## What Makes MyPick Different
 
-This turns the platform from a static analytics dashboard into a competitive fantasy sports experience.
+Traditional fantasy sports products often focus on private leagues among small groups of friends. That structure is fun, but it can be limiting for new users who do not already have a group to play with.
 
-### 6. Point-Based Prediction System
+MyPick is built around a broader ranking ecosystem.
 
-MyPick includes a point-based prediction and betting-style system for KBO games.
+All users can participate in the same competitive environment through overall rankings, while friend features and friend rankings still preserve the social competition of private fantasy leagues.
 
-The prediction system supports:
+MyPick also adds additional strategic layers:
 
-- Game prediction markets
-- User point staking
-- Bet tracking
-- Market settlement
-- Payout calculation
-- User betting history
-- Prediction performance feedback
+### 1. Player data becomes easier to understand
 
-This feature was designed as a structured engagement layer rather than a real-money gambling system.
+Users do not need to analyze every raw baseball statistic. Fantasy scores, batter rankings, pitcher rankings, and player price changes provide a more direct way to understand player performance, form, and value.
+
+### 2. Dynamic prices show player trends
+
+A player’s price movement becomes an intuitive signal of recent performance and value change. Users can identify rising players, falling players, stable performers, and possible undervalued options.
+
+### 3. Team building becomes a strategy problem
+
+Users are not simply choosing favorite players. They must consider budget, position, role, captain value, current price, future upside, and ranking impact.
+
+### 4. Release profit creates value-based play
+
+MyPick rewards users who identify players before their value rises. This adds a player valuation layer beyond simple score accumulation.
+
+### 5. Predictions make daily games more interactive
+
+Point-based predictions give users another reason to follow daily KBO games. The system is based on platform points, not real-money gambling.
+
+Together, these systems turn KBO records into participatory sports content.
+
+---
+
+## Analytics & Data System
+
+MyPick converts KBO game records into user-facing analytics through several connected systems.
+
+| System | Role |
+|---|---|
+| Data Collection | Syncs KBO schedules, game results, and player records |
+| Raw Stat Storage | Stores batter and pitcher records separately |
+| Fantasy Scoring | Converts player performance into role-aware fantasy points |
+| Player Rankings | Organizes players into easier comparison views |
+| Dynamic Pricing | Updates player prices based on performance and role |
+| Team Aggregation | Calculates fantasy team scores from selected players |
+| Ranking System | Produces overall rankings, team rankings, and friend rankings |
+| Prediction System | Handles point-based prediction markets and settlement |
+| Ledger Logic | Tracks stakes, payouts, and point movements |
+| Validation Scripts | Checks score consistency, price integrity, roster rules, and settlement results |
 
 ---
 
 ## System Architecture
 
-```text
-KBO Game Data
-     ↓
-Data Collection / Sync Scripts
-     ↓
-SQLite Database
-     ↓
-Fantasy Scoring Engine
-     ↓
-Dynamic Player Pricing Engine
-     ↓
-Fantasy Team / Ranking Logic
-     ↓
-Prediction Market / Settlement Logic
-     ↓
-Flask Web Application
-     ↓
-Gunicorn + Nginx + HTTPS
-     ↓
-User-Facing Web Platform
+```mermaid
+flowchart TD
+    A[KBO Game Records] --> B[Data Collection / Sync Scripts]
+    B --> C[SQLite Database]
+
+    C --> D[Fantasy Scoring Engine]
+    C --> E[Dynamic Player Pricing Engine]
+    C --> H[Point-Based Prediction System]
+
+    D --> F[Fantasy Team Aggregation]
+    E --> F
+    F --> G[User Rankings / Friend Rankings]
+
+    H --> I[Settlement / Ledger Logic]
+
+    G --> J[Flask Web Application]
+    I --> J
+    C --> J
+
+    J --> K[Gunicorn + Nginx + HTTPS]
+    K --> L[Users]
 ```
+
+---
+
+## Core Modules
+
+| File / Directory | Purpose |
+|---|---|
+| `app.py` | Main Flask application, routes, authentication flow, user pages, team management, rankings, profiles, and UI logic |
+| `db.py` | Database initialization and schema-related logic |
+| `scoring.py` | Fantasy scoring rules and scoring helper logic |
+| `calculate_team_daily_scores.py` | Aggregates player scores into fantasy team scores |
+| `update_market_prices_v3.py` | Dynamic player price update logic |
+| `betting.py` | Point-based prediction market, odds, bet placement, payout, and ledger logic |
+| `settle_betting.py` | Prediction settlement workflow |
+| `sync_db.py` | Daily database synchronization workflow |
+| `sync_betting_games.py` | Betting-game synchronization workflow |
+| `scraper.py` | KBO data collection helpers |
+| `scheduler.py` | Scheduled update orchestration |
+| `audit_mypick_integrity.py` | Data integrity and consistency checks |
+| `price_reactivity_report.py` | Price movement validation and reactivity checks |
+| `trade_bonus_report.py` | Release-profit and trade-bonus validation |
+| `position_rules.py` | Position and roster eligibility rules |
+| `templates/` | Jinja HTML templates for the web interface |
+| `static/` | CSS, icons, SEO assets, and static images |
+| `deploy/` | Deployment examples for systemd, Nginx, and update scripts |
+| `docs/` | Project documentation |
+| `sample_data/` | Planned anonymized sample data for portfolio demonstration |
+| `screenshots/` | Planned portfolio-safe screenshots |
 
 ---
 
 ## Data Pipeline
 
-The daily update pipeline powers the platform by transforming raw game records into user-facing analytics.
+The daily update pipeline transforms game records into user-facing content.
 
-```text
-1. Fetch or sync daily KBO game data
-2. Store raw batter and pitcher records
-3. Calculate fantasy daily scores
-4. Aggregate player totals
-5. Aggregate fantasy team scores
-6. Update dynamic player prices
-7. Update rankings and prediction markets
-8. Run validation and consistency checks
-9. Serve updated results through the web application
+```mermaid
+flowchart LR
+    A[Game Schedule / Results] --> B[Raw Batter & Pitcher Stats]
+    B --> C[Fantasy Daily Scores]
+    C --> D[Player Totals]
+    C --> E[Fantasy Team Scores]
+    D --> F[Player Rankings]
+    D --> G[Dynamic Player Prices]
+    E --> H[User Rankings]
+    A --> I[Prediction Markets]
+    I --> J[Settlement]
+    C --> K[Validation Checks]
+    G --> K
+    H --> K
+    J --> K
 ```
 
-The pipeline is designed to support automated daily operations while maintaining data quality across game records, player scores, price updates, team rankings, and prediction settlement.
+The pipeline supports:
 
----
-
-## Core Analytics Logic
-
-### Fantasy Scoring Model
-
-The fantasy scoring model transforms raw KBO game records into fantasy points.
-
-Rather than treating all players the same, the model separates players by role:
-
-- Batters
-- Starting pitchers
-- Bullpen pitchers
-
-This allows the scoring system to better reflect how different types of players contribute to the game.
-
-### Dynamic Player Pricing Model
-
-The pricing model converts player performance into a dynamic valuation layer.
-
-The goal is not simply to rank players by total points, but to create a more interpretable player value system that can support fantasy team-building decisions.
-
-The pricing model considers:
-
-- Player role
-- Recent performance
-- Fantasy score movement
-- Market stability
-- Roster strategy
-
-### Prediction Market Logic
-
-The prediction system allows users to participate in daily KBO games using points.
-
-It includes logic for:
-
-- Market creation
-- Bet placement
-- Bet settlement
-- Payout calculation
-- User betting history
-- Ledger-style point tracking
-
-This system adds an engagement layer to the analytics platform.
+- Schedule and result synchronization
+- Raw batter and pitcher stat storage
+- Fantasy score calculation
+- Player total aggregation
+- Fantasy team score aggregation
+- Dynamic player price updates
+- Player ranking refreshes
+- User and friend ranking updates
+- Point-based prediction market settlement
+- Data validation reports
 
 ---
 
 ## Tech Stack
 
-| Area | Technologies |
+| Layer | Technologies |
 |---|---|
 | Backend | Python, Flask |
 | Database | SQLite |
-| Frontend | HTML, Jinja Templates, CSS, JavaScript |
-| Data Processing | Python scripts |
-| Scheduling | systemd service / timer |
+| Frontend | Jinja Templates, HTML, CSS, JavaScript |
+| Data Processing | Python, pandas, NumPy |
+| Data Collection | requests, BeautifulSoup |
+| Scheduling | systemd timer, APScheduler |
 | Deployment | AWS Lightsail, Ubuntu, Gunicorn, Nginx |
-| Security / Configuration | Environment variables, production-safe config, HTTPS |
-| SEO | sitemap.xml, robots.txt, Google Search Console, Naver Webmaster Tools |
+| Security / Configuration | Environment variables, HTTPS, production-safe secret handling |
+| SEO | robots.txt, sitemap.xml, Google Search Console, Naver Webmaster Tools |
 
 ---
 
-## Repository Structure
+## Deployment & Operations
 
-```text
-.
-├── app.py
-├── db.py
-├── betting.py
-├── scoring.py
-├── scheduler.py
-├── sync_db.py
-├── scraper.py
-├── update_market_prices_v3.py
-├── calculate_team_daily_scores.py
-├── templates/
-├── static/
-├── docs/
-├── deploy/
-├── sample_data/
-├── screenshots/
-├── tests/
-├── README.md
-├── CHANGELOG.md
-└── .gitignore
-```
+MyPick is deployed as a live web application using a production server environment.
+
+Deployment and operations include:
+
+- AWS Lightsail server
+- Ubuntu-based deployment
+- Flask application served with Gunicorn
+- Nginx reverse proxy
+- HTTPS with Certbot
+- systemd web service for the application
+- systemd timer/service for automated daily updates
+- Environment-based production configuration
+- Portfolio-safe repository separation from production data and secrets
+
+The live deployment is part of the project’s value: MyPick is not only a local prototype, but an operated sports data product.
 
 ---
 
-## Documentation
+## Validation & Data Quality
 
-Detailed project documentation is organized in the `docs/` directory.
-
-Current and planned documentation topics include:
-
-- Problem statement
-- Market context
-- Data pipeline
-- Fantasy scoring model
-- Dynamic pricing model
-- Prediction system
-- Validation checks
-- Deployment
-- Roadmap
-- Security and privacy
-
-Planned documentation structure:
-
-```text
-docs/
-├── 01_problem_statement.md
-├── 02_market_context.md
-├── 03_product_strategy.md
-├── 04_data_pipeline.md
-├── 05_scoring_model.md
-├── 06_pricing_model.md
-├── 07_prediction_system.md
-├── 08_database_schema.md
-├── 09_validation_checks.md
-├── 10_deployment.md
-├── 11_security_and_privacy.md
-└── 12_roadmap.md
-```
-
----
-
-## Screenshots
-
-Screenshots will be added after the portfolio-safe visual review.
-
-Planned screenshot set:
-
-```text
-screenshots/
-├── 01_center_page.png
-├── 02_player_rankings.png
-├── 03_player_detail.png
-├── 04_team_edit.png
-├── 05_my_team.png
-├── 06_user_rankings.png
-├── 07_prediction_page.png
-└── 08_mobile_view.png
-```
-
-Example sections to be added:
-
-### Center Dashboard
-
-![Center Dashboard](screenshots/01_center_page.png)
-
-### Player Rankings
-
-![Player Rankings](screenshots/02_player_rankings.png)
-
-### Fantasy Team Management
-
-![Fantasy Team Management](screenshots/04_team_edit.png)
-
-### Prediction System
-
-![Prediction System](screenshots/07_prediction_page.png)
-
----
-
-## Sample Data
-
-Production database files are not included in this repository.
-
-A small anonymized sample dataset will be added for portfolio demonstration purposes.
-
-Planned sample data structure:
-
-```text
-sample_data/
-├── sample_games.csv
-├── sample_batter_stats.csv
-├── sample_pitcher_stats.csv
-├── sample_fantasy_scores.csv
-├── sample_player_prices.csv
-└── README.md
-```
-
-The sample data will be simplified and anonymized. It will not include production database files, user-sensitive data, secrets, logs, or operational backups.
-
----
-
-## Validation and Data Quality
-
-MyPick includes validation checks to reduce the risk of inconsistent updates.
+Because MyPick connects raw game records, player scores, player prices, fantasy teams, rankings, and prediction settlement, validation is an important part of the system.
 
 Validation areas include:
 
@@ -375,53 +312,68 @@ Validation areas include:
 - Missing game data detection
 - Missing fantasy score detection
 - Player price consistency checks
+- Price reactivity checks
 - Position eligibility checks
 - Roster budget validation
 - Team score aggregation checks
-- Betting market settlement checks
+- Release-profit validation
+- Prediction market settlement checks
+- Betting ledger consistency checks
 
-These checks are important because the platform depends on multiple connected systems: raw records, fantasy scores, player prices, rosters, rankings, and prediction markets.
-
----
-
-## Deployment
-
-MyPick is deployed as a production web application.
-
-Deployment components include:
-
-- AWS Lightsail
-- Ubuntu
-- Gunicorn
-- Nginx reverse proxy
-- HTTPS with Certbot
-- systemd web service
-- systemd daily update timer
-
-The production deployment supports automated daily updates and public web access through a custom domain.
-
-Sensitive production files are excluded from this repository.
+These checks help keep daily updates reliable and reduce the risk of inconsistent user-facing results.
 
 ---
 
-## Security and Privacy Notice
+## Screenshots
 
-This repository is a portfolio-safe version of the project.
+Screenshots will be added after portfolio-safe visual review.
 
-It does not include:
+Planned screenshot set:
+
+- Center dashboard
+- Player rankings
+- Player detail page
+- Team edit / roster construction
+- My team page
+- User rankings
+- Friend rankings
+- Point-based prediction page
+- Mobile layout
+
+---
+
+## Repository Status
+
+This repository is currently maintained as a portfolio-safe version of the production project.
+
+It is intended to show:
+
+- Project structure
+- Full-stack implementation
+- Data pipeline logic
+- Fantasy scoring and pricing logic
+- Prediction system logic
+- Deployment examples
+- Documentation and portfolio materials
+
+It is not intended to expose production data, private server files, user-sensitive information, or operational secrets.
+
+---
+
+## Security & Privacy
+
+This repository does not include:
 
 - Production database files
-- `.env.production`
-- API keys
-- Secret keys
-- Private server credentials
+- Environment secrets
 - Server logs
 - Backups
-- User-sensitive data
-- SSL keys or certificate files
 - SSH keys or `.pem` files
+- SSL keys or certificates
+- User-sensitive data
+- Private deployment credentials
 
-Example environment files may be included only with placeholder values.
+Example configuration files are included only with placeholder values.
 
 ---
 
@@ -431,26 +383,28 @@ Planned improvements include:
 
 - Add portfolio-safe screenshots
 - Add anonymized sample datasets
-- Expand documentation for the scoring and pricing models
+- Expand documentation for scoring, pricing, and prediction systems
 - Add database schema documentation
-- Add more automated tests
-- Improve data validation reports
-- Build a GitHub Pages case study site
+- Improve automated validation reports
+- Add more unit and integration tests
+- Build a GitHub Pages case study
+- Explore more advanced player valuation methods
 - Add more product analytics and user engagement metrics
-- Explore more advanced player valuation models
 
 ---
 
 ## Korean Summary
 
-MyPick은 KBO 경기 기록을 단순히 보여주는 사이트가 아니라, 복잡한 야구 데이터를 자체 판타지 점수, 동적 선수 가격, 유저 랭킹, 포인트 기반 승부예측 시스템으로 변환하는 데이터 기반 스포츠 분석 플랫폼입니다.
+MyPick은 복잡한 KBO 경기 기록과 선수 데이터를 팬들이 쉽게 이해할 수 있는 판타지 점수, 타자/투수 순위, 동적 선수 가격, 가격 변동으로 변환하는 스포츠 데이터 플랫폼입니다.
 
-이 프로젝트는 데이터 수집, 점수화 모델, 선수 가치 평가, 사용자 랭킹, 예측 시스템, 자동화된 운영 파이프라인, 실제 웹 배포까지 포함한 풀스택 데이터 프로덕트입니다.
+사용자는 세부 야구 기록을 모두 분석하지 않아도 선수의 성과, 기복, 상승세, 하락세, 가치 변화를 직관적으로 이해할 수 있습니다. 또한 직접 판타지 팀을 구성하고, 전체 랭킹과 친구 랭킹에서 경쟁하며, 포인트 기반 승부예측에 참여하면서 KBO를 더 쉽고 능동적으로 즐길 수 있습니다.
+
+MyPick은 기존의 폐쇄적인 친구 리그 중심 판타지 스포츠와 달리, 모든 유저가 함께 경쟁하는 전체 랭킹 생태계를 중심으로 설계되었습니다. 동시에 친구 추가와 친구 랭킹 기능을 통해 기존 판타지 스포츠의 소셜 경쟁 경험도 제공합니다.
 
 ---
 
 ## Author
 
-Jiho Choi  
+**Jiho Choi**  
 Data Analytics Student  
-Interested in sports analytics, data products, full-stack analytics platforms, and applied data systems.
+Interested in sports analytics, data products, full-stack analytics platforms, and fan engagement systems.
