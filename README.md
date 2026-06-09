@@ -1,4 +1,4 @@
-# MyPick — A Data-Driven KBO Fantasy Sports & Player Valuation Platform
+# MyPick — A Data-Driven KBO Fantasy Sports & Player Valuation
 
 MyPick is a full-stack sports analytics platform that transforms raw KBO baseball records into fantasy scores, dynamic player valuations, user rankings, and point-based prediction experiences.
 
