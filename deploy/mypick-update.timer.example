@@ -1,0 +1,16 @@
+
+# Example systemd timer for the MyPick daily updater.
+# Copy to: /etc/systemd/system/mypick-update.timer
+# This runs every day at 23:00 Asia/Seoul server time.
+# Recommended: set the server timezone to Asia/Seoul with timedatectl.
+
+[Unit]
+Description=Run MyPick daily update at 23:00 KST
+
+[Timer]
+OnCalendar=*-*-* 23:00:00
+Persistent=true
+Unit=mypick-update.service
+
+[Install]
+WantedBy=timers.target

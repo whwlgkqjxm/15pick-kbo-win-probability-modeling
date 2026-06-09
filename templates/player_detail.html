@@ -1,0 +1,352 @@
+{% extends "_base.html" %}
+{% import "_ui.html" as ui with context %}
+
+{% block content %}
+{% if player is none %}
+    <section class="content-card empty-state">
+        <strong>선수 정보를 찾을 수 없습니다.</strong>
+        <p>선수명, 팀, 구분 정보를 다시 확인해주세요.</p>
+    </section>
+{% else %}
+    <section class="player-detail-shell">
+    <section class="player-hero-detail content-card detail-reveal" style="--detail-index: 0;">
+        <div class="player-hero-uniform">
+            {{ ui.uniform(player['team'], player.get('back_no', ''), 'lg') }}
+        </div>
+        <div class="player-hero-info">
+            <div class="chip-row">
+                {{ ui.team_badge(player['team']) }}
+                {{ ui.type_chip(player.get('position_type')) }}
+                {{ ui.position_badge(player.get('display_detail_position') or player.get('detail_position'), player.get('position_type')) }}
+                {% if player.get('is_display_inactive') or player.get('raw_is_active') == 0 %}
+                    <span class="inactive-player-badge">말소</span>
+                {% endif %}
+            </div>
+            <h1>{{ player['player_name'] }}</h1>
+            <div class="player-meta-line">
+                {% if player.get('back_no') %}<span>No.{{ player['back_no'] }}</span>{% endif %}
+                {% if player.get('birthdate_display') %}<span>{{ player['birthdate_display'] }}</span>{% elif player.get('birthdate') %}<span>{{ format_game_date_for_display(player['birthdate']) }}</span>{% endif %}
+                {% if player.get('height_weight') %}<span>{{ player['height_weight'] }}</span>{% endif %}
+                {% if player.get('throw_bat') %}<span>{{ player['throw_bat'] }}</span>{% endif %}
+            </div>
+        </div>
+    </section>
+
+    <section class="metric-grid four player-detail-metrics detail-reveal" style="--detail-index: 1;">
+        <article class="content-card stat-card">
+            <span>시장가</span>
+            {% if player.get('price') is not none %}
+                <strong>{{ '%.1f'|format(player['price']) }}</strong>
+                <small>{{ player.get('basis_date_display') or '-' }} 기준</small>
+            {% else %}
+                <strong>-</strong>
+            {% endif %}
+        </article>
+        <article class="content-card stat-card">
+            <span>최근 경기 수입</span>
+            <strong class="{{ score_value_class(player['total_points'] or 0) }}">{{ (player['total_points'] or 0)|money }}</strong>
+            {% set recent_score_date = player.get('last_updated_at_display') or '-' %}
+            <small>{% if recent_score_date != '-' and ':' in recent_score_date %}{{ recent_score_date.rsplit(' ', 1)[0] }}{% else %}{{ recent_score_date }}{% endif %}</small>
+        </article>
+        <article class="content-card stat-card">
+            <span>시즌 누적 수입</span>
+            <strong class="season-total-detail-value {{ score_value_class(season_total_points or 0) }}">{{ (season_total_points or 0)|money }}</strong>
+        </article>
+        <article class="content-card stat-card">
+            <span>최근 가격 변동</span>
+            <strong class="{{ player.get('latest_price_change_class', 'price-same') }}">{{ player.get('latest_price_change_label', '-') }}</strong>
+            <small>{{ player.get('latest_price_change_date_display') or '-' }}</small>
+        </article>
+    </section>
+
+    <section class="detail-grid player-detail-grid detail-reveal" style="--detail-index: 2;">
+        <article class="content-card chart-card">
+            <div class="section-heading compact-heading">
+                <div>
+                    <p class="eyebrow">Market Daily</p>
+                    <h2>가격 변동 그래프</h2>
+                </div>
+                {% if price_history_month|default([]) or price_history_year|default([]) %}
+                    <div class="chart-range-tabs" aria-label="가격 그래프 기간 선택">
+                        <button type="button" class="chart-range-button active" data-price-range="month">1개월</button>
+                        <button type="button" class="chart-range-button" data-price-range="year">1년</button>
+                    </div>
+                {% endif %}
+            </div>
+            {% if price_history_month|default([]) or price_history_year|default([]) %}
+                <canvas id="priceChart" height="210"></canvas>
+            {% else %}
+                <p class="empty-table-text">가격 변동 기록이 없습니다.</p>
+            {% endif %}
+        </article>
+
+        <article class="content-card">
+            <div class="section-heading compact-heading">
+                <div>
+                    <p class="eyebrow">Season Stats</p>
+                    <h2>시즌 주요 스탯</h2>
+                </div>
+            </div>
+            {% if season_stats %}
+                <div class="stat-tile-grid season-stat-grid">
+                    {% for stat in season_stats %}
+                        <div class="stat-tile">
+                            <span>{{ stat['label'] }}</span>
+                            <strong>{{ stat['value'] }}</strong>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="empty-table-text">시즌 스탯 데이터가 없습니다.</p>
+            {% endif %}
+        </article>
+    </section>
+
+    <section class="detail-grid player-detail-grid detail-reveal" style="--detail-index: 3;">
+        <article class="content-card recent-game-card">
+            <div class="section-heading compact-heading">
+                <div>
+                    <p class="eyebrow">Recent Games</p>
+                    <h2>최근 5경기 기록</h2>
+                </div>
+            </div>
+            {% if daily_scores %}
+                <div class="recent-game-list">
+                    {% for score in daily_scores %}
+                        <article class="recent-game-item">
+                            <div class="recent-game-main">
+                                <span>{{ score['game_date_display'] }}</span>
+                                <strong>{% if score['opponent'] and score['opponent'] != '-' %}vs {{ score['opponent'] }}{% else %}-{% endif %}</strong>
+                            </div>
+                            <div class="recent-game-points">
+                                <span>수입</span>
+                                <strong class="{{ score_value_class(score['points'] or 0) }}">{{ (score['points'] or 0)|money }}</strong>
+                            </div>
+                            <div class="recent-game-detail">
+                                {% if score['score_detail'] %}
+                                    {% for key, value in score['score_detail'].items() %}
+                                        <span class="detail-pill">{{ key }} {{ value }}</span>
+                                    {% endfor %}
+                                {% else %}
+                                    <span class="detail-pill">상세 없음</span>
+                                {% endif %}
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="empty-table-text">최근 경기 수입 기록이 없습니다.</p>
+            {% endif %}
+        </article>
+
+        <article class="content-card">
+            <div class="section-heading compact-heading">
+                <div>
+                    <p class="eyebrow">Price History</p>
+                    <h2>최근 가격 변동 기록</h2>
+                </div>
+            </div>
+            {% if price_history %}
+                <div class="price-history-list">
+                    {% for item in price_history|reverse %}
+                        <div class="price-history-item">
+                            <div>
+                                <strong>{{ item['basis_date_display'] }}</strong>
+                                {% set reason_text = item['reason'] or '가격 변동 사유 없음' %}
+                                <p>{{ reason_text.split(' +')[0].split(' -')[0] }}</p>
+                            </div>
+                            <div class="price-history-price">
+                                <span>{{ '%.1f'|format(item['old_price_decimal'] or 0) }} → {{ '%.1f'|format(item['new_price_decimal'] or 0) }}</span>
+                                <strong class="{{ item['price_change_class'] }}">{{ item['price_change_label'] }}</strong>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="empty-table-text">가격 변동 기록이 없습니다.</p>
+            {% endif %}
+        </article>
+    </section>
+    </section>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+{% if price_history_month|default([]) or price_history_year|default([]) %}
+<script id="price-history-month-data" type="application/json">{{ price_history_month|tojson }}</script>
+<script id="price-history-year-data" type="application/json">{{ price_history_year|tojson }}</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const monthNode = document.getElementById('price-history-month-data');
+    const yearNode = document.getElementById('price-history-year-data');
+    const monthHistory = monthNode ? JSON.parse(monthNode.textContent || '[]') : [];
+    const yearHistory = yearNode ? JSON.parse(yearNode.textContent || '[]') : [];
+    const priceCtx = document.getElementById('priceChart');
+    const rangeButtons = document.querySelectorAll('[data-price-range]');
+
+    if (!priceCtx || typeof Chart === 'undefined') return;
+
+    function getHistory(range) {
+        if (range === 'year') return yearHistory.length ? yearHistory : monthHistory;
+        return monthHistory.length ? monthHistory : yearHistory;
+    }
+
+    function getYAxisBounds(history) {
+        const values = history.map(item => Number(item.new_price_decimal || 0)).filter(value => !Number.isNaN(value));
+        if (!values.length) return { min: 0, max: 1 };
+
+        const rawMin = Math.min(...values);
+        const rawMax = Math.max(...values);
+        const spread = Math.max(rawMax - rawMin, 0.2);
+        const padding = Math.max(spread * 0.35, 0.18);
+        const min = Math.max(0, Math.floor((rawMin - padding) * 10) / 10);
+        let max = Math.ceil((rawMax + padding) * 10) / 10;
+
+        // 가격 상한(15.7)에 닿은 선수는 점이 차트 천장에 붙지 않도록
+        // 실제 가격 상한보다 y축만 살짝 위로 열어 둡니다.
+        if (rawMax >= 15.7) {
+            max = Math.max(max, 16.1);
+        }
+
+        if (min === max) {
+            return {
+                min: Math.max(0, min - 0.5),
+                max: max + 0.5
+            };
+        }
+
+        return { min, max };
+    }
+
+    function buildChartData(history) {
+        return {
+            labels: history.map(item => item.chart_label || item.basis_date_display || item.basis_date),
+            datasets: [{
+                label: '시장 가격',
+                data: history.map(item => item.new_price_decimal),
+                borderColor: '#08d4df',
+                backgroundColor: 'rgba(8, 212, 223, 0.12)',
+                tension: 0.35,
+                fill: true,
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }]
+        };
+    }
+
+    function getOrCreatePriceTooltip(chart) {
+        var parent = chart.canvas.parentNode;
+        var tooltipEl = parent.querySelector('.price-chart-square-tooltip');
+
+        if (!tooltipEl) {
+            tooltipEl = document.createElement('div');
+            tooltipEl.className = 'price-chart-square-tooltip';
+            tooltipEl.setAttribute('aria-hidden', 'true');
+            parent.appendChild(tooltipEl);
+        }
+
+        return tooltipEl;
+    }
+
+    function priceTooltipHandler(context) {
+        var chart = context.chart;
+        var tooltip = context.tooltip;
+        var tooltipEl = getOrCreatePriceTooltip(chart);
+
+        if (!tooltip || tooltip.opacity === 0 || !tooltip.dataPoints || !tooltip.dataPoints.length) {
+            tooltipEl.style.opacity = 0;
+            return;
+        }
+
+        var point = tooltip.dataPoints[0];
+        var dateLabel = String(point.label || '');
+        var priceLabel = Number(point.parsed.y || 0).toFixed(1);
+        var canvas = chart.canvas;
+        var element = point.element || {};
+        var boxPadding = 8;
+        var pointGap = 12;
+
+        tooltipEl.innerHTML = '<strong class="tooltip-date">' + dateLabel + '</strong><span class="tooltip-price">' + priceLabel + '</span>';
+        tooltipEl.style.opacity = 1;
+        tooltipEl.style.left = '-9999px';
+        tooltipEl.style.top = '-9999px';
+
+        var rect = tooltipEl.getBoundingClientRect();
+        var tooltipWidth = rect.width || 48;
+        var tooltipHeight = rect.height || 36;
+        var elementX = typeof element.x === 'number' ? element.x : tooltip.caretX;
+        var elementY = typeof element.y === 'number' ? element.y : tooltip.caretY;
+        var pointX = canvas.offsetLeft + elementX;
+        var pointY = canvas.offsetTop + elementY;
+
+        var left = pointX - (tooltipWidth / 2);
+        var top = pointY - tooltipHeight - pointGap;
+        var minLeft = canvas.offsetLeft + boxPadding;
+        var maxLeft = canvas.offsetLeft + canvas.offsetWidth - tooltipWidth - boxPadding;
+        var minTop = canvas.offsetTop + boxPadding;
+        var maxTop = canvas.offsetTop + canvas.offsetHeight - tooltipHeight - boxPadding;
+
+        if (left < minLeft) left = minLeft;
+        if (left > maxLeft) left = maxLeft;
+
+        // 점을 절대 가리지 않도록 기본은 점 위에 띄우고,
+        // 위 공간이 부족할 때만 점 아래로 내린다.
+        if (top < minTop) {
+            top = pointY + pointGap;
+        }
+        if (top > maxTop) {
+            top = Math.max(minTop, pointY - tooltipHeight - pointGap);
+        }
+
+        tooltipEl.style.left = Math.round(left) + 'px';
+        tooltipEl.style.top = Math.round(top) + 'px';
+    }
+
+    const initialHistory = getHistory('month');
+    const initialBounds = getYAxisBounds(initialHistory);
+    const priceChart = new Chart(priceCtx, {
+        type: 'line',
+        data: buildChartData(initialHistory),
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'nearest', intersect: false },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    enabled: false,
+                    external: priceTooltipHandler
+                }
+            },
+            scales: {
+                x: { ticks: { color: '#8b9cb3' }, grid: { color: 'rgba(255, 255, 255, 0.06)' } },
+                y: {
+                    min: initialBounds.min,
+                    max: initialBounds.max,
+                    ticks: { color: '#8b9cb3' },
+                    grid: { color: 'rgba(255, 255, 255, 0.06)' }
+                }
+            }
+        }
+    });
+
+    rangeButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const range = button.dataset.priceRange;
+            const history = getHistory(range);
+            const bounds = getYAxisBounds(history);
+
+            rangeButtons.forEach(item => item.classList.remove('active'));
+            button.classList.add('active');
+
+            priceChart.data = buildChartData(history);
+            priceChart.options.scales.y.min = bounds.min;
+            priceChart.options.scales.y.max = bounds.max;
+            priceChart.update();
+        });
+    });
+});
+</script>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,89 @@
+{% extends "_base.html" %}
+
+{% block content %}
+<section class="support-shell support-detail-shell admin-support-detail-shell">
+    <section class="hero-panel compact-hero-panel support-hero-panel admin-support-hero ranking-reveal" style="--reveal-index: 0;">
+        <div>
+            <p class="eyebrow">Ticket #{{ ticket.id }}</p>
+            <h1>{{ ticket.title }}</h1>
+            <p class="hero-copy single-line-copy">{{ ticket.user_display_name }}님의 {{ ticket.category_label }} 문의입니다.</p>
+        </div>
+        <a class="button-link secondary" href="{{ url_for('admin_support') }}">문의 목록</a>
+    </section>
+
+    <section class="support-detail-grid admin-detail-grid">
+        <article class="content-card support-card support-detail-card ranking-reveal" style="--reveal-index: 1;">
+            <div class="support-detail-head">
+                <span class="support-status-badge {{ ticket.status_tone }}">{{ ticket.status_label }}</span>
+                <span class="support-category-pill">{{ ticket.category_label }}</span>
+            </div>
+            <dl class="support-detail-meta">
+                <div>
+                    <dt>유저</dt>
+                    <dd>{{ ticket.user_display_name }} · {{ ticket.username }}</dd>
+                </div>
+                <div>
+                    <dt>접수일</dt>
+                    <dd>{{ ticket.created_at_display }}</dd>
+                </div>
+                <div>
+                    <dt>마지막 업데이트</dt>
+                    <dd>{{ ticket.updated_at_display }}</dd>
+                </div>
+                {% if ticket.resolved_at_display %}
+                    <div>
+                        <dt>처리완료 시각</dt>
+                        <dd>{{ ticket.resolved_at_display }}</dd>
+                    </div>
+                {% endif %}
+                {% if ticket.page_url %}
+                    <div>
+                        <dt>관련 페이지</dt>
+                        <dd>{{ ticket.page_url }}</dd>
+                    </div>
+                {% endif %}
+            </dl>
+            <div class="support-message-box">
+                <h2>문의 내용</h2>
+                <p>{{ ticket.message }}</p>
+            </div>
+        </article>
+
+        <aside class="content-card support-card support-admin-action-card ranking-reveal" style="--reveal-index: 2;">
+            <p class="eyebrow">Manage</p>
+            <h2>상태 관리</h2>
+            <form class="support-form" method="post" action="{{ url_for('admin_support_detail', ticket_id=ticket.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="form-field">
+                    <label for="admin_ticket_status">처리 상태</label>
+                    <select id="admin_ticket_status" name="status" required>
+                        {% for value, label in statuses %}
+                            <option value="{{ value }}" {% if ticket.status == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label for="admin_reply">유저에게 보이는 답변</label>
+                    <textarea id="admin_reply" name="admin_reply" rows="6" placeholder="예: 확인했습니다. 다음 업데이트에서 수정 예정입니다.">{{ ticket.admin_reply or '' }}</textarea>
+                </div>
+                <div class="form-field">
+                    <label for="admin_note">관리자 내부 메모</label>
+                    <textarea id="admin_note" name="admin_note" rows="6" placeholder="유저에게 보이지 않는 내부 메모입니다.">{{ ticket.admin_note or '' }}</textarea>
+                </div>
+                <button type="submit">저장하기</button>
+            </form>
+
+            <div class="support-danger-zone">
+                <div>
+                    <strong>문의 영구 삭제</strong>
+                    <p>삭제하면 관리자와 작성자 모두 다시 볼 수 없습니다. 처리완료 문의는 24시간 뒤 자동 삭제됩니다.</p>
+                </div>
+                <form method="post" action="{{ url_for('admin_support_delete', ticket_id=ticket.id) }}" onsubmit="return confirm('이 문의를 영구 삭제할까요? 이 작업은 되돌릴 수 없습니다.');">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="danger-button">영구 삭제</button>
+                </form>
+            </div>
+        </aside>
+    </section>
+</section>
+{% endblock %}

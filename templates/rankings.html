@@ -1,0 +1,196 @@
+{% extends "_base.html" %}
+{% import "_ui.html" as ui with context %}
+
+{% block content %}
+<section class="ranking-page-shell">
+    <section class="hero-panel rankings-hero-panel compact-hero-panel ranking-reveal" style="--reveal-index: 0;">
+        <div>
+            <p class="eyebrow">Player Rankings</p>
+            <h1>{{ page_title }}</h1>
+        </div>
+        <div class="hero-metric slim ranking-count-card">
+            <span>랭킹 선수</span>
+            <strong>{{ ranking_total_count|default(rankings|length) }}</strong>
+        </div>
+    </section>
+
+    <section class="content-card compact-card ranking-filter-card ranking-reveal" style="--reveal-index: 1;">
+        <nav class="tab-nav" aria-label="선수 랭킹 필터">
+            <a href="{{ url_for('rankings') }}" class="{% if active_tab == 'all' %}active{% endif %}">전체 선수</a>
+            <a href="{{ url_for('batters') }}" class="{% if active_tab == 'batters' %}active{% endif %}">타자</a>
+            <a href="{{ url_for('pitchers') }}" class="{% if active_tab == 'pitchers' %}active{% endif %}">투수</a>
+        </nav>
+    </section>
+
+    <section class="content-card ranking-board-card ranking-reveal" style="--reveal-index: 2;">
+        <div class="section-heading compact-heading ranking-board-heading">
+            <div>
+                <p class="eyebrow">Season Total Score</p>
+                <h2>선수 랭킹</h2>
+            </div>
+        </div>
+
+        <div class="table-wrap ranking-table-wrap">
+            <table class="data-table ranking-table ranking-table-modern">
+                <thead>
+                    <tr>
+                        <th>순위</th>
+                        <th>선수</th>
+                        <th>팀</th>
+                        <th>구분</th>
+                        <th>상세 포지션</th>
+                        <th>시장가</th>
+                        <th>시즌 수입</th>
+                        <th>최근 수입</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for player in rankings %}
+                        {% set rank = player.get('display_rank', loop.index) %}
+                        {% set player_url = url_for('player_detail', position_type=player.get('position_type'), team=player['team'], player_name=player['player_name']) %}
+                        <tr class="ranking-row ranking-clickable-row {% if rank <= 3 %}rank-row rank-{{ rank }}{% endif %}" style="--row-index: {{ loop.index0 }};" data-player-url="{{ player_url }}" tabindex="0" role="link" aria-label="{{ player['player_name'] }} 선수 상세 보기">
+                            <td class="ranking-rank-cell">{{ ui.rank_badge(rank) }}</td>
+                            <td>
+                                <div class="player-cell ranking-player-cell">
+                                    {{ ui.uniform(player['team'], player.get('back_no', ''), 'sm') }}
+                                    <div class="ranking-player-meta">
+                                        <a class="player-link" href="{{ player_url }}">
+                                            {{ player['player_name'] }}
+                                        </a>
+                                        <span class="ranking-player-badge-line">
+                                            {% if player.get('back_no') %}
+                                                <span class="ranking-player-number">No.{{ player.get('back_no') }}</span>
+                                            {% endif %}
+                                            {% if player.get('is_display_inactive') %}
+                                                <span class="inactive-player-badge ranking-inactive-badge">말소</span>
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ ui.team_badge(player['team']) }}</td>
+                            <td>{{ ui.type_chip(player.get('position_type')) }}</td>
+                            <td>{{ ui.position_badge(player.get('display_detail_position') or player.get('detail_position'), player.get('position_type')) }}</td>
+                            <td>
+                                {% if player.get('price') is not none %}
+                                    <strong>{{ '%.1f'|format(player['price']) }}</strong>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td class="season-total-cell {{ score_value_class(player['cumulative_points'] or 0) }}">{{ (player['cumulative_points'] or 0)|money }}</td>
+                            <td class="points {{ score_value_class(player['total_points'] or 0) }}">{{ (player['total_points'] or 0)|money }}</td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="8" class="empty-table-text">랭킹 데이터가 없습니다.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+
+        <!-- MYPICK MOBILE RANKINGS PHASE 8 PLAYER CARDS 2026-05-31 START -->
+        <div class="mobile-ranking-player-list" aria-label="모바일 선수 랭킹 리스트">
+            {% for player in rankings %}
+                {% set rank = player.get('display_rank', loop.index) %}
+                {% set player_url = url_for('player_detail', position_type=player.get('position_type'), team=player['team'], player_name=player['player_name']) %}
+                <article class="mobile-ranking-player-card {% if rank <= 3 %}rank-{{ rank }}{% endif %}" data-player-url="{{ player_url }}" tabindex="0" role="link" aria-label="{{ player['player_name'] }} 선수 상세 보기">
+                    <div class="mobile-ranking-player-top">
+                        <div class="mobile-ranking-rank-badge">#{{ rank }}</div>
+                        <div class="mobile-ranking-player-identity">
+                            {{ ui.uniform(player['team'], player.get('back_no', ''), 'sm') }}
+                            <div class="mobile-ranking-player-copy">
+                                <a class="mobile-ranking-player-name" href="{{ player_url }}">{{ player['player_name'] }}</a>
+                                <div class="mobile-ranking-player-subline">
+                                    {% if player.get('back_no') %}<span>No.{{ player.get('back_no') }}</span>{% endif %}
+                                    {% if player.get('is_display_inactive') %}<span class="inactive-player-badge ranking-inactive-badge">말소</span>{% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mobile-ranking-chip-row">
+                        {{ ui.team_badge(player['team']) }}
+                        {{ ui.type_chip(player.get('position_type')) }}
+                        {{ ui.position_badge(player.get('display_detail_position') or player.get('detail_position'), player.get('position_type')) }}
+                    </div>
+
+                    <div class="mobile-ranking-metrics">
+                        <div>
+                            <span>시장가</span>
+                            {% if player.get('price') is not none %}
+                                <strong>{{ '%.1f'|format(player['price']) }}</strong>
+                            {% else %}
+                                <strong>-</strong>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <span>시즌 수입</span>
+                            <strong class="{{ score_value_class(player['cumulative_points'] or 0) }}">{{ (player['cumulative_points'] or 0)|money }}</strong>
+                        </div>
+                        <div>
+                            <span>최근 수입</span>
+                            <strong class="{{ score_value_class(player['total_points'] or 0) }}">{{ (player['total_points'] or 0)|money }}</strong>
+                        </div>
+                    </div>
+                </article>
+            {% else %}
+                <section class="content-card full-width-card players-empty-card">
+                    <p class="empty-table-text">랭킹 데이터가 없습니다.</p>
+                </section>
+            {% endfor %}
+        </div>
+        <!-- MYPICK MOBILE RANKINGS PHASE 8 PLAYER CARDS 2026-05-31 END -->
+
+        {% if pagination and pagination.total_pages > 1 %}
+            <nav class="pagination-nav ranking-pagination" aria-label="선수 랭킹 페이지">
+                {% if pagination.has_prev %}
+                    <a href="{{ url_for(request.endpoint, page=pagination.prev_page) }}">‹</a>
+                {% else %}
+                    <span class="disabled">‹</span>
+                {% endif %}
+
+                {% for page_num in pagination.pages %}
+                    {% if page_num == pagination.page %}
+                        <span class="active">{{ page_num }}</span>
+                    {% else %}
+                        <a href="{{ url_for(request.endpoint, page=page_num) }}">{{ page_num }}</a>
+                    {% endif %}
+                {% endfor %}
+
+                {% if pagination.has_next %}
+                    <a href="{{ url_for(request.endpoint, page=pagination.next_page) }}">›</a>
+                {% else %}
+                    <span class="disabled">›</span>
+                {% endif %}
+            </nav>
+        {% endif %}
+    </section>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // MYPICK MOBILE RANKINGS PHASE 8 CARD CLICK 2026-05-31
+    document.querySelectorAll('.ranking-clickable-row[data-player-url], .mobile-ranking-player-card[data-player-url]').forEach(function (row) {
+        const url = row.dataset.playerUrl;
+        if (!url) return;
+
+        row.addEventListener('click', function (event) {
+            if (event.target.closest('a, button, select, input, textarea, label')) return;
+            window.location.href = url;
+        });
+
+        row.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                window.location.href = url;
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

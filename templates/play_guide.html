@@ -1,0 +1,158 @@
+{% extends "_base.html" %}
+
+{% block content %}
+<section class="play-guide-shell">
+    <section class="play-guide-hero hero-panel compact-hero-panel ranking-reveal" style="--reveal-index: 0;">
+        <div class="guide-hero-copy">
+            <p class="eyebrow">Play Guide</p>
+            <h1>플레이 가이드</h1>
+        </div>
+        <div class="guide-hero-actions">
+            <a class="button-link secondary" href="{{ url_for('center') }}">메인으로 가기</a>
+            <a class="button-link" href="{{ url_for('my_team') }}">내 팀으로 가기</a>
+        </div>
+    </section>
+
+    <section class="guide-quick-grid ranking-reveal" style="--reveal-index: 1;" aria-label="핵심 흐름">
+        <article>
+            <span>01</span>
+            <strong>팀 만들기</strong>
+            <p>처음에는 사용가능 예산 100.0으로 나만의 15인 로스터를 구성합니다.</p>
+        </article>
+        <article>
+            <span>02</span>
+            <strong>팀 확정</strong>
+            <p>팀을 확정하면 선택한 로스터가 경기 수익 계산 대상이 됩니다. 팀 확정은 사용가능 예산이나 영입 기준가를 다시 계산하지 않습니다.</p>
+        </article>
+        <article>
+            <span>03</span>
+            <strong>선수 영입/방출</strong>
+            <p>선수 영입과 방출은 당일 첫 경기 시작 전까지만 가능합니다. 경기 시작 후에는 마감되며, 23:00 이후 사용 가능합니다. 경기 시작 전 SP 선발투수 교체를 잊지 마세요.</p>
+        </article>
+        <article>
+            <span>04</span>
+            <strong>데이터 업데이트</strong>
+            <p>선수 수익, 배팅 정산, 선수 가격 변동은 매일 밤 11시에 같은 기준으로 업데이트됩니다.</p>
+        </article>
+        <article>
+            <span>05</span>
+            <strong>방출 수익</strong>
+            <p>시장가가 증가한 선수를 방출하면, 방출 직전 팀 가치 100.0 초과분 안에서 방출 수익이 발생합니다.</p>
+        </article>
+        <article>
+            <span>06</span>
+            <strong>배팅 참여</strong>
+            <p>보유 자산으로 경기 시작 전까지 고정 배당 배팅에 참여할 수 있습니다.</p>
+        </article>
+    </section>
+
+    <section class="guide-two-column guide-card-grid">
+        <article class="content-card guide-card ranking-reveal" style="--reveal-index: 2;">
+            <p class="eyebrow">Roster</p>
+            <h2>팀 구성 규칙</h2>
+            <div class="guide-rule-list">
+                <div><strong>타자 9명</strong><span>C, 1B, 2B, 3B, SS, LF, CF, RF, UTIL</span></div>
+                <div><strong>투수 6명</strong><span>SP 선발투수 1명, P1~P5 불펜투수 5명</span></div>
+                <div><strong>C</strong><span>팀 수익 계산에서만 해당 선수 수익이 2배로 반영됩니다.</span></div>
+                <div><strong>포지션</strong><span>슬롯과 포지션이 맞지 않으면 그 선수만 해당 경기 0점 처리됩니다.</span></div>
+                <div><strong>시장가</strong><span>영입은 현재 시장가 기준이며, 사용가능 예산 안에서만 가능합니다.</span></div>
+            </div>
+        </article>
+
+        <article class="content-card guide-card ranking-reveal" style="--reveal-index: 3;">
+            <p class="eyebrow">Asset</p>
+            <h2>수익과 자산</h2>
+            <div class="guide-rule-list">
+                <div><strong>최근 팀 수익</strong><span>가장 최근 경기에서 내 팀이 기록한 수익입니다.</span></div>
+                <div><strong>총 자산</strong><span>경기 수익, 방출 수익, 배팅 결과를 모두 합산한 현재 보유 자산입니다.</span></div>
+                <div><strong>방출 수익</strong><span>방출 직전 팀 가치가 100.0을 넘은 상태에서 시장가가 증가한 선수를 방출하면, 초과 수익 0.1마다 ₩500이 내 자산에 더해집니다. 초과 수익으로 계산되지 않은 현재가는 사용가능 예산으로 돌아옵니다.</span></div>
+            </div>
+        </article>
+
+        <article class="content-card guide-card ranking-reveal" style="--reveal-index: 4;">
+            <p class="eyebrow">Market</p>
+            <h2>선수 시장가 변동</h2>
+            <div class="guide-rule-list">
+                <div><strong>매일 반영</strong><span>경기 기록과 기대치 대비 성과를 기준으로 선수 시장가가 변동됩니다.</span></div>
+                <div><strong>출전 기준</strong><span>출전하지 않은 선수는 경기 성과로 가격이 오르지 않습니다.</span></div>
+                <div><strong>기대치</strong><span>고가 선수는 좋은 기록을 꾸준히 내야 유지되고, 저가 선수는 기대 이상 활약에 더 민감하게 반응합니다.</span></div>
+                <div><strong>팀 가치</strong><span>내 선수들을 지금 시장가로 모두 더한 값입니다. 방출 수익은 방출 직전 팀 가치를 기준으로 계산됩니다.</span></div>
+            </div>
+        </article>
+
+        <article class="content-card guide-card guide-status-card ranking-reveal" style="--reveal-index: 5;">
+            <p class="eyebrow">Status</p>
+            <h2>말소·미출전 규칙</h2>
+            <div class="guide-rule-list">
+                <div><strong>말소 기준</strong><span>KBO 등록 현황에 없으면 말소 상태로 표시됩니다.</span></div>
+                <div><strong>기록 보존</strong><span>말소되어도 선수 기록, 보유 이력, 가격 히스토리는 삭제하지 않습니다.</span></div>
+                <div><strong>가격 기준</strong><span>말소 선수는 활성 선수 가격 기준군에서 제외되어 별도로 추적됩니다.</span></div>
+                <div><strong>미출전</strong><span>경기 기록이 없으면 해당 경기 선수 수익은 0으로 표시됩니다.</span></div>
+                <div><strong>가격 상승</strong><span>미출전 선수는 경기 성과로 가격이 상승하지 않습니다.</span></div>
+            </div>
+        </article>
+    </section>
+
+    <section class="content-card guide-card scoring-card ranking-reveal" style="--reveal-index: 6;">
+        <div class="guide-section-heading">
+            <div>
+                <p class="eyebrow">Scoring</p>
+                <h2>선수 수익 계산 방식</h2>
+            </div>
+            <span>실제 KBO 경기 기록 기준</span>
+        </div>
+
+        <div class="scoring-grid">
+            <div>
+                <h3>타자</h3>
+                <dl class="score-list">
+                    <div><dt>출전</dt><dd>+100</dd></div>
+                    <div><dt>1루타 / 2루타 / 3루타</dt><dd>+120 / +200 / +300</dd></div>
+                    <div><dt>홈런</dt><dd>+500</dd></div>
+                    <div><dt>타점 / 득점</dt><dd>+200 / +150</dd></div>
+                    <div><dt>결승타</dt><dd>+500</dd></div>
+                    <div><dt>도루</dt><dd>+100</dd></div>
+                    <div><dt>출루</dt><dd>볼넷 +100, 몸에 맞는 볼 +100</dd></div>
+                    <div><dt>삼진 / 병살타</dt><dd>-200 / -300</dd></div>
+                </dl>
+            </div>
+            <div>
+                <h3>투수</h3>
+                <dl class="score-list">
+                    <div><dt>출전</dt><dd>+100</dd></div>
+                    <div><dt>승리 / 홀드 / 세이브</dt><dd>+500 / +300 / +300</dd></div>
+                    <div><dt>이닝</dt><dd>1이닝당 +100</dd></div>
+                    <div><dt>삼진 / 투구수</dt><dd>+100 / 1구당 +1</dd></div>
+                    <div><dt>실점 / 피안타</dt><dd>-100 / -50</dd></div>
+                    <div><dt>패전</dt><dd>-200</dd></div>
+                    <div><dt>등판 역할 배율</dt><dd>선발 ×2.0, 불펜 ×1.4</dd></div>
+                </dl>
+            </div>
+        </div>
+    </section>
+
+    <section class="guide-two-column guide-card-grid">
+        <article class="content-card guide-card ranking-reveal" style="--reveal-index: 7;">
+            <p class="eyebrow">Betting</p>
+            <h2>배팅 규칙</h2>
+            <div class="guide-rule-list">
+                <div><strong>시작 자산</strong><span>신규 가입 유저는 ₩10,000으로 시작합니다.</span></div>
+                <div><strong>가능 시간</strong><span>경기 시작 전까지만 배팅할 수 있습니다.</span></div>
+                <div><strong>고정 배당</strong><span>배팅 확정 순간의 배당이 고정됩니다.</span></div>
+                <div><strong>중복 제한</strong><span>같은 경기의 같은 항목에는 한 번만 배팅할 수 있습니다.</span></div>
+                <div><strong>정산</strong><span>적중은 수령액이 자산에 더해지고, 미적중은 추가 지급이 없습니다.</span></div>
+            </div>
+        </article>
+
+        <article class="content-card guide-card ranking-reveal" style="--reveal-index: 8;">
+            <p class="eyebrow">Markets</p>
+            <h2>배팅 항목</h2>
+            <div class="guide-rule-list">
+                <div><strong>승부 예측</strong><span>홈 승, 원정 승, 무승부를 고릅니다.</span></div>
+                <div><strong>승리 점수차</strong><span>1점차, 2~3점차, 4점차 이상을 고릅니다. 무승부면 환불됩니다.</span></div>
+                <div><strong>총 득점</strong><span>양 팀 합산 득점이 기준점보다 높은지 낮은지 고릅니다.</span></div>
+            </div>
+        </article>
+    </section>
+</section>
+{% endblock %}

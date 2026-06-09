@@ -1,0 +1,24 @@
+
+# Example one-shot systemd service for the MyPick daily updater.
+# Copy to: /etc/systemd/system/mypick-update.service
+
+[Unit]
+Description=Run MyPick daily KBO sync, scores, prices, and betting settlement
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=mypick
+Group=www-data
+WorkingDirectory=/var/www/mypick
+Environment="MYPICK_ENV=production"
+Environment="MYPICK_PROJECT_DIR=/var/www/mypick"
+Environment="MYPICK_DB_PATH=/var/www/mypick/kbo_fantasy.db"
+Environment="MYPICK_BACKUP_DIR=/var/www/mypick/backups"
+Environment="MYPICK_LOG_DIR=/var/www/mypick/logs"
+Environment="SECRET_KEY=REPLACE_WITH_SAME_SECRET_AS_WEB_SERVICE"
+ExecStart=/var/www/mypick/deploy/run_daily_update_with_backup.sh
+
+# A daily update can take time when KBO scraping is slow.
+TimeoutStartSec=1800

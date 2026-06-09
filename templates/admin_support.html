@@ -1,0 +1,101 @@
+{% extends "_base.html" %}
+
+{% block content %}
+<section class="support-shell admin-support-shell">
+    <section class="hero-panel compact-hero-panel support-hero-panel admin-support-hero ranking-reveal" style="--reveal-index: 0;">
+        <div>
+            <p class="eyebrow">Admin Support</p>
+            <h1>문의 관리</h1>
+            <p class="hero-copy single-line-copy">유저 문의를 확인하고 상태를 관리합니다.</p>
+        </div>
+        <a class="button-link secondary" href="{{ url_for('support') }}">문의 작성 화면</a>
+    </section>
+
+    <section class="support-summary-grid ranking-reveal" style="--reveal-index: 1;" aria-label="문의 요약">
+        <article class="support-summary-card">
+            <span>전체</span>
+            <strong>{{ counts.total }}</strong>
+        </article>
+        <article class="support-summary-card">
+            <span>접수됨</span>
+            <strong>{{ counts.open }}</strong>
+        </article>
+        <article class="support-summary-card">
+            <span>확인중</span>
+            <strong>{{ counts.reviewing }}</strong>
+        </article>
+        <article class="support-summary-card">
+            <span>처리완료</span>
+            <strong>{{ counts.resolved }}</strong>
+        </article>
+    </section>
+
+    <div class="support-policy-note ranking-reveal" style="--reveal-index: 2;">
+        처리완료 상태의 문의는 24시간 후 자동 삭제됩니다. 긴급하게 정리해야 하는 문의는 상세 화면에서 바로 영구 삭제할 수 있습니다.
+    </div>
+
+    <section class="content-card support-card support-filter-card ranking-reveal" style="--reveal-index: 3;">
+        <form class="support-admin-filter" method="get" action="{{ url_for('admin_support') }}">
+            <div class="form-field">
+                <label for="admin_status">상태</label>
+                <select id="admin_status" name="status">
+                    <option value="all" {% if status_filter == 'all' %}selected{% endif %}>전체</option>
+                    {% for value, label in statuses %}
+                        <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-field">
+                <label for="admin_category">유형</label>
+                <select id="admin_category" name="category">
+                    <option value="all" {% if category_filter == 'all' %}selected{% endif %}>전체</option>
+                    {% for value, label in categories %}
+                        <option value="{{ value }}" {% if category_filter == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-field support-filter-search">
+                <label for="admin_q">검색</label>
+                <input id="admin_q" type="search" name="q" value="{{ search_query }}" placeholder="제목, 내용, 유저명 검색">
+            </div>
+            <button type="submit">필터 적용</button>
+        </form>
+    </section>
+
+    <section class="content-card support-card ranking-reveal" style="--reveal-index: 4;">
+        <div class="section-heading compact-heading split">
+            <div>
+                <p class="eyebrow">Tickets</p>
+                <h2>문의 목록</h2>
+            </div>
+        </div>
+
+        {% if tickets %}
+            <div class="support-ticket-list admin-ticket-list">
+                {% for ticket in tickets %}
+                    <a class="support-ticket-row" href="{{ url_for('admin_support_detail', ticket_id=ticket.id) }}">
+                        <div class="support-ticket-main">
+                            <div class="support-ticket-title-line">
+                                <span class="support-status-badge {{ ticket.status_tone }}">{{ ticket.status_label }}</span>
+                                <strong>#{{ ticket.id }} · {{ ticket.title }}</strong>
+                            </div>
+                            <div class="support-ticket-meta">
+                                <span>{{ ticket.category_label }}</span>
+                                <span>{{ ticket.user_display_name }} · {{ ticket.username }}</span>
+                                <span>{{ ticket.created_at_display }}</span>
+                                {% if ticket.page_url %}<span>{{ ticket.page_url }}</span>{% endif %}
+                            </div>
+                        </div>
+                        <span class="support-row-arrow" aria-hidden="true">›</span>
+                    </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state compact-empty-state">
+                <strong>조건에 맞는 문의가 없습니다</strong>
+                <p>필터를 변경하거나 새 문의가 접수되면 이곳에 표시됩니다.</p>
+            </div>
+        {% endif %}
+    </section>
+</section>
+{% endblock %}

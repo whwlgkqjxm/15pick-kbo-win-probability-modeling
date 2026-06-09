@@ -1,0 +1,32 @@
+
+# Example systemd service for the MyPick Flask web app.
+# Copy to: /etc/systemd/system/mypick-web.service
+# Then edit User, Group, WorkingDirectory, Environment, and ExecStart if needed.
+
+[Unit]
+Description=MyPick Gunicorn Web Service
+After=network.target
+
+[Service]
+Type=simple
+User=mypick
+Group=www-data
+WorkingDirectory=/var/www/mypick
+Environment="MYPICK_ENV=production"
+Environment="MYPICK_DB_PATH=/var/www/mypick/kbo_fantasy.db"
+Environment="SECRET_KEY=REPLACE_WITH_LONG_RANDOM_SECRET"
+ExecStart=/var/www/mypick/venv/bin/gunicorn --workers 2 --threads 2 --timeout 120 --bind unix:/run/mypick.sock wsgi:application
+Restart=always
+RestartSec=5
+RuntimeDirectory=mypick
+RuntimeDirectoryMode=0755
+
+# Basic hardening. If something breaks because of file permissions, disable one line at a time and inspect logs.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+ReadWritePaths=/var/www/mypick
+
+[Install]
+WantedBy=multi-user.target

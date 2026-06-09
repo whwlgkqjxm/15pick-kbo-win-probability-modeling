@@ -1,0 +1,368 @@
+{% extends "_base.html" %}
+{% import "_ui.html" as ui with context %}
+
+{% block content %}
+<section class="my-team-page-shell">
+<section class="hero-panel my-team-hero compact-hero-panel ranking-reveal" style="--reveal-index: 0;">
+    <div>
+        <p class="eyebrow">My Fantasy Team</p>
+        <h1>내 팀</h1>
+        <p class="hero-copy single-line-copy">확정된 팀만 공식 수익을 획득합니다.</p>
+    </div>
+</section>
+
+{% if team is none %}
+    <section id="team-status" class="content-card auth-card my-team-glass-card ranking-reveal" style="--reveal-index: 1;">
+        <div class="section-heading">
+            <div>
+                <p class="eyebrow">Create Team</p>
+                <h2>아직 만든 팀이 없습니다</h2>
+            </div>
+        </div>
+
+        {% if team_notice and team_notice['section'] == 'team' %}
+            <div class="notice-panel {{ team_notice['category'] }}">
+                <strong>{{ team_notice['message'] }}</strong>
+            </div>
+        {% endif %}
+
+        <form method="post" action="{{ url_for('create_my_team') }}" class="auth-form team-create-simple-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <p class="team-create-copy">
+                별도 이름 입력 없이 표시 이름으로 내 스쿼드를 시작합니다.
+            </p>
+            <button type="submit">팀 만들기</button>
+        </form>
+    </section>
+{% else %}
+    {% set roster_valid = validation and validation['is_complete'] %}
+    {% set confirmed_valid = team['is_confirmed'] and roster_valid %}
+    {% set team_edit_locked = team_edit_lock and team_edit_lock.is_locked %}
+
+    {% if team_notice %}
+        <section class="notice-panel {{ team_notice['category'] }} my-team-notice ranking-reveal" style="--reveal-index: 1;">
+            <strong>{{ team_notice['message'] }}</strong>
+            {% if team_notice['problems'] %}
+                <ul>
+                    {% for problem in team_notice['problems'] %}
+                        <li>{{ problem }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </section>
+    {% endif %}
+
+    <section id="team-status" class="content-card my-team-overview-card ranking-reveal" style="--reveal-index: 1;">
+        <div class="my-team-overview-top">
+            <div class="my-team-title-block">
+                <p class="eyebrow">Team Status</p>
+                <div class="my-team-title-line">
+                    <h2>{{ current_user.display_name or current_user.username }}의 팀</h2>
+                    {% if not roster_valid %}
+                        {{ ui.status_badge('warning', '⚠ 수정 필요') }}
+                    {% elif team['is_confirmed'] %}
+                        {{ ui.status_badge('confirmed') }}
+                    {% else %}
+                        {{ ui.status_badge('ready') }}
+                    {% endif %}
+                </div>
+            </div>
+            <div class="my-team-mobile-actions" aria-label="팀 상태 및 편집">
+                {% if not roster_valid %}
+                    {{ ui.status_badge('warning', '⚠ 수정 필요') }}
+                {% elif team['is_confirmed'] %}
+                    {{ ui.status_badge('confirmed') }}
+                {% else %}
+                    {{ ui.status_badge('ready') }}
+                {% endif %}
+                {% if team_edit_locked %}
+                    <span class="button-link my-team-edit-button my-team-edit-button-locked" aria-disabled="true" title="{{ team_edit_lock.message }}">팀 편집 불가</span>
+                {% else %}
+                    <a class="button-link my-team-edit-button" href="{{ url_for('team_edit') }}">팀 편집</a>
+                {% endif %}
+            </div>
+            {% if team_edit_locked %}
+                <span class="button-link my-team-edit-button my-team-edit-button-locked" aria-disabled="true" title="{{ team_edit_lock.message }}">팀 편집 불가</span>
+            {% else %}
+                <a class="button-link my-team-edit-button" href="{{ url_for('team_edit') }}">팀 편집</a>
+            {% endif %}
+        </div>
+
+        {% if not roster_valid and validation %}
+            <div class="my-team-validation-warning">
+                <strong>경기 출전 전 수정이 필요합니다.</strong>
+                <ul>
+                    {% for problem in validation['problems'][:3] %}
+                        <li>{{ problem }}</li>
+                    {% endfor %}
+                </ul>
+                {% if validation['problems']|length > 3 %}
+                    <small>외 {{ validation['problems']|length - 3 }}개 항목은 팀 편집에서 확인하세요.</small>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        <div class="my-team-metric-strip">
+            <article class="my-team-metric-item">
+                <span>총 자산</span>
+                <strong class="{{ score_value_class(current_user_wealth_points or 0) }}">
+                    {{ (current_user_wealth_points or 0)|money }}
+                </strong>
+            </article>
+            <article class="my-team-metric-item">
+                <span>전체 순위</span>
+                <strong>{% if team_score_summary and team_score_summary['total_rank'] %}{{ team_score_summary['total_rank'] }}위{% else %}-{% endif %}</strong>
+            </article>
+            <article class="my-team-metric-item">
+                <span>최근 팀 수익</span>
+                <strong class="{{ score_value_class(team_score_summary['recent_points'] or 0) if team_score_summary and team_score_summary['recent_points'] is not none else 'score-zero' }}">
+                    {% if team_score_summary and team_score_summary['recent_points'] is not none %}{{ (team_score_summary['recent_points'] or 0)|money }}{% else %}-{% endif %}
+                </strong>
+            </article>
+            <article class="my-team-metric-item">
+                <span>최근 경기 순위</span>
+                <strong>{% if team_score_summary and team_score_summary['recent_rank'] %}{{ team_score_summary['recent_rank'] }}위{% else %}-{% endif %}</strong>
+            </article>
+            <article class="my-team-metric-item team-value-item">
+                <span>팀 가치</span>
+                {% set my_team_market_value = summary['team_market_value'] or 0 %}
+                <strong class="{% if my_team_market_value > 100.0 %}metric-current-over{% else %}metric-current-ok{% endif %}">{{ '%.1f'|format(my_team_market_value) }}</strong>
+            </article>
+            <article class="my-team-metric-item team-budget-item">
+                <span>사용가능 예산</span>
+                <strong class="{% if summary['remaining_budget'] < 0 %}budget-negative{% endif %}">{{ '%.1f'|format(summary['remaining_budget'] or 0) }}</strong>
+            </article>
+        </div>
+        <p class="team-value-rule">팀 가치는 현재 스쿼드의 시장가격 합산입니다. 사용가능 예산은 실제 추가 영입에 사용할 수 있는 금액이며, 방출 수익은 방출 직전 팀 가치 100.0 초과분 안에서 계산됩니다.</p>
+    </section>
+
+    <section class="content-card field-card my-team-roster-section ranking-reveal" style="--reveal-index: 2;">
+        <div class="section-heading split compact-heading my-team-roster-heading">
+            <div>
+                <p class="eyebrow">Lineup</p>
+                <h2>내 스쿼드</h2>
+            </div>
+            <div class="roster-view-tabs" role="tablist" aria-label="로스터 보기 방식">
+                <span class="roster-tab-indicator" aria-hidden="true"></span>
+                <button type="button" class="roster-view-button active" data-roster-toggle="lineup" role="tab" aria-selected="true">라인업</button>
+                <button type="button" class="roster-view-button" data-roster-toggle="list" role="tab" aria-selected="false">리스트</button>
+            </div>
+        </div>
+
+        <div class="roster-view-panel lineup-view-panel active" data-roster-panel="lineup">
+            <div class="lineup-board">
+                <div class="lineup-field-wrap">
+                    <div class="baseball-field readonly-field my-team-stadium">
+                        {{ ui.baseball_field_svg() }}
+
+                        <div class="field-position pos-lf">{{ ui.roster_slot(roster_row_by_slot(roster_rows, 'LF')) }}</div>
+                        <div class="field-position pos-cf">{{ ui.roster_slot(roster_row_by_slot(roster_rows, 'CF')) }}</div>
+                        <div class="field-position pos-rf">{{ ui.roster_slot(roster_row_by_slot(roster_rows, 'RF')) }}</div>
+                        <div class="field-position pos-ss">{{ ui.roster_slot(roster_row_by_slot(roster_rows, 'SS')) }}</div>
+                        <div class="field-position pos-2b">{{ ui.roster_slot(roster_row_by_slot(roster_rows, '2B')) }}</div>
+                        <div class="field-position pos-3b">{{ ui.roster_slot(roster_row_by_slot(roster_rows, '3B')) }}</div>
+                        <div class="field-position pos-1b">{{ ui.roster_slot(roster_row_by_slot(roster_rows, '1B')) }}</div>
+                        <div class="field-position pos-p1">{{ ui.roster_slot(roster_row_by_slot(roster_rows, 'P1')) }}</div>
+                        <div class="field-position pos-c">{{ ui.roster_slot(roster_row_by_slot(roster_rows, 'C')) }}</div>
+                        <div class="field-position pos-util">{{ ui.roster_slot(roster_row_by_slot(roster_rows, 'UTIL')) }}</div>
+                    </div>
+                </div>
+
+                <aside class="lineup-bullpen-panel" aria-label="불펜투수">
+                    <div class="support-card-heading bullpen-heading">
+                        <span>불펜투수</span>
+                        <small>P1 - P5</small>
+                    </div>
+                    <div class="bullpen-rail">
+                        {% for slot in ['P2', 'P3', 'P4', 'P5', 'P6'] %}
+                            {{ ui.roster_slot(roster_row_by_slot(roster_rows, slot)) }}
+                        {% endfor %}
+                    </div>
+                </aside>
+            </div>
+        </div>
+
+        <div class="roster-view-panel list-view-panel" data-roster-panel="list">
+            <div class="roster-list-grid">
+                {% for row in roster_rows %}
+                    {% if loop.index0 == 0 %}
+                        <div class="mobile-roster-group-heading mobile-batter-lineup-heading">타자 라인업</div>
+                    {% elif loop.index0 == 9 %}
+                        <div class="mobile-roster-group-heading mobile-pitcher-lineup-heading">투수 라인업</div>
+                    {% endif %}
+                    {% set player = row['player'] %}
+                    {% if player %}
+                        {% set player_url = url_for('player_detail', position_type=player.get('fantasy_position_type'), team=player['team'], player_name=player['name']) %}
+                    {% endif %}
+                    <article class="roster-list-row {% if player and player.get('is_captain') %}captain-roster-row{% endif %} {% if not player %}empty-slot-row searchable-empty-slot{% endif %}" style="--row-index: {{ loop.index0 }};" data-slot="{{ row['slot'] }}"{% if player %} data-card-url="{{ player_url }}" tabindex="0" role="link" aria-label="{{ player['name'] }} 상세 페이지로 이동"{% else %} tabindex="0" role="button" aria-label="{{ row['label'] }} 포지션 팀 편집으로 이동"{% endif %}>
+                        <div class="roster-slot-chip">
+                            <strong>{{ ui.slot_display(row['slot']) }}</strong>
+                            <span>{% if row['slot'] == 'UTIL' %}지명타자{% else %}{{ row['label'] }}{% endif %}</span>
+                        </div>
+
+                        {% if player %}
+                            <div class="roster-player-identity">
+                                {{ ui.uniform(player['team'], player['back_no'], 'sm') }}
+                                <div>
+                                    <a class="player-link" href="{{ player_url }}">{{ player['name'] }}</a>
+                                    <small>{% if player['back_no'] %}No.{{ player['back_no'] }}{% else %}No.-{% endif %}</small>
+                                </div>
+                            </div>
+                            <div class="roster-list-meta">
+                                {{ ui.team_badge(player['team'], 'xs') }}
+                                {{ ui.position_badge(player.get('display_detail_position') or player.get('detail_position'), player.get('fantasy_position_type')) }}
+                                {% if player.get('is_display_inactive') %}
+                                    <span class="inactive-player-badge">말소</span>
+                                {% endif %}
+                                {% if player.get('is_position_eligible') is sameas false %}
+                                    <span class="position-mismatch-badge" title="{{ player.get('position_mismatch_reason') or '포지션 불일치로 팀 점수 0점 처리' }}">포지션 불일치</span>
+                                {% endif %}
+                                {% if player.get('is_captain') %}
+                                    <span class="captain-badge" title="Captain">C</span>
+                                {% endif %}
+                            </div>
+                            <div class="roster-price-row">
+                                <div class="roster-list-stat roster-list-stat-acq">
+                                    <span>영입 가격</span>
+                                    {% if player.get('price') is not none %}<strong class="acquisition-price-value">{{ '%.1f'|format(player['price']) }}</strong>{% else %}<strong class="score-zero">-</strong>{% endif %}
+                                </div>
+                                <div class="roster-list-stat roster-list-stat-market">
+                                    <span>현재 시장가</span>
+                                    {% if player['current_market_price'] is not none %}
+                                        <strong class="market-price-value {{ player.get('market_price_trend_class', 'market-price-same') }}">{{ '%.1f'|format(player['current_market_price']) }}</strong>
+                                    {% else %}
+                                        <strong class="score-zero">-</strong>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="roster-list-stat roster-list-stat-income">
+                                <span>최근 수입</span>
+                                <strong class="points {{ score_value_class(player['total_points'] or 0) }}">{{ (player['total_points'] or 0)|money }}{% if player.get('is_captain') %} <small>×2</small>{% endif %}</strong>
+                            </div>
+                        {% else %}
+                            <div class="roster-player-identity empty">
+                                <span class="empty-plus">+</span>
+                                <div>
+                                    <strong>비어 있음</strong>
+                                    <small>팀 편집에서 선수를 추가하세요</small>
+                                </div>
+                            </div>
+                            <div class="roster-list-meta muted-meta">-</div>
+                            <div class="roster-price-row">
+                                <div class="roster-list-stat roster-list-stat-acq"><span>영입 가격</span><strong>-</strong></div>
+                                <div class="roster-list-stat roster-list-stat-market"><span>현재 시장가</span><strong>-</strong></div>
+                            </div>
+                            <div class="roster-list-stat roster-list-stat-income"><span>최근 수입</span><strong>-</strong></div>
+                        {% endif %}
+                    </article>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+{% endif %}
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var shell = document.querySelector('.my-team-page-shell');
+    if (!shell) return;
+
+    var buttons = shell.querySelectorAll('[data-roster-toggle]');
+    var panels = shell.querySelectorAll('[data-roster-panel]');
+    var indicator = shell.querySelector('.roster-tab-indicator');
+
+    function moveRosterIndicator(activeButton) {
+        if (!indicator || !activeButton || !activeButton.parentElement) return;
+        var parentRect = activeButton.parentElement.getBoundingClientRect();
+        var buttonRect = activeButton.getBoundingClientRect();
+        indicator.style.width = buttonRect.width + 'px';
+        indicator.style.transform = 'translateX(' + (buttonRect.left - parentRect.left) + 'px)';
+    }
+
+    function activateRosterView(view) {
+        if (view !== 'lineup' && view !== 'list') {
+            view = 'lineup';
+        }
+
+        var activeButton = null;
+        buttons.forEach(function (button) {
+            var isActive = button.getAttribute('data-roster-toggle') === view;
+            button.classList.toggle('active', isActive);
+            button.setAttribute('aria-selected', isActive ? 'true' : 'false');
+            if (isActive) activeButton = button;
+        });
+
+        panels.forEach(function (panel) {
+            var isActive = panel.getAttribute('data-roster-panel') === view;
+            panel.classList.toggle('active', isActive);
+            panel.setAttribute('aria-hidden', isActive ? 'false' : 'true');
+        });
+
+        moveRosterIndicator(activeButton);
+
+    }
+
+    var teamEditUrl = {{ url_for('team_edit')|tojson }};
+    var teamEditLocked = {{ team_edit_lock.is_locked|tojson }};
+    var slotSearchMap = {
+        C: { detail: '포수', type: 'batter' },
+        '1B': { detail: '1루수', type: 'batter' },
+        '2B': { detail: '2루수', type: 'batter' },
+        '3B': { detail: '3루수', type: 'batter' },
+        SS: { detail: '유격수', type: 'batter' },
+        LF: { detail: '좌익수', type: 'batter' },
+        CF: { detail: '중견수', type: 'batter' },
+        RF: { detail: '우익수', type: 'batter' },
+        UTIL: { detail: '', type: 'batter' },
+        P1: { detail: '선발투수', type: 'pitcher' },
+        P2: { detail: '불펜투수', type: 'pitcher' },
+        P3: { detail: '불펜투수', type: 'pitcher' },
+        P4: { detail: '불펜투수', type: 'pitcher' },
+        P5: { detail: '불펜투수', type: 'pitcher' },
+        P6: { detail: '불펜투수', type: 'pitcher' }
+    };
+
+    function openTeamEditForSlot(slotCard) {
+        if (!slotCard || teamEditLocked) return;
+        var slot = slotCard.getAttribute('data-slot') || '';
+        var preset = slotSearchMap[slot] || {
+            detail: slotCard.getAttribute('data-detail-position') || '',
+            type: slotCard.getAttribute('data-position-type') || ''
+        };
+        var params = new URLSearchParams();
+        if (preset.type) params.set('fantasy_position_type', preset.type);
+        if (preset.detail) params.set('detail_position', preset.detail);
+        var target = teamEditUrl + (params.toString() ? '?' + params.toString() : '') + '#roster-section';
+        window.location.href = target;
+    }
+
+    shell.querySelectorAll('.searchable-empty-slot').forEach(function (slotCard) {
+        slotCard.addEventListener('click', function () {
+            openTeamEditForSlot(slotCard);
+        });
+        slotCard.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                openTeamEditForSlot(slotCard);
+            }
+        });
+    });
+
+    buttons.forEach(function (button) {
+        button.addEventListener('click', function () {
+            activateRosterView(button.getAttribute('data-roster-toggle'));
+        });
+    });
+
+    // 내 팀 페이지는 진입할 때 항상 라인업 뷰로 시작합니다.
+    activateRosterView('lineup');
+
+    window.addEventListener('resize', function () {
+        var activeButton = shell.querySelector('[data-roster-toggle].active');
+        moveRosterIndicator(activeButton);
+    });
+});
+</script>
+{% endblock %}
