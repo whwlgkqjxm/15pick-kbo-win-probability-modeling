@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="MyPick">
-  <rect width="512" height="512" rx="120" fill="#020b0f"/>
-  <rect x="54" y="54" width="404" height="404" rx="104" fill="#06181f" stroke="#00d7df" stroke-width="16"/>
-  <path d="M150 344V158h54l52 88 52-88h54v186h-50V246l-39 64h-34l-39-64v98h-50z" fill="#00f0ff"/>
-  <circle cx="390" cy="390" r="36" fill="#00d7df"/>
-</svg>

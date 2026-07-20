@@ -1,0 +1,13 @@
+models:
+  cv_selected:
+    family: L2 logistic regression
+    C: 0.03
+    training_strategy: all_equal_2024_2025
+    status: temporal-CV selected specification
+    2026_log_loss: 0.6673896328
+  best_observed_development:
+    family: L2 logistic regression
+    C: 0.1
+    training_strategy: recent_720
+    status: retrospective development champion; prospective validation required
+    2026_log_loss: 0.6661347845

@@ -1,410 +1,235 @@
-# MyPick — KBO Sports Analytics & Fan Engagement Platform
+# Do Player-Income Indices Improve KBO Win-Probability Forecasts?
 
-**MyPick is a production-deployed KBO sports analytics and fan engagement platform that turns complex baseball records into fantasy scores, player rankings, dynamic price movements, team competition, friend rankings, and point-based prediction experiences.**
+[![Python](https://img.shields.io/badge/Python-3.11%2B-blue)](#reproduction)
+[![Task](https://img.shields.io/badge/Task-Probabilistic%20Forecasting-informational)](#research-question)
+[![Validation](https://img.shields.io/badge/Validation-Temporal%20%2B%20Leakage--Controlled-success)](#methodology)
+[![Status](https://img.shields.io/badge/Status-Retrospective%20Development-orange)](#scientific-status)
 
-MyPick was built around one idea:
+**MyPick KBO Player-Income Research** studies whether a compact, role-specific summary of player performance contains real predictive information for pregame baseball forecasts.
 
-> Sports data becomes more valuable when it helps fans understand, decide, compete, and participate.
+I originally built **MyPick**, a fantasy-sports and point-based prediction platform, to translate complex KBO records into a single intuitive **player-income score**. The product goal was simple: help fans compare how strongly different players contributed without requiring them to interpret dozens of batting and pitching statistics.
 
-Instead of only displaying KBO records, MyPick translates player performance into easier-to-read indicators and connects those indicators to fantasy team building, ranking competition, player value strategy, and daily game predictions.
+That product decision led to a research question:
 
-[Live Site](https://mypickkbo.com) · [Documentation](docs/) · [Tech Stack](#tech-stack) · [System Architecture](#system-architecture)
+> **Does this simplified player-income representation preserve meaningful information about future game outcomes, or is it only an easier way to display past performance?**
 
-![Python](https://img.shields.io/badge/Python-3.x-blue)
-![Flask](https://img.shields.io/badge/Backend-Flask-lightgrey)
-![SQLite](https://img.shields.io/badge/Database-SQLite-blue)
-![Deployment](https://img.shields.io/badge/Deployment-AWS%20Lightsail-orange)
-![Status](https://img.shields.io/badge/Status-Portfolio--safe-green)
+This repository answers that question through official KBO data engineering, role-specific index design, strict point-in-time feature construction, temporal machine learning, ablation studies, and probability-focused evaluation.
 
----
+## Research Question
 
-## Table of Contents
+> **Do role-specific, strictly prior composite player-performance indices derived from official KBO game records improve pregame KBO win-probability forecasts beyond models based on conventional team strength and pregame records?**
 
-- [Overview](#overview)
-- [Why This Project Matters](#why-this-project-matters)
-- [Key Highlights](#key-highlights)
-- [Product Features](#product-features)
-- [What Makes MyPick Different](#what-makes-mypick-different)
-- [Analytics & Data System](#analytics--data-system)
-- [System Architecture](#system-architecture)
-- [Core Modules](#core-modules)
-- [Data Pipeline](#data-pipeline)
-- [Tech Stack](#tech-stack)
-- [Deployment & Operations](#deployment--operations)
-- [Validation & Data Quality](#validation--data-quality)
-- [Screenshots](#screenshots)
-- [Security & Privacy](#security--privacy)
-- [Roadmap](#roadmap)
-- [Korean Summary](#korean-summary)
-- [Author](#author)
+### Korean
 
----
+> **공식 KBO 경기 기록으로 구축한 역할별 strict-prior 복합 선수 활약도 지표는 기존 팀 전력과 일반적인 경기 전 기록만 사용하는 모델보다 KBO 경기의 승리확률 예측을 개선하는가?**
 
-## Overview
+## Main Finding
 
-Baseball is a data-rich sport, but raw records are not always easy for casual fans to interpret.
+**Retrospective evidence supports the hypothesis.** Under the same model family, training window, and team-strength features, adding the prior-average batter and starting-pitcher income indices improved every primary evaluation metric.
 
-KBO games produce many different statistics across batters, starting pitchers, bullpen pitchers, team results, and recent player performance. For users who are new to baseball or who do not want to analyze every box score manually, it can be difficult to quickly understand questions like:
+### Best observed development comparison — 416 games in 2026
 
-- Which players are performing well right now?
-- Which players are rising or falling?
-- How should batters and pitchers be compared?
-- Which players are valuable for building a fantasy team?
-- How can game data become something fans can actively participate in?
+| Model | Log loss ↓ | Brier ↓ | ROC AUC ↑ | Accuracy ↑ |
+|---|---:|---:|---:|---:|
+| Conventional pregame features, **no player income** | 0.683942 | 0.245313 | 0.575781 | 54.33% |
+| Conventional features + **batter and starter income** | **0.666135** | **0.236498** | **0.635275** | **59.62%** |
+| Change | **−0.017807** | **−0.008815** | **+0.059494** | **+5.29 pp** |
 
-MyPick addresses this by converting KBO records into fan-friendly indicators:
+Date-cluster bootstrap, 20,000 repetitions:
 
-- **Fantasy scores** summarize player performance.
-- **Batter and pitcher rankings** make comparison easier.
-- **Dynamic player prices** reflect value changes over time.
-- **Price movements** help users notice hot streaks, slumps, and potential upside.
-- **Fantasy teams, rankings, friend rankings, and point-based predictions** turn sports data into participatory content.
+- Probability that the full-income model improves Log loss: **98.69%**
+- 95% interval for `full − no income`: **[−0.033154, −0.002114]**
 
-The goal is not just to show baseball data. The goal is to make baseball easier to understand and more enjoyable to follow.
+![Primary ablation](reports/figures/primary_ablation_logloss.png)
 
----
+### Role ablation
 
-## Why This Project Matters
+| Player-income block | Log loss ↓ | Brier ↓ | ROC AUC ↑ | Accuracy ↑ |
+|---|---:|---:|---:|---:|
+| No player income | 0.683942 | 0.245313 | 0.575781 | 54.33% |
+| Batter income only | 0.678611 | 0.242599 | 0.603188 | 57.45% |
+| Starting-pitcher income only | 0.673157 | 0.239875 | 0.617343 | 57.93% |
+| **Batter + starting-pitcher income** | **0.666135** | **0.236498** | **0.635275** | **59.62%** |
 
-Many sports websites present schedules, results, standings, and raw player statistics. Those are useful, but they often assume that users already know how to interpret the numbers.
+The result suggests that the two role-specific indices are complementary: starting-pitcher income contributed the larger individual gain, while batter income added further information beyond the starter block.
 
-MyPick starts from a different perspective:
+## Scientific Status
 
-> What if baseball records could be transformed into a more accessible and participatory fan experience?
+The repository distinguishes two claims:
 
-The platform turns complex KBO data into simplified but meaningful signals. Users do not need to know every advanced baseball statistic to understand player performance. They can look at fantasy points, rankings, price levels, and price changes to understand a player’s current form, consistency, value, and trend.
+1. **CV-selected specification:** model family and regularization were selected using temporal cross-validation on 2024–2025. On 2026, adding all player-income features reduced Log loss from `0.683516` to `0.667390`.
+2. **Best observed development specification:** the recent-720-game strategy produced the strongest 2026 result, reducing Log loss from `0.683942` to `0.666135`.
 
-From there, users can make decisions:
+The second result is the current development champion, but 2026 has been repeatedly observed during research. It is therefore **not presented as an untouched final test**. A frozen prospective prediction ledger is required for the final generalization claim.
 
-- Build their own fantasy team
-- Choose players under budget constraints
-- Compare their team with other users
-- Compete in overall rankings
-- Compare with friends through friend rankings
-- Predict daily KBO game outcomes using points
-- Think strategically about player upside and release profit
+## Why This Project Is More Than a Sports Prediction Model
 
-This makes MyPick both a sports analytics project and a fan engagement product.
-
----
-
-## Key Highlights
-
-- Built a full-stack KBO sports analytics web application with Python, Flask, SQLite, Jinja templates, CSS, and JavaScript
-- Designed a role-aware fantasy scoring system for batters, starting pitchers, and bullpen pitchers
-- Implemented dynamic player pricing to reflect player performance, value movement, hot streaks, and slumps
-- Built fantasy team construction with budget constraints, roster slots, captain selection, and team confirmation logic
-- Added overall user rankings and friend-based rankings to support both public competition and social competition
-- Developed a point-based prediction system with market creation, bet placement, settlement, payouts, and betting history
-- Added release-profit logic so users can benefit from identifying undervalued or rising players
-- Automated daily data updates using Python scripts and scheduled server jobs
-- Deployed the service with AWS Lightsail, Ubuntu, Gunicorn, Nginx, HTTPS, and production-safe configuration
-- Prepared this repository as a portfolio-safe version without production database files, secrets, logs, backups, or private credentials
-
----
-
-## Product Features
-
-| Feature | Purpose |
-|---|---|
-| Fantasy Scores | Converts raw player records into easy-to-read performance indicators |
-| Batter / Pitcher Rankings | Helps users compare players without manually analyzing every raw statistic |
-| Dynamic Player Prices | Shows player value movement, hot streaks, slumps, and market-like trends |
-| Price Change Tracking | Makes rising and falling players easier to notice at a glance |
-| Fantasy Team Management | Lets users build a team using KBO players under budget and roster constraints |
-| Captain System | Adds strategic weight to team construction |
-| Overall User Rankings | Gives all users a shared ranking ecosystem and long-term motivation |
-| Friend Features | Allows users to add friends and compare performance socially |
-| Friend Rankings | Preserves the private-group competition of traditional fantasy sports |
-| Point-Based Predictions | Lets users participate in daily KBO games through prediction-based engagement |
-| Release Profit Logic | Rewards users for identifying undervalued or rising players before their value increases |
-| Mobile UI | Supports a more accessible experience across desktop and mobile layouts |
-
----
-
-## What Makes MyPick Different
-
-Traditional fantasy sports products often focus on private leagues among small groups of friends. That structure is fun, but it can be limiting for new users who do not already have a group to play with.
-
-MyPick is built around a broader ranking ecosystem.
-
-All users can participate in the same competitive environment through overall rankings, while friend features and friend rankings still preserve the social competition of private fantasy leagues.
-
-MyPick also adds additional strategic layers:
-
-### 1. Player data becomes easier to understand
-
-Users do not need to analyze every raw baseball statistic. Fantasy scores, batter rankings, pitcher rankings, and player price changes provide a more direct way to understand player performance, form, and value.
-
-### 2. Dynamic prices show player trends
-
-A player’s price movement becomes an intuitive signal of recent performance and value change. Users can identify rising players, falling players, stable performers, and possible undervalued options.
-
-### 3. Team building becomes a strategy problem
-
-Users are not simply choosing favorite players. They must consider budget, position, role, captain value, current price, future upside, and ranking impact.
-
-### 4. Release profit creates value-based play
-
-MyPick rewards users who identify players before their value rises. This adds a player valuation layer beyond simple score accumulation.
-
-### 5. Predictions make daily games more interactive
-
-Point-based predictions give users another reason to follow daily KBO games. The system is based on platform points, not real-money gambling.
-
-Together, these systems turn KBO records into participatory sports content.
-
----
-
-## Analytics & Data System
-
-MyPick converts KBO game records into user-facing analytics through several connected systems.
-
-| System | Role |
-|---|---|
-| Data Collection | Syncs KBO schedules, game results, and player records |
-| Raw Stat Storage | Stores batter and pitcher records separately |
-| Fantasy Scoring | Converts player performance into role-aware fantasy points |
-| Player Rankings | Organizes players into easier comparison views |
-| Dynamic Pricing | Updates player prices based on performance and role |
-| Team Aggregation | Calculates fantasy team scores from selected players |
-| Ranking System | Produces overall rankings, team rankings, and friend rankings |
-| Prediction System | Handles point-based prediction markets and settlement |
-| Ledger Logic | Tracks stakes, payouts, and point movements |
-| Validation Scripts | Checks score consistency, price integrity, roster rules, and settlement results |
-
----
-
-## System Architecture
-
-```mermaid
-flowchart TD
-    A[KBO Game Records] --> B[Data Collection / Sync Scripts]
-    B --> C[SQLite Database]
-
-    C --> D[Fantasy Scoring Engine]
-    C --> E[Dynamic Player Pricing Engine]
-    C --> H[Point-Based Prediction System]
-
-    D --> F[Fantasy Team Aggregation]
-    E --> F
-    F --> G[User Rankings / Friend Rankings]
-
-    H --> I[Settlement / Ledger Logic]
-
-    G --> J[Flask Web Application]
-    I --> J
-    C --> J
-
-    J --> K[Gunicorn + Nginx + HTTPS]
-    K --> L[Users]
-```
-
----
-
-## Core Modules
-
-| File / Directory | Purpose |
-|---|---|
-| `app.py` | Main Flask application, routes, authentication flow, user pages, team management, rankings, profiles, and UI logic |
-| `db.py` | Database initialization and schema-related logic |
-| `scoring.py` | Fantasy scoring rules and scoring helper logic |
-| `calculate_team_daily_scores.py` | Aggregates player scores into fantasy team scores |
-| `update_market_prices_v3.py` | Dynamic player price update logic |
-| `betting.py` | Point-based prediction market, odds, bet placement, payout, and ledger logic |
-| `settle_betting.py` | Prediction settlement workflow |
-| `sync_db.py` | Daily database synchronization workflow |
-| `sync_betting_games.py` | Betting-game synchronization workflow |
-| `scraper.py` | KBO data collection helpers |
-| `scheduler.py` | Scheduled update orchestration |
-| `audit_mypick_integrity.py` | Data integrity and consistency checks |
-| `price_reactivity_report.py` | Price movement validation and reactivity checks |
-| `trade_bonus_report.py` | Release-profit and trade-bonus validation |
-| `position_rules.py` | Position and roster eligibility rules |
-| `templates/` | Jinja HTML templates for the web interface |
-| `static/` | CSS, icons, SEO assets, and static images |
-| `deploy/` | Deployment examples for systemd, Nginx, and update scripts |
-| `docs/` | Project documentation |
-| `sample_data/` | Planned anonymized sample data for portfolio demonstration |
-| `screenshots/` | Planned portfolio-safe screenshots |
-
----
-
-## Data Pipeline
-
-The daily update pipeline transforms game records into user-facing content.
+This is a study of **representation value**:
 
 ```mermaid
 flowchart LR
-    A[Game Schedule / Results] --> B[Raw Batter & Pitcher Stats]
-    B --> C[Fantasy Daily Scores]
-    C --> D[Player Totals]
-    C --> E[Fantasy Team Scores]
-    D --> F[Player Rankings]
-    D --> G[Dynamic Player Prices]
-    E --> H[User Rankings]
-    A --> I[Prediction Markets]
-    I --> J[Settlement]
-    C --> K[Validation Checks]
-    G --> K
-    H --> K
-    J --> K
+    A[Official KBO game records] --> B[Canonical player-game events]
+    B --> C[Role-specific game indices]
+    C --> D[Strict-prior player averages]
+    D --> E[Confirmed lineup and starter aggregation]
+    E --> F[Pregame probability model]
+    F --> G[Ablation: with vs without player income]
 ```
 
-The pipeline supports:
+The central contribution is not simply a classifier. It is the design and evaluation of a compact player-performance representation under realistic temporal constraints.
 
-- Schedule and result synchronization
-- Raw batter and pitcher stat storage
-- Fantasy score calculation
-- Player total aggregation
-- Fantasy team score aggregation
-- Dynamic player price updates
-- Player ranking refreshes
-- User and friend ranking updates
-- Point-based prediction market settlement
-- Data validation reports
+## Data Foundation
 
----
+| Component | Scale |
+|---|---:|
+| Official completed games | 1,864 |
+| Seasons | 2024, 2025, 2026 through July 9 |
+| Player-game occurrences | 65,554 |
+| Batter occurrences | 47,353 |
+| Pitcher occurrences | 18,201 |
+| Official starting-lineup rows | 33,552 |
+| Resolved player occurrences | 65,554 / 65,554 |
+| Same-date temporal violations | 0 |
 
-## Tech Stack
+The public repository does not redistribute the full official raw dataset. It provides schemas, synthetic examples, maintained research code, aggregate results, and reproducibility instructions.
 
-| Layer | Technologies |
-|---|---|
-| Backend | Python, Flask |
-| Database | SQLite |
-| Frontend | Jinja Templates, HTML, CSS, JavaScript |
-| Data Processing | Python, pandas, NumPy |
-| Data Collection | requests, BeautifulSoup |
-| Scheduling | systemd timer, APScheduler |
-| Deployment | AWS Lightsail, Ubuntu, Gunicorn, Nginx |
-| Security / Configuration | Environment variables, HTTPS, production-safe secret handling |
-| SEO | robots.txt, sitemap.xml, Google Search Console, Naver Webmaster Tools |
+## Player-Income Indices
 
----
+### Batter index
 
-## Deployment & Operations
+The selected batter system scores official plate-appearance events, converts the score to a 4.2-PA rate, standardizes it around 1,000, and forms a strict-prior player mean with `K=5` shrinkage toward the previous-season mean.
 
-MyPick is deployed as a live web application using a production server environment.
+Event weights:
 
-Deployment and operations include:
+| Event | Weight |
+|---|---:|
+| Single | 0.50 |
+| Double | 0.95 |
+| Triple | 1.35 |
+| Home run | 1.85 |
+| Walk / HBP | 0.42 |
+| Stolen base | 0.22 |
+| Strikeout | −0.08 |
+| Grounded into double play | −0.32 |
 
-- AWS Lightsail server
-- Ubuntu-based deployment
-- Flask application served with Gunicorn
-- Nginx reverse proxy
-- HTTPS with Certbot
-- systemd web service for the application
-- systemd timer/service for automated daily updates
-- Environment-based production configuration
-- Portfolio-safe repository separation from production data and secrets
+The game feature aggregates the official nine-player starting lineup using the mean prior index plus coverage and reliability variables.
 
-The live deployment is part of the project’s value: MyPick is not only a local prototype, but an operated sports data product.
+### Starting-pitcher index
 
----
+Starting pitchers are evaluated from **prior starts only**, without mixing relief appearances. The game index combines recorded outs and strikeouts with penalties for home runs, walks, and hit batters. A `K=10` cross-season shrinkage mean stabilizes early-season estimates.
 
-## Validation & Data Quality
+Detailed definitions are in [`docs/player_income_index.md`](docs/player_income_index.md).
 
-Because MyPick connects raw game records, player scores, player prices, fantasy teams, rankings, and prediction settlement, validation is an important part of the system.
+## Methodology
 
-Validation areas include:
+- Official KBO schedule and GameCenter records
+- Numeric player identity resolution rather than name-only joins
+- Current-game and same-date results excluded
+- Doubleheader Game 1 excluded from Game 2 features on the same date
+- Train-only imputation and scaling
+- Temporal cross-validation rather than shuffled splits
+- Probability-first model selection using Log loss and Brier score
+- Date-cluster bootstrap for paired uncertainty
+- Explicit feature-group ablation
 
-- Database integrity checks
-- Missing game data detection
-- Missing fantasy score detection
-- Player price consistency checks
-- Price reactivity checks
-- Position eligibility checks
-- Roster budget validation
-- Team score aggregation checks
-- Release-profit validation
-- Prediction market settlement checks
-- Betting ledger consistency checks
+See [`docs/temporal_validation.md`](docs/temporal_validation.md).
 
-These checks help keep daily updates reliable and reduce the risk of inconsistent user-facing results.
+## Model and Training-Strategy Search
 
----
+The study compared:
 
-## Screenshots
+- L2 logistic regression
+- Elastic Net
+- Random Forest and Extra Trees
+- Gradient boosting and histogram boosting
+- XGBoost, LightGBM, and CatBoost
+- Probability blending, stacking, and calibration
+- Full-history, recent-window, time-decay, rolling, expanding, and daily-update training strategies
 
-Screenshots will be added after portfolio-safe visual review.
+The strongest and most stable family was a regularized logistic model. The best observed development configuration was:
 
-Planned screenshot set:
+```yaml
+model: L2 logistic regression
+C: 0.1
+training_strategy: most recent 720 decision games
+features: team strength + post-starter team runs + starter income + batter income
+```
 
-- Center dashboard
-- Player rankings
-- Player detail page
-- Team edit / roster construction
-- My team page
-- User rankings
-- Friend rankings
-- Point-based prediction page
-- Mobile layout
+Complexity did not automatically improve generalization; several tree and ensemble models were rejected after worse temporal probability performance.
 
----
+## Research Progress and Failure Analysis
 
-## Repository Status
+The project deliberately preserves negative results and design corrections:
 
-This repository is currently maintained as a portfolio-safe version of the production project.
+1. A 2026-only limited-sample model produced weak, compressed probabilities.
+2. Multi-season data improved estimation stability.
+3. A broad high-dimensional model search underperformed a regularized logistic model.
+4. A role audit found that early income histories mixed substitute/starter and starter/reliever appearances.
+5. The starting-pitcher index was rebuilt from start-only records.
+6. Player-level bullpen income did not add stable predictive value.
+7. Additional workload, handedness, and lineup-interaction features did not improve probability loss.
+8. A new batter index was selected from 215 official-event candidates.
+9. Forty-two model and learning-strategy configurations were compared.
+10. The final ablation directly tested all player-income features against a no-income model.
 
-It is intended to show:
+See [`docs/experiment_history.md`](docs/experiment_history.md) and [`docs/failure_analysis.md`](docs/failure_analysis.md).
 
-- Project structure
-- Full-stack implementation
-- Data pipeline logic
-- Fantasy scoring and pricing logic
-- Prediction system logic
-- Deployment examples
-- Documentation and portfolio materials
+## Repository Structure
 
-It is not intended to expose production data, private server files, user-sensitive information, or operational secrets.
+```text
+.
+├── src/mypick_rq1/           # maintained index, temporal, modeling, and evaluation code
+├── scripts/                  # reproducible command-line entry points
+├── configs/                  # frozen formulas and model specifications
+├── experiments/              # key experiment cards and retained research scripts
+├── reports/                  # published aggregate results and figures
+├── docs/                     # research design, lineage, failures, and limitations
+├── data/schema/              # public schemas
+├── data/sample/              # synthetic examples only
+├── tests/                    # temporal, formula, and result-verification tests
+└── models/                   # model registry; binaries are not required for review
+```
 
----
+## Reproduction
 
-## Security & Privacy
+### Install
 
-This repository does not include:
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -e ".[dev]"
+```
 
-- Production database files
-- Environment secrets
-- Server logs
-- Backups
-- SSH keys or `.pem` files
-- SSL keys or certificates
-- User-sensitive data
-- Private deployment credentials
+### Verify published results
 
-Example configuration files are included only with placeholder values.
+```bash
+python scripts/verify_published_results.py
+pytest
+```
 
----
+### Re-run the primary ablation with a local modeling dataset
 
-## Roadmap
+```bash
+python scripts/reproduce_primary_ablation.py \
+  --data /path/to/V12_MODELING_DATASET.csv \
+  --protocol best-development \
+  --output reports/reproduced_primary_ablation.csv
+```
 
-Planned improvements include:
+The full official dataset is intentionally not committed. Required columns and file contracts are documented in [`data/schema/modeling_dataset_schema.csv`](data/schema/modeling_dataset_schema.csv).
 
-- Add portfolio-safe screenshots
-- Add anonymized sample datasets
-- Expand documentation for scoring, pricing, and prediction systems
-- Add database schema documentation
-- Improve automated validation reports
-- Add more unit and integration tests
-- Build a GitHub Pages case study
-- Explore more advanced player valuation methods
-- Add more product analytics and user engagement metrics
+## Limitations
 
----
+- The strongest recent-720 result is a retrospective development result, not a pristine final test.
+- Historical official lineup records were reconstructed from completed game pages; a future production study should capture immutable pregame timestamps.
+- Exact physical runs after starter exit require play-by-play substitution and scoring timelines.
+- Market odds, weather, injuries, and verified historical roster availability are outside the primary feature set.
+- Final external validity requires frozen prospective predictions.
 
-## Korean Summary
+## Next Step
 
-MyPick은 복잡한 KBO 경기 기록과 선수 데이터를 팬들이 쉽게 이해할 수 있는 판타지 점수, 타자/투수 순위, 동적 선수 가격, 가격 변동으로 변환하는 스포츠 데이터 플랫폼입니다.
+Freeze the current model, store each future prediction before first pitch with input and model hashes, and evaluate the immutable ledger using Log loss, Brier score, calibration, AUC, and date-cluster uncertainty.
 
-사용자는 세부 야구 기록을 모두 분석하지 않아도 선수의 성과, 기복, 상승세, 하락세, 가치 변화를 직관적으로 이해할 수 있습니다. 또한 직접 판타지 팀을 구성하고, 전체 랭킹과 친구 랭킹에서 경쟁하며, 포인트 기반 승부예측에 참여하면서 KBO를 더 쉽고 능동적으로 즐길 수 있습니다.
+## License and Data Use
 
-MyPick은 기존의 폐쇄적인 친구 리그 중심 판타지 스포츠와 달리, 모든 유저가 함께 경쟁하는 전체 랭킹 생태계를 중심으로 설계되었습니다. 동시에 친구 추가와 친구 랭킹 기능을 통해 기존 판타지 스포츠의 소셜 경쟁 경험도 제공합니다.
-
----
-
-## Author
-
-**Jiho Choi**  
-Data Analytics Student  
-Interested in sports analytics, data products, full-stack analytics platforms, and fan engagement systems.
+Code and original documentation are released under the MIT License. Official KBO source data remains subject to its original rights and terms; this repository does not redistribute the complete raw archive.

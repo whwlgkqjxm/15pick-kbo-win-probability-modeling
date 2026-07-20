@@ -1,0 +1,19 @@
+column,role,description
+season,key,season year
+game_date,key,target game date
+game_id,key,official game identifier
+home_win,target,1 for home win and 0 for away win; ties excluded from binary fitting
+elo_diff,conventional,home minus away Elo
+prior_win_pct_diff,conventional,strict-prior win-percentage difference
+prior_run_diff_per_game_diff,conventional,strict-prior run-differential-per-game difference
+prior_rank_advantage,conventional,strict-prior rank advantage
+bullpen_strength_diff,conventional,strict-prior team responsibility-run difference
+PS_R20_RA_G_diff,conventional,recent-20 post-starter team responsibility runs per game
+K10_starter_value_diff,starter_income,start-only shrunk income difference
+K10_starter_count_diff,starter_income,prior start-count difference
+K10_starter_reliability_diff,starter_income,shrinkage reliability difference
+K10_both_starters_covered,starter_income,both-starter history coverage flag
+mean,batter_income,home minus away official-lineup mean prior batter income
+coverage,batter_income,lineup history coverage difference
+count_mean,batter_income,lineup mean prior-game-count difference
+coverage_min,batter_income,lower side coverage across the two lineups

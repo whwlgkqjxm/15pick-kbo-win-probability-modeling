@@ -1,49 +1,16 @@
-# Python
+.venv/
 __pycache__/
 *.py[cod]
-*.pyo
-*.pyd
-venv/
-.venv/
-
-# Environment / secrets
+.pytest_cache/
+.ruff_cache/
+.DS_Store
 .env
 .env.*
-!.env.example
-!.env.production.example
 *.pem
 *.key
-
-# Database
-*.db
-*.db-shm
-*.db-wal
-*.sqlite
-*.sqlite3
-kbo_fantasy.db
-
-# Logs / backups
-logs/
-backups/
-BACKUP*/
-_BACKUP*/
-FIX_BACKUP*/
-_FIX_BACKUP*/
-
-# Local exports / snapshots
-mypick_server_current_*.zip
-kbo_fantasy_db_snapshot_*.zip
-mypick_release_*.zip
-mypick_server_code_latest.zip
-_server_systemd_snapshot/
-_server_nginx_snapshot/
-
-# OS / editor
-.DS_Store
-.vscode/
-.idea/
-
-# Additional public-portfolio safety
-_EXPORT_INFO.txt
-RELEASE_MANIFEST.txt
-DEPLOYMENT_GUIDE.md
+data/local/
+data/raw/
+models/*.joblib
+artifacts/
+*.zip
+*.egg-info/

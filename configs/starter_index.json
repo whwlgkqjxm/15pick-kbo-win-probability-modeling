@@ -1,0 +1,12 @@
+{
+  "score_id": "KBO_CONSTRAINED_START_ONLY",
+  "multiplier": 1000.0,
+  "weights": {
+    "outs_recorded": 0.216,
+    "strikeouts": 0.132,
+    "home_runs_allowed": -1.565,
+    "walks_plus_hbp_allowed": -0.557
+  },
+  "history_scope": "prior starting appearances only",
+  "shrinkage_k": 10.0
+}

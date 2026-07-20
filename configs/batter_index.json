@@ -1,0 +1,22 @@
+{
+  "score_id": "POWER_OBP__RATE100",
+  "weights": {
+    "singles": 0.50,
+    "doubles": 0.95,
+    "triples": 1.35,
+    "home_runs": 1.85,
+    "walks": 0.42,
+    "hit_by_pitch": 0.42,
+    "stolen_bases": 0.22,
+    "strikeouts": -0.08,
+    "double_play": -0.32
+  },
+  "plate_appearance_normalizer": 4.2,
+  "reference_mean": 0.738432383380831,
+  "reference_sd": 0.9411772120687678,
+  "standardized_center": 1000.0,
+  "standardized_scale": 250.0,
+  "clip": [-500.0, 3000.0],
+  "shrinkage_k": 5.0,
+  "cold_start_center": 1000.0
+}
