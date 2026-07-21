@@ -1,0 +1,18 @@
+{
+  "absolute_improvement_impossible": false,
+  "current_best_model": "V2 Probability Logistic Regression",
+  "current_feature_practical_ceiling_supported": true,
+  "evidence": [
+    "V2 error prediction AUC 0.497-0.510 using 224 additional features",
+    "sequential residual correction worsened log loss by 0.001572",
+    "best development feature addition failed to generalize and worsened 2026 by 0.005072",
+    "full historical window did not beat 75% historical window",
+    "2025-2026 feature drift was low to moderate with zero PSI above 0.25",
+    "calibration reliability error was small relative to limited resolution",
+    "42.31% of decision games were decided by one or two runs"
+  ],
+  "forbidden_claim": "KBO win prediction can never improve beyond V2",
+  "next_research_branch": "genuinely new pregame information ablation and prospective evaluation",
+  "primary_bottleneck": "limited stable incremental information in current BoxScore-derived pregame features",
+  "version": "rq1_v5_bottleneck_decision_v1_20260719"
+}

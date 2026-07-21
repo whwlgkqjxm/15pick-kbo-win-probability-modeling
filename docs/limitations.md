@@ -1,13 +1,33 @@
 # Limitations
 
-1. **Retrospective model selection:** The recent-720 specification was chosen after observing 2026 development results.
-2. **Historical lineup timing:** Official lineups were reconstructed from completed game pages rather than a contemporaneously archived confirmation feed.
-3. **Relief-pitcher uncertainty:** Intended reliever identities, order, leverage, and exact availability are not known before the game.
-4. **Team-level relief proxy:** Post-starter responsibility-run variables are proxies and do not fully reconstruct every run physically scored after the starter left.
-5. **Missing contextual inputs:** Market odds, weather, verified injury status, travel, and complete historical roster availability are outside the primary model.
-6. **Cross-study comparability:** MLB benchmarks use different leagues, samples, modeling units, features, and validation protocols.
-7. **League specificity:** Results may not transfer directly from KBO to MLB, NPB, or other leagues.
-8. **No causal player valuation claim:** The indices are predictive representations, not causal estimates of player contribution.
-9. **Betting boundary:** Better probability metrics do not guarantee profitability after bookmaker margin and market efficiency.
-10. **Data redistribution:** Complete official raw data are not distributed publicly.
-11. **Final confirmation:** A prospective immutable ledger is still required.
+## Development-period reuse
+
+2026 game features are strict-prior and same-date excluded, but 2026 outcomes were repeatedly inspected when comparing learning strategies. The recent-720 model is therefore a development champion, not a final untouched test result.
+
+## Historical pregame reconstruction
+
+Official starting lineups and starting pitchers are available in historical game records, but a complete archive of the exact public confirmation timestamp for every historical game is not present. The study models the lineup-confirmed setting retrospectively and requires timestamped snapshots for future prospective evidence.
+
+## Repeated teams and dates
+
+Games are not independent draws. The same ten teams appear repeatedly, and multiple games share a date. Date-cluster bootstrap partially addresses within-date dependence, but uncertainty may remain optimistic relative to season-level or team-level regime changes.
+
+## Composite-index interpretation
+
+The batter and starter indices are predictive representations, not causal measures, universal player rankings, salaries, or contract values. Weights were selected within a development process and must be revalidated prospectively.
+
+## Post-starter run prevention
+
+The current post-starter feature uses official pitcher responsibility runs. It is not identical to every physical run scored after the starter actually exits. Exact physical post-exit runs require play-by-play substitution and scoring timelines.
+
+## Relief-pitcher availability
+
+The actual relievers who will appear are unknown pregame. The project does not possess complete historical point-in-time roster, injury, recovery, and availability snapshots. This limits player-level relief modeling.
+
+## Missing external context
+
+The frozen primary model does not include point-in-time weather, travel, park effects, market odds, or complete official absence data. Odds may be useful as a benchmark but should remain distinct from the player-index research question.
+
+## Redistribution
+
+Complete official raw KBO responses are not included. The derived table is provided for technical review in the current portfolio package, but the release policy should be reviewed before a fully public launch.

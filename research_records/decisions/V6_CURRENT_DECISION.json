@@ -1,0 +1,14 @@
+{
+  "version": "rq1_v6_current_decision_v1_20260719",
+  "status": "PARTIAL_SUCCESS_CONTINUE_ROLE_SPECIFIC_SEARCH",
+  "best_overall_scoring_candidate_on_2025": "KBO_CONSTRAINED",
+  "best_validated_role": "pitcher_starter",
+  "starter_formula_status": "CURRENT_BEST_CANDIDATE",
+  "batter_formula_status": "UNRESOLVED",
+  "bullpen_formula_status": "UNRESOLVED",
+  "current_best_model_status": "V2_PROBABILITY_REMAINS_PRIMARY",
+  "challenger": "V2_PLUS_KBO_CONSTRAINED",
+  "challenger_2025_delta_log_loss": -0.00121,
+  "challenger_2026_posthoc_delta_log_loss": -0.00039,
+  "final_claim": "The redesigned starter income is materially better than the old starter measurement in 2025 development. The all-role income system is not yet final because batter and bullpen measurement remain unresolved."
+}

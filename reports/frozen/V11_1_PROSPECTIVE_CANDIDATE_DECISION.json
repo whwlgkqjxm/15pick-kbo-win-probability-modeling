@@ -1,0 +1,69 @@
+{
+  "status": "post-holdout development candidate; requires prospective confirmation",
+  "selected_score_id": "POWER_OBP__RATE100",
+  "selected_mean_method": "S_K5",
+  "selected_block": "MEAN",
+  "selected_family": "L2",
+  "selected_C": 0.01,
+  "2024_cv_log_loss": 0.6822366179691397,
+  "2025_validation_log_loss": 0.6650197832911406,
+  "2025_validation_auc": 0.6326076240552087,
+  "clean_no_batter_2025_log_loss": 0.668953644311711,
+  "no_2026_tuning": true,
+  "top_2024_only_ensemble_results": [
+    {
+      "model_id": "LOGIT_BLEND_CLEAN_BEST",
+      "selection": "2024 OOF weight=1.00",
+      "log_loss": 0.67082308241435,
+      "brier": 0.23892186022699052,
+      "roc_auc": 0.6230282615839632,
+      "accuracy": 0.6017191977077364,
+      "n": 698
+    },
+    {
+      "model_id": "TOP3_MEAN",
+      "selection": "top configs by 2024 CV only",
+      "log_loss": 0.6708915779611089,
+      "brier": 0.23893309817174674,
+      "roc_auc": 0.6231514952349655,
+      "accuracy": 0.6074498567335244,
+      "n": 698
+    },
+    {
+      "model_id": "TOP5_MEAN",
+      "selection": "top configs by 2024 CV only",
+      "log_loss": 0.6709625021297371,
+      "brier": 0.23897630113735552,
+      "roc_auc": 0.623126848504765,
+      "accuracy": 0.5945558739255015,
+      "n": 698
+    },
+    {
+      "model_id": "TOP10_MEAN",
+      "selection": "top configs by 2024 CV only",
+      "log_loss": 0.6710917197349728,
+      "brier": 0.23900359826031642,
+      "roc_auc": 0.623430824843904,
+      "accuracy": 0.5931232091690545,
+      "n": 698
+    },
+    {
+      "model_id": "TOP10_MEDIAN",
+      "selection": "top configs by 2024 CV only",
+      "log_loss": 0.6712763187868742,
+      "brier": 0.23910987236331216,
+      "roc_auc": 0.6227078540913573,
+      "accuracy": 0.5902578796561605,
+      "n": 698
+    },
+    {
+      "model_id": "TOP10_STACK_WITH_CLEAN",
+      "selection": "2024 OOF meta C=0.03",
+      "log_loss": 0.6724263729748475,
+      "brier": 0.2395807688348156,
+      "roc_auc": 0.6224613867893526,
+      "accuracy": 0.5916905444126075,
+      "n": 698
+    }
+  ]
+}

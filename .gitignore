@@ -3,14 +3,15 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 .ruff_cache/
+.coverage
+htmlcov/
+build/
+dist/
+*.egg-info/
 .DS_Store
 .env
-.env.*
 *.pem
 *.key
-data/local/
+# Raw official responses and operational data are never committed
 data/raw/
-models/*.joblib
-artifacts/
-*.zip
-*.egg-info/
+data/operational/

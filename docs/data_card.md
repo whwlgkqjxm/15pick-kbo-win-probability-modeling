@@ -1,51 +1,54 @@
-# Data Card
+# Data card
 
-## Intended use
+## Purpose
 
-The modeling dataset supports retrospective and prospective research on KBO pregame win-probability forecasting and the incremental value of role-aware player performance indices.
+The derived data supports a study of pregame KBO home-win probabilities using conventional team strength, clean start-only pitcher priors, team post-starter run prevention, and a newly designed official-event batter-lineup index.
+
+## Observation units
+
+- Canonical foundation: one row per player-game occurrence or event, depending on table.
+- Modeling table: one row per completed decision game.
+- Prediction target: home win (`1`) versus away win (`0`).
+- Ties: preserved in canonical data, excluded from binary fitting.
+- Cancelled/postponed games: excluded or voided.
 
 ## Coverage
 
-- Official KBO seasons: 2024, 2025, and 2026 through July 9
-- Scheduled-game rows: 2,047
-- Completed games: 1,864
-- Cancelled or postponed games: 183
-- Binary modeling rows after excluding ties: 710 in 2024, 698 in 2025, 416 in 2026
-- Player-game occurrences: 65,554
-- Batter occurrences: 47,353
-- Pitcher occurrences: 18,201
-- Official starting-lineup rows: 33,552
+| Season | Completed games | Binary modeling rows |
+|---|---:|---:|
+| 2024 | 720 | 710 |
+| 2025 | 720 | 698 |
+| 2026 through July 9 | 424 | 416 |
+| **Total** | **1,864** | **1,824** |
 
-## Unit of analysis
+## Player-level foundation
 
-One modeling row represents one completed decision game with a binary target:
+- batter occurrences: 47,353
+- pitcher occurrences: 18,201
+- total occurrences: 65,554
+- numeric identity resolution: 65,554/65,554
+- name-only forced merges: 0
+- official starting-lineup rows: 33,552
+- history available: 63,595
+- cold starts: 1,959
+- temporal violations: 0
 
-- `home_win = 1` when the home team won
-- `home_win = 0` when the away team won
+## Included table
 
-Ties are excluded from binary fitting and scoring.
+`data/derived/V12_MODELING_DATASET.csv` contains 71 columns and 1,824 decision-game rows. It includes identifiers and outcomes needed for audit plus the 14 frozen model features. It is deterministically ordered by `game_date, game_id`.
 
-## Feature timing
+## Quality controls
 
-All historical aggregates are computed strictly before the target game date. Same-date games are excluded, so doubleheader Game 1 does not enter Game 2 features.
-
-## Identity
-
-Official numeric player IDs are preferred. The final occurrence-level identity table resolves all 65,554 player-game occurrences. Name-only forced merges are not used.
-
-## Public distribution
-
-The repository does not redistribute the complete official KBO raw archive. It publishes:
-
-- modeling schema
-- synthetic example rows
-- frozen aggregate result tables
-- maintained transformation and evaluation code
-- data-lineage documentation
+- duplicate official game ID check;
+- exact official nine-player lineup per side;
+- side-specific identity coverage;
+- no name-only forced identity merge;
+- score-component parity and mismatch adjudication;
+- current-game and same-date exclusion;
+- model probability range checks;
+- saved-model binary replay;
+- SHA256 artifact manifest.
 
 ## Known limitations
 
-- Historical lineup confirmation timestamps were not archived contemporaneously for every game.
-- Complete historical injury and active-roster availability snapshots are not part of the primary dataset.
-- Exact relief-pitcher intent and deployment are not observable before first pitch.
-- Findings are KBO-specific and may not transfer directly to other leagues.
+Historical lineup confirmation is reconstructed from official game records rather than preserved timestamped screenshots for every game. Exact physical runs after a starter exits and historical daily roster availability require additional play-by-play and point-in-time roster sources. See `docs/limitations.md`.

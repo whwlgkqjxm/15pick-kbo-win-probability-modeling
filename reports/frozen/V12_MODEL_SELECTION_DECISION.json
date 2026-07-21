@@ -1,0 +1,76 @@
+{
+  "scientific_status": {
+    "2024_2025_temporal_cv": "model-family and hyperparameter selection without 2026",
+    "2026": "development evaluation; no within-game or same-date leakage, but already observed and therefore not final untouched test",
+    "future_prospective": "required for final generalization claim"
+  },
+  "cv_selected_champion": {
+    "model_id": "L2_C0.03",
+    "family": "L2_LOGISTIC",
+    "cv_log_loss": 0.668642531384877,
+    "cv_brier": 0.23789923688694858,
+    "cv_auc": 0.6286094389747107,
+    "2026_static_all_equal": {
+      "log_loss": 0.6673896327657686,
+      "brier": 0.23703439314697938,
+      "roc_auc": 0.6315679733110926,
+      "accuracy": 0.59375
+    }
+  },
+  "best_2026_observed_development_method": {
+    "model_id": "L2_C0.1",
+    "family": "L2_LOGISTIC",
+    "training_strategy": "RECENT_720",
+    "adaptation": "STATIC",
+    "log_loss": 0.6661347844671042,
+    "brier": 0.23649786240497755,
+    "roc_auc": 0.635274766008711,
+    "accuracy": 0.5961538461538461
+  },
+  "best_direct_learning_method": {
+    "model_id": "L2_C0.1",
+    "family": "L2_LOGISTIC",
+    "training_strategy": "RECENT_720",
+    "adaptation": "STATIC",
+    "log_loss": 0.6661347844671042,
+    "brier": 0.23649786240497755,
+    "roc_auc": 0.635274766008711,
+    "accuracy": 0.5961538461538461
+  },
+  "batter_ablation": [
+    {
+      "model_id": "CV_CHAMPION_WITH_BATTER",
+      "log_loss": 0.6673896327657686,
+      "brier": 0.23703439314697938,
+      "roc_auc": 0.6315679733110926,
+      "accuracy": 0.59375,
+      "n": 416
+    },
+    {
+      "model_id": "CV_CHAMPION_NO_BATTER",
+      "log_loss": 0.6727330274736077,
+      "brier": 0.2397031244708442,
+      "roc_auc": 0.6192660550458716,
+      "accuracy": 0.5817307692307693,
+      "n": 416
+    },
+    {
+      "model_id": "BEST_DIRECT_WITH_BATTER",
+      "log_loss": 0.6661347844671042,
+      "brier": 0.23649786240497755,
+      "roc_auc": 0.635274766008711,
+      "accuracy": 0.5961538461538461,
+      "n": 416
+    },
+    {
+      "model_id": "BEST_DIRECT_NO_BATTER",
+      "log_loss": 0.6731570260130579,
+      "brier": 0.23987461520907022,
+      "roc_auc": 0.6173431563339821,
+      "accuracy": 0.5793269230769231,
+      "n": 416
+    }
+  ],
+  "no_legacy_batter_income": true,
+  "no_same_date_target_update": true
+}

@@ -1,0 +1,10 @@
+check,status,value
+lineup_exact_9,PASS,1.0
+lineup_all_averages_finite,PASS,1.0
+lineup_same_date_excluded,PASS,1.0
+lineup_manual_mean_matches_feature,PASS,5.684341886080802e-14
+bullpen_same_date_excluded,PASS,1.0
+starter_excluded_from_pool,PASS,0.0
+bullpen_all_averages_finite,PASS,1.0
+bullpen_manual_weighted_mean_matches_feature,PASS,0.0
+same_formula_each_side,PASS,1.0

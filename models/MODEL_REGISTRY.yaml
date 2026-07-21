@@ -1,19 +1,41 @@
+schema_version: 2
+random_seed: 20260720
+feature_schema: reports/frozen/V12_MODEL_SCHEMA.json
 models:
-  cv_selected:
-    family: L2 logistic regression
-    C: 0.03
-    training_strategy: all_equal_2024_2025
-    feature_set: conventional_team_context_plus_batter_and_starter_indices
-    status: temporal-CV-selected specification
-    evaluation_period: 2026-03-28_to_2026-07-09
-    evaluation_games: 416
-    log_loss: 0.6673896328
-  best_observed_development:
-    family: L2 logistic regression
-    C: 0.1
-    training_strategy: recent_720
-    feature_set: conventional_team_context_plus_batter_and_starter_indices
-    status: retrospective development candidate; prospective validation required
-    evaluation_period: 2026-03-28_to_2026-07-09
-    evaluation_games: 416
-    log_loss: 0.6661347845
+  - model_id: L2_C0.03_ALL_EQUAL
+    role: scientific_cv_candidate
+    scientific_status: selected using 2024-2025 temporal CV without 2026
+    training_strategy: all 2024-2025 decision games, equal weight
+    training_rows: 1408
+    feature_count: 14
+    feature_set: team + clean starter + new batter
+    regularization_C: 0.03
+    model_binary: models/frozen/V12_CV_SELECTED_MODEL_REFIT_2024_2025.joblib
+    evaluation_period: 2026 development, 416 games
+    log_loss: 0.6673896327657686
+    brier: 0.2370343931469793
+    roc_auc: 0.6315679733110926
+    accuracy: 0.59375
+    final_generalization_claim: false
+  - model_id: L2_C0.1_RECENT_720
+    role: best_observed_development_candidate
+    scientific_status: selected after comparing learning methods on observed 2026 outcomes
+    training_strategy: most recent 720 decision games before 2026-03-28
+    training_rows: 720
+    training_start: 2024-09-24
+    training_end: 2025-10-04
+    feature_count: 14
+    feature_set: team + clean starter + new batter
+    regularization_C: 0.1
+    model_binary: models/frozen/V12_2026_BEST_OBSERVED_RECENT720_MODEL.joblib
+    evaluation_period: 2026 development, 416 games
+    log_loss: 0.6661347844671042
+    brier: 0.23649786240497755
+    roc_auc: 0.635274766008711
+    accuracy: 0.5961538461538461
+    final_generalization_claim: false
+provenance:
+  manifest: artifacts/RESEARCH_MANIFEST_SHA256.csv
+  model_binary_replay: reports/frozen/V12_MODEL_BINARY_REPRODUCTION_AUDIT.json
+  input_hashes: reports/frozen/V12_INPUT_DATA_SHA256.csv
+  environment: reports/frozen/V12_ENVIRONMENT.txt

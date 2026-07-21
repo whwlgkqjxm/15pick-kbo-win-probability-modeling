@@ -1,0 +1,8 @@
+{
+  "cv_model_max_abs_prediction_error": 1.6653345369377348e-16,
+  "development_model_max_abs_prediction_error": 2.7755575615628914e-16,
+  "cv_model_loaded": true,
+  "development_model_loaded": true,
+  "expected_2026_rows": 416,
+  "actual_2026_rows": 416
+}

@@ -20,6 +20,8 @@ class BatterIndexConfig:
     upper_clip: float = 3000.0
 
 
+DEFAULT_BATTER_INDEX_CONFIG = BatterIndexConfig()
+
 def batter_game_performance_index(
     *,
     at_bats: float,
@@ -32,7 +34,7 @@ def batter_game_performance_index(
     stolen_bases: float,
     strikeouts: float,
     double_plays: float,
-    config: BatterIndexConfig = BatterIndexConfig(),
+    config: BatterIndexConfig = DEFAULT_BATTER_INDEX_CONFIG,
 ) -> float:
     """Calculate the selected standardized batter game-performance index.
 

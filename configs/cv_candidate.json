@@ -1,0 +1,12 @@
+{
+  "model_id": "L2_C0.03_ALL_EQUAL",
+  "scientific_status": "selected using 2024-2025 expanding temporal CV without 2026",
+  "prediction_target": "pregame home-team win probability",
+  "model_family": "L2_LOGISTIC",
+  "C": 0.03,
+  "training_strategy": "all 2024-2025 decision games with equal weight",
+  "training_rows": 1408,
+  "random_seed": 20260720,
+  "feature_schema": "reports/frozen/V12_MODEL_SCHEMA.json",
+  "final_generalization_claim": false
+}

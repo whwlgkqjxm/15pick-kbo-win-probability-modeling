@@ -1,3 +1,5 @@
 # Contributing
 
-Open an issue before proposing major changes to formulas, temporal rules, or evaluation protocols. Any model change must state the training cutoff, feature schema, comparison model, and whether future outcomes were observed before the change.
+Open an issue before changing a frozen formula, temporal rule, published result, or model registry entry. Research changes must identify the hypothesis, input cutoff, comparison model, primary metric, leakage review, and artifact hashes.
+
+New methods must be versioned challengers. Do not overwrite frozen models or retrospective prediction files. Tests and documentation are required for behavior changes.

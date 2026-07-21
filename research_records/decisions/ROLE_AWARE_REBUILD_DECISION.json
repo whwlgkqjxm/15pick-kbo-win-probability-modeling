@@ -1,0 +1,24 @@
+{
+  "version": "rq1_role_aware_income_audit_v1_20260719",
+  "decision": "REBUILD_REQUIRED",
+  "raw_income_collection_complete": true,
+  "role_specific_history_complete": false,
+  "player_level_bullpen_income_feature_complete": false,
+  "prior_v5_ceiling_decision_status": "SUSPENDED_PENDING_ROLE_AWARE_REBUILD",
+  "required_history_scopes": [
+    "season|batter|player_id|all_appearances",
+    "season|batter|player_id|starter",
+    "season|batter|player_id|substitute",
+    "season|pitcher|player_id|all_appearances",
+    "season|pitcher|player_id|starter",
+    "season|pitcher|player_id|bullpen"
+  ],
+  "required_next_models": [
+    "all-role and role-specific lineup features retained separately",
+    "starting-pitcher start-only income history",
+    "pregame eligible bullpen-pool relief-only income history",
+    "bullpen workload and availability",
+    "cold-start shrinkage that assigns a value to all nine lineup players"
+  ],
+  "interpretation": "The frozen player-game income data are complete, but V1/V2 did not implement the intended role-aware lineup, starter and bullpen income comparison. The previous current-information ceiling conclusion applies only to the flawed existing feature construction and must not be treated as the final RQ1 ceiling."
+}

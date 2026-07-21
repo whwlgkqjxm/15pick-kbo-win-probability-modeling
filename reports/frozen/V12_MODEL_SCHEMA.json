@@ -1,0 +1,42 @@
+{
+  "feature_columns": [
+    "elo_diff",
+    "prior_win_pct_diff",
+    "prior_run_diff_per_game_diff",
+    "prior_rank_advantage",
+    "bullpen_strength_diff",
+    "K10_starter_value_diff",
+    "K10_starter_count_diff",
+    "K10_starter_reliability_diff",
+    "K10_both_starters_covered",
+    "PS_R20_RA_G_diff",
+    "mean",
+    "coverage",
+    "count_mean",
+    "coverage_min"
+  ],
+  "target": "home_win",
+  "development_training_seasons": [
+    2024,
+    2025
+  ],
+  "development_evaluation_season": 2026,
+  "cv_selected_model_id": "L2_C0.03",
+  "cv_selected_family": "L2_LOGISTIC",
+  "cv_selected_params": {
+    "C": 0.03
+  },
+  "top_ensemble_model_ids": [
+    "L2_C0.03",
+    "L2_C0.01",
+    "ENET_C0.1_L10.25",
+    "ENET_C0.1_L10.5",
+    "ENET_C0.3_L10.75",
+    "ENET_C0.3_L10.5"
+  ],
+  "stack_meta_C": 0.01,
+  "new_batter_income_only": true,
+  "legacy_batter_income_used": false,
+  "same_date_updates_excluded": true,
+  "random_seed": 20260720
+}

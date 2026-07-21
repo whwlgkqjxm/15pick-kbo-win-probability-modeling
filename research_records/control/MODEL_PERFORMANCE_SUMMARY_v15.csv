@@ -1,0 +1,14 @@
+model,protocol,period,n_games,log_loss,brier,roc_auc,accuracy,status
+V2 Probability Logistic,2026 post-hoc historical V2,2026 posthoc,416,0.6706104493891073,0.238737937,0.62969141,0.598558,historical baseline
+V3 broad ensemble,2026 post-hoc broad development lab,2026 posthoc,416,0.677185,,,,rejected; worse than V2
+V7 V2+starter K10 logit stack,corrected full-date 2025 temporal OOF,2025 OOF,698,0.6694826202559611,0.2384706451226088,0.6204321393361814,0.5830945558739254,strong clean challenger
+V7 V2+starter K10 logit stack,corrected historical post-hoc,2026 posthoc,416,0.6677851232420587,0.2373108802653355,0.6363636363636364,0.5961538461538461,post-hoc only
+V9 Recent-20 V7 Stack,V9 replacement evaluation,2025 OOF,698,0.6690043464337433,0.2382206085051316,0.6223135064081498,0.5931232091690545,best observed V9 candidate; superiority not proven
+V9 Recent-20 V7 Stack,V9 replacement evaluation,2026 posthoc,416,0.6677714954656994,0.2372803998442265,0.6343712352886665,0.5913461538461539,post-hoc only
+V9_STYLE,"V10 strict protocol: 2024 selection, full 2025 untouched holdout",2025 untouched holdout,698,0.6673356958884145,0.2374121482156219,0.6285573447255997,0.5830945558739254,best probability model within latest strict comparison
+V10 Combined,"V10 strict protocol: 2024 selection, full 2025 untouched holdout",2025 untouched holdout,698,0.6678166518901683,0.2376033881589388,0.6292474531712127,0.5974212034383954,rejected for probability quality; accuracy challenger
+V11.1 NEW BATTER,2025 validation after post-holdout redesign,2025 validation,698,0.6650197832911406,0.236312,0.6326076240552087,0.5945558739255015,post-holdout development candidate
+V11.1 CLEAN NO BATTER,same clean integration comparison,2025 validation,698,0.668953644311711,0.238270,0.619939,0.5744985673352435,batter ablation reference
+V12 CV-selected L2 C=0.03 ALL_EQUAL,selected by 2024-2025 expanding temporal CV; 2026 development evaluation,2026 development,416,0.6673896327657686,0.23703439314697938,0.6315679733110926,0.59375,clean scientific candidate
+V12 L2 C=0.1 RECENT_720,2026-observed static training-strategy comparison,2026 development,416,0.6661347844671042,0.23649786240497755,0.635274766008711,0.5961538461538461,best observed development champion
+V12 L2 C=0.1 RECENT_720 NO BATTER,same model/training strategy batter ablation,2026 development,416,0.6731570260130579,0.23987461520907022,0.6173431563339821,0.5793269230769231,new batter ablation reference

@@ -1,0 +1,13 @@
+{
+  "lineup_rows": 33552,
+  "lineup_bat_hand_known": 30868,
+  "lineup_bat_hand_coverage": 0.920004768717215,
+  "starter_rows": 3728,
+  "starter_throw_hand_known": 3727,
+  "starter_throw_hand_coverage": 0.9997317596566524,
+  "games_with_exactly_18_lineup_rows": 1864,
+  "same_date_update_excluded": true,
+  "current_game_excluded": true,
+  "exact_post_exit_runs_available_in_frozen_boxscore": false,
+  "historical_daily_roster_snapshots_frozen": false
+}

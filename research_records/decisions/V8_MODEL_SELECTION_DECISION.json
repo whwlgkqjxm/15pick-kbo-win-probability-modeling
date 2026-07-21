@@ -1,0 +1,25 @@
+{
+  "version": "rq1_v8_batter_bullpen_income_system_lab_v1_20260719",
+  "selected_batter": {
+    "score_id": "B_RATE50",
+    "mean_method": "ALL_K10",
+    "aggregation_block": "ORDER",
+    "C": 0.003,
+    "2025_oof_log_loss": 0.6828664637828736
+  },
+  "selected_bullpen": {
+    "score_id": "P_RUN_PREVENT",
+    "mean_method": "HIER_ALL_K3",
+    "pool_config": "W30_H14_NONE",
+    "C": 0.003,
+    "2025_oof_log_loss": 0.6874441561227899
+  },
+  "selected_prediction_application": {
+    "method": "LOGIT_STACK_V7_STARTER_C0.1",
+    "2025_oof_log_loss": 0.6694826202559611,
+    "2026_posthoc_log_loss": 0.6677851232420587
+  },
+  "mean_comparison_audit_all_pass": true,
+  "interpretation": "Selected batter income improves the team-only domain model and legacy batter system in 2025, but neither batter nor bullpen improved the already-strong V7 starter stack on the 2025 selection period.",
+  "status": "OFFLINE_ACTUAL_DATA_DIAGNOSTIC; PROSPECTIVE_CONFIRMATION_REQUIRED"
+}

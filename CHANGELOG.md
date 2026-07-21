@@ -1,23 +1,17 @@
 # Changelog
 
-## 1.2.0 — 2026-07-21
+## 2.0.0 — 2026-07-21
 
-- Reframed the repository around **KBO pregame win-probability prediction**.
-- Standardized all public terminology around **role-aware player performance indices**.
-- Renamed the Python package to `fifteenpick_prediction`.
-- Renamed ablation reports, scripts, documentation, and model labels for semantic consistency.
-- Clarified that the player indices are predictive inputs, not the project’s final objective.
-- Strengthened the external MLB benchmark section and separated internal evidence from cross-study context.
-- Expanded the relief-pitcher negative result using deployment uncertainty, leakage, availability, fatigue, and small-sample variance.
-- Curated the experiment history into research decisions rather than archived implementation versions.
+- Added the verified V11.1 and V12 research source and frozen artifacts.
+- Added the 1,824-row derived modeling table for exact core reproduction.
+- Corrected logistic solver drift and deterministic recent-window ordering.
+- Restored authoritative date-cluster bootstrap behavior.
+- Added exact metric, bootstrap, SHA, dataset, and model-replay verification.
+- Added calibration, coefficient, model-family, learning-strategy, and feature-importance outputs.
+- Expanded the research journey, failure/root-cause ledger, scientific status, data lineage, release policy, and prospective protocol.
+- Rebuilt experiment cards for Phase 1 through V12.
+- Expanded the model registry with training, scientific-status, and provenance fields.
 
-## 1.1.0 — 2026-07-21
+## 1.2.0
 
-- Corrected the public project identity to 15Pick.
-- Added MLB forecasting context and prospective success criteria.
-- Added the player-level relief-pitcher negative result and academic interpretation.
-
-## 1.0.0 — 2026-07-20
-
-- Created the public, leakage-controlled research repository.
-- Added maintained temporal evaluation code, aggregate results, and reproducibility documentation.
+Initial portfolio-oriented repository with maintained formulas, aggregate results, documentation, and basic tests.

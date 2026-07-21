@@ -1,0 +1,62 @@
+{
+  "archive_version": "v15.0_20260720",
+  "research_question": "Do role-specific 15Pick composite player-performance indices derived from official KBO records provide incremental pregame win-probability information beyond team strength?",
+  "official_data_ranges": {
+    "2024": "2024-03-23 to 2024-10-01",
+    "2025": "2025-03-22 to 2025-10-04",
+    "2026": "2026-03-28 to 2026-07-09"
+  },
+  "games": 1864,
+  "decision_games": 1824,
+  "player_occurrences": 65554,
+  "new_batter_income": {
+    "version": "V11.1",
+    "score": "POWER_OBP__RATE100",
+    "history": "S_K5",
+    "lineup_block": "MEAN",
+    "legacy_batter_income_used": false,
+    "status": "post-holdout development candidate"
+  },
+  "cv_selected_scientific_candidate": {
+    "model": "L2_C0.03_ALL_EQUAL",
+    "selection": "2024-2025 expanding temporal CV without 2026",
+    "cv_log_loss": 0.668642531384877,
+    "cv_brier": 0.23789923688694858,
+    "cv_auc": 0.6286094389747107,
+    "2026_development": {
+      "n": 416,
+      "log_loss": 0.6673896327657686,
+      "brier": 0.23703439314697938,
+      "roc_auc": 0.6315679733110926,
+      "accuracy": 0.59375
+    }
+  },
+  "best_observed_development_model": {
+    "model": "L2_C0.1_RECENT_720",
+    "training_rows": 720,
+    "training_dates": "2024-09-24 to 2025-10-04",
+    "features": 14,
+    "2026_development": {
+      "n": 416,
+      "log_loss": 0.6661347844671042,
+      "brier": 0.23649786240497755,
+      "roc_auc": 0.635274766008711,
+      "accuracy": 0.5961538461538461
+    },
+    "status": "2026-observed development champion, not untouched final test"
+  },
+  "batter_ablation_best_observed": {
+    "with_batter_log_loss": 0.6661347844671042,
+    "without_batter_log_loss": 0.6731570260130579,
+    "delta_log_loss": -0.0070222415459537,
+    "bootstrap_ci95": [
+      -0.013416,
+      -0.000547958
+    ],
+    "improvement_probability": 0.9832
+  },
+  "starter_income": "clean start-only KBO_CONSTRAINED K10; no legacy starter-income mixing",
+  "bullpen": "team responsibility-run features; no player-level bullpen income",
+  "next_required_step": "Freeze CV and RECENT_720 candidates and begin immutable prospective pregame ledger.",
+  "test_set_warning": "No within-game/same-date leakage in 2026 predictions, but 2026 was used to compare strategies and is development evaluation only."
+}

@@ -1,0 +1,31 @@
+{
+  "score_id": "POWER_OBP__RATE100",
+  "definition": "per-game event score divided by approximate PA and normalized to 4.2 PA; early-2024 standardized to mean 1000, sd 250",
+  "weights": {
+    "singles": 0.5,
+    "doubles": 0.95,
+    "triples": 1.35,
+    "home_runs": 1.85,
+    "walks": 0.42,
+    "hit_by_pitch": 0.42,
+    "stolen_bases": 0.22,
+    "strikeouts": -0.08,
+    "double_play": -0.32,
+    "runs": 0.0,
+    "rbi": 0.0,
+    "game_winning_hit": 0.0
+  },
+  "rate_share": 1.0,
+  "early_mean_raw": 0.738432383380831,
+  "early_sd_raw": 0.9411772120687678,
+  "history_method": "S_K5",
+  "history_definition": "same-season prior mean shrunk with K=5 toward previous-season mean, or 1000 when unavailable",
+  "lineup_block": "MEAN",
+  "lineup_features": [
+    "mean",
+    "coverage",
+    "count_mean",
+    "coverage_min"
+  ],
+  "legacy_income_used": false
+}

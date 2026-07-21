@@ -1,0 +1,28 @@
+{
+  "status": "2026-observed development candidate; not final untouched test",
+  "model_id": "L2_C0.1_RECENT_720",
+  "features": [
+    "elo_diff",
+    "prior_win_pct_diff",
+    "prior_run_diff_per_game_diff",
+    "prior_rank_advantage",
+    "bullpen_strength_diff",
+    "K10_starter_value_diff",
+    "K10_starter_count_diff",
+    "K10_starter_reliability_diff",
+    "K10_both_starters_covered",
+    "PS_R20_RA_G_diff",
+    "mean",
+    "coverage",
+    "count_mean",
+    "coverage_min"
+  ],
+  "training_rule": "most recent 720 decision games strictly before 2026-03-28",
+  "training_rows": 720,
+  "training_start_game_date": 20240924,
+  "training_end_game_date": 20251004,
+  "C": 0.1,
+  "legacy_batter_income_used": false,
+  "new_batter_income_system": "POWER_OBP__RATE100 / S_K5 / lineup MEAN",
+  "random_seed": 20260720
+}

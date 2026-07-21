@@ -1,286 +1,206 @@
-# 15Pick — KBO Win-Probability Prediction with Role-Aware Player Performance Indices
+# 15Pick — Leakage-Controlled KBO Win-Probability Research
 
-[![Python](https://img.shields.io/badge/Python-3.11%2B-blue)](#reproduction)
-[![Task](https://img.shields.io/badge/Task-Pregame%20Win%20Probability-informational)](#research-question)
-[![Validation](https://img.shields.io/badge/Validation-Temporal%20%2B%20Leakage--Controlled-success)](#validation-design)
-[![Status](https://img.shields.io/badge/Status-Retrospective%20Development-orange)](#scientific-status)
-
-**15Pick** is a leakage-controlled KBO pregame win-probability project. Its central question is whether compact, role-aware summaries of player performance add useful predictive information beyond conventional team-strength and pregame context variables.
+[![Python](https://img.shields.io/badge/Python-3.11%2B-blue)](#reproduce-the-core-results)
+[![Validation](https://img.shields.io/badge/Validation-Temporal%20%2B%20Same--Date%20Excluded-success)](docs/temporal_validation_and_leakage.md)
+[![Artifacts](https://img.shields.io/badge/Artifacts-SHA256%20Manifest-success)](artifacts/RESEARCH_MANIFEST_SHA256.csv)
+[![Scientific status](https://img.shields.io/badge/Status-Development%20%7C%20Prospective%20Freeze-orange)](docs/scientific_status_and_claims.md)
 
 [한국어 README](README.ko.md)
 
-## Project Motivation
+## One-minute summary
 
-15Pick began as a fantasy-sports and point-based prediction platform. Baseball performance is distributed across many heterogeneous events: singles, extra-base hits, walks, strikeouts, double plays, innings recorded, home runs allowed, and more. These records are informative, but they are not easy for every fan to compare directly—especially across batting and pitching roles.
+This project asks whether **role-specific composite player-performance indices**, built from official KBO game records and averaged strictly before each target game, add predictive information beyond conventional pregame team-strength variables.
 
-The platform therefore transformed official game records into a single, intuitive **player performance score**. The product goal was interpretability: let users compare how strongly players had performed without requiring them to inspect dozens of statistics separately.
+The project is not a single final model notebook. It is an end-to-end research record covering:
 
-That design choice led to a research problem. A score can be easy to understand while still discarding important information. This repository tests whether the compressed representation has value beyond presentation:
+- official schedule and BoxScore collection across 2024–2026;
+- 65,554 player-game occurrences with numeric identity resolution;
+- strict-prior, same-date-excluded feature engineering;
+- detection and correction of home/away identity asymmetry and role contamination;
+- 215 batter-score candidates, 20 prior-average methods, and multiple lineup aggregations;
+- 42 model configurations and static, rolling, decay, adaptive, online, calibration, and ensemble strategies;
+- ablation, date-cluster bootstrap, calibration, model serialization, replay, and SHA-based provenance;
+- negative results and suspended conclusions when audits invalidated earlier assumptions.
 
-> **Does a role-aware player performance index preserve information that improves prediction of future KBO game outcomes?**
+The strongest observed 2026 development specification was L2 logistic regression (`C=0.1`) trained on the most recent 720 decision games. The scientifically cleaner specification was selected using only 2024–2025 temporal CV (`C=0.03`, all prior rows). Both are preserved and must be compared on future immutable predictions.
 
-The repository is therefore organized around a **win-probability model**, not around the score itself. The player indices are candidate predictive inputs whose incremental value is tested through controlled ablation.
+## Research question
 
-## Research Question
+> **Do role-specific 15Pick composite player-performance indices derived from official KBO game records provide incremental information for pregame win-probability forecasting beyond conventional team-strength features, and which player roles contribute the greatest predictive value?**
 
-> **Do role-specific, strictly prior composite player performance indices derived from official KBO game records improve pregame KBO win-probability forecasts beyond models based on conventional team strength and pregame records?**
+The score is not salary, contract value, betting profit, or economic value. It is a reproducible game-performance index. A target game's own score is never used as an input; only performance observed on dates strictly earlier than the target date is allowed.
 
-### Korean
+## Main evidence
 
-> **공식 KBO 경기 기록으로 구축한 역할별 strict-prior 복합 선수 활약 지표는 기존 팀 전력과 일반적인 경기 전 정보만 사용하는 모델보다 KBO 경기의 승리확률 예측을 개선하는가?**
-
-## Main Result
-
-Retrospective temporal evidence supports the research hypothesis. Under the same model family, training window, and conventional pregame variables, adding batter and starting-pitcher performance indices improved every primary metric.
-
-### Best observed development comparison — 416 decision games in 2026
+### Role-specific ablation — 2026 development evaluation, 416 decision games
 
 | Feature set | Log loss ↓ | Brier ↓ | ROC AUC ↑ | Accuracy ↑ |
 |---|---:|---:|---:|---:|
 | Conventional pregame variables only | 0.683942 | 0.245313 | 0.575781 | 54.33% |
-| + Batter performance index only | 0.678611 | 0.242599 | 0.603188 | 57.45% |
-| + Starting-pitcher performance index only | 0.673157 | 0.239875 | 0.617343 | 57.93% |
+| + Batter index only | 0.678611 | 0.242599 | 0.603188 | 57.45% |
+| + Starting-pitcher index only | 0.673157 | 0.239875 | 0.617343 | 57.93% |
 | **+ Batter and starting-pitcher indices** | **0.666135** | **0.236498** | **0.635275** | **59.62%** |
 
-Compared with the no-player-index baseline, the combined model achieved:
+For the combined model versus the no-player-index baseline:
 
-- Log-loss improvement: **−0.017807**
-- Brier improvement: **−0.008815**
-- ROC AUC improvement: **+0.059494**
-- Accuracy improvement: **+5.29 percentage points**
-- Date-cluster bootstrap probability of lower Log loss: **98.69%**
-- 95% bootstrap interval for the Log-loss difference: **[−0.033154, −0.002114]**
+- Log-loss difference: **−0.017807**
+- 95% paired date-cluster bootstrap interval: **[−0.033154, −0.002114]**
+- Probability of lower Log loss: **98.69%**
 
-![Primary player-index ablation](reports/figures/primary_ablation_logloss.png)
+The narrower V12 batter-block ablation, holding the team and clean-starter block fixed, improved Log loss from `0.673157` to `0.666135`, with a 95% date-cluster interval of `[-0.013416, -0.000548]`.
 
-The combined result also matters scientifically because the batter-only and starter-only models each improved over the baseline, while the combined model improved further. This suggests that the two role-specific representations contain partially complementary information.
+![Role-specific ablation](reports/figures/player_index_ablation_logloss.png)
 
-## External Baseball Forecasting Context
+## Why the research process matters
 
-There is no universal accuracy threshold for a “good” baseball model. Performance depends on the league, prediction unit, information timing, class balance, features, and validation protocol. Published MLB next-game studies summarized by Li, Huang, and Li (2022) commonly fall around **55–62% accuracy**. Their own feature-selected SVM reported **65.75% accuracy and 0.6501 ROC AUC**, while Soto Valero (2016) reported **58.92% accuracy** for the strongest model in that study.
+The strongest part of this project is not that every experiment worked. It is that failures changed the research design.
 
-These values are used as context—not as a direct leaderboard—because the published studies use different datasets and validation designs.
+| Problem discovered | Evidence | Root cause | Corrective action | Outcome |
+|---|---|---|---|---|
+| Weak 2026-only model | probabilities concentrated near 0.5; complex model degraded | small repeated-team sample and adaptive search | expanded to 2024–2026 official data | stronger and more stable temporal evidence |
+| Away-starting-pitcher history missing | home starter eligibility 416, away 0 | asymmetric raw identity tokens | numeric identity reconstruction and side-specific audits | 832/832 model-period starters eligible |
+| Role-contaminated histories | 78.11% of experienced starting-batter rows contained substitute history; 20.77% of starting-pitcher rows contained relief history | history key omitted role | role-aware parallel histories and start-only redesign | clean starter index became a strong signal |
+| Broad complex-model search failed | V3 Log loss 0.677185 versus V2 0.670610 | feature proliferation and limited independent information | retained regulated logistic baseline | negative result preserved rather than hidden |
+| Ceiling conclusion became invalid | earlier audit suggested little signal remained | ceiling was measured on contaminated features | suspended the claim | research question reopened after data repair |
+| Initial batter candidate failed to add value | V8 batter addition worsened the V7 stack | limited score/mean/aggregation search | full V11.1 rebuild from official batting events | new batter block showed incremental value |
+| Player-level relief index failed | 2025 domain delta +0.000009; stack worsened | actual reliever deployment unknown pregame | retained team-level prior post-starter run prevention | negative result documented and scope narrowed |
+| Daily retraining failed to help | expanding/rolling adaptive models trailed static recent-window model | adaptation followed noise in a modest sample | preserved both clean CV and observed development candidates | future prospective comparison required |
 
-| Reference level | Accuracy | ROC AUC | Log loss | Brier |
-|---|---:|---:|---:|---:|
-| Neutral 0.5 forecast | 50.00% | 0.5000 | 0.6931 | 0.2500 |
-| Broad published MLB context | approximately 55–62% | varies | often not reported | often not reported |
-| Strong published MLB example | 65.75% | 0.6501 | not reported | not reported |
-| **15Pick retrospective development model** | **59.62%** | **0.6353** | **0.6661** | **0.2365** |
+The full causal record is in [`docs/research_journey.md`](docs/research_journey.md) and [`docs/failure_root_cause_ledger.md`](docs/failure_root_cause_ledger.md).
 
-The current result is within the broad published baseball-prediction range and approaches the stronger reported AUC context. It is not yet a final confirmatory result because 2026 was observed during development.
+## Data foundation
 
-### Success criteria for future frozen evaluation
-
-1. **Incremental scientific value:** the player-index model must outperform the identical no-player-index model on both Log loss and Brier score.
-2. **Competitive forecasting context:** prospective performance should remain near **60% accuracy** and **ROC AUC ≥ 0.63**, with stable calibration.
-3. **Aspirational target:** approach **ROC AUC ≈ 0.65** without sacrificing Log loss, Brier score, or calibration.
-4. **Confirmatory requirement:** all final claims must survive an immutable prospective prediction ledger.
-
-Accuracy is secondary because 15Pick outputs probabilities. Log loss, Brier score, and calibration are the primary standards.
-
-See [`docs/external_benchmarks_and_success_criteria.md`](docs/external_benchmarks_and_success_criteria.md).
-
-## Relief-Pitcher Index: Negative Result
-
-Adding a player-level relief-pitcher performance index did not improve the tested pregame models.
-
-| Evaluation | Reference Log loss | + Relief-pitcher index | Difference |
-|---|---:|---:|---:|
-| 2025 relief-unit domain model | 0.687435 | 0.687444 | **+0.000009** |
-| 2025 added to starter stack | 0.669483 | 0.674253 | **+0.004770** |
-| 2026 post-hoc addition | 0.667785 | 0.668898 | **+0.001113** |
-
-Positive differences are worse. The standalone 2025 comparison produced only a **49.95% probability of improvement**, effectively a null result.
-
-This does **not** imply that relief pitching is unimportant. It indicates that the tested player-level pregame representation was not sufficiently identifiable or stable. The structural reasons are:
-
-- **Unknown deployment:** unlike starting pitchers, the relievers who will appear are generally not confirmed before first pitch.
-- **Outcome-dependent selection:** reliever choice depends on inning, score, leverage, starter exit, handedness matchups, and managerial strategy that develop during the game.
-- **Leakage-versus-dilution trade-off:** using actual relievers leaks postgame deployment information; averaging the full relief pool includes pitchers who may never enter.
-- **Time-varying availability:** recent pitch counts, consecutive-day use, recovery, injury, and roster status affect who is realistically available.
-- **High variance:** relievers work in smaller samples, and their observed performance is strongly conditioned by leverage and role.
-
-Published MLB research supports the importance of recent workload for short-term reliever effectiveness and the strategic role of handedness in pitcher substitution. The final model therefore uses a **team-level strict-prior post-starter run-prevention feature** rather than forcing uncertain player-level relief assignments into the predictor.
-
-![Relief-pitcher index negative result](reports/figures/relief_pitcher_index_negative_result.png)
-
-See [`docs/relief_pitcher_index_negative_result.md`](docs/relief_pitcher_index_negative_result.md).
-
-## Scientific Status
-
-This repository separates two specifications:
-
-1. **Temporally CV-selected specification:** L2 logistic regression with `C=0.03`, selected using 2024–2025 temporal comparisons. On the 2026 evaluation period, adding batter and starter indices reduced Log loss from `0.683516` to `0.667390`.
-2. **Best observed development specification:** L2 logistic regression with `C=0.1`, trained on the most recent 720 decision games. It reduced Log loss from `0.683942` to `0.666135`.
-
-The second is the strongest observed development candidate, but it was selected after inspecting 2026 results. It is therefore not labeled an untouched final test or production champion. A frozen prospective ledger is required for the final generalization claim.
-
-## Data Foundation
-
-| Component | Scale |
+| Component | Count |
 |---|---:|
-| Official scheduled-game rows | 2,047 |
+| Official schedule rows | 2,047 |
 | Completed games | 1,864 |
-| Cancelled or postponed games | 183 |
-| Seasons | 2024, 2025, 2026 through July 9 |
-| Player-game occurrences | 65,554 |
+| Cancelled or postponed | 183 |
 | Batter occurrences | 47,353 |
 | Pitcher occurrences | 18,201 |
+| Total player-game occurrences | 65,554 |
 | Official starting-lineup rows | 33,552 |
-| Resolved player occurrences | 65,554 / 65,554 |
-| Same-date temporal violations | 0 |
+| Resolved occurrences | 65,554 / 65,554 |
+| Name-only forced merges | 0 |
+| Strict-prior history rows | 65,554 |
+| Temporal violations | 0 |
 
-Binary fitting excludes tied games. The resulting evaluation rows were 710 in 2024, 698 in 2025, and 416 in 2026.
+The included V12 derived modeling table has 1,824 decision games: 710 in 2024, 698 in 2025, and 416 in 2026. Complete official raw responses are not redistributed in this repository.
 
-The public repository does not redistribute the complete official KBO archive. It provides schemas, synthetic examples, maintained code, aggregate results, and a documented data lineage.
+## Player-performance indices
 
-## Player Performance Indices
-
-### Batter index
-
-The selected batter index combines official plate-appearance events:
+### Batter game index
 
 ```text
-0.50·1B + 0.95·2B + 1.35·3B + 1.85·HR
-+ 0.42·BB + 0.42·HBP + 0.22·SB
-− 0.08·SO − 0.32·GIDP
+0.50 × 1B + 0.95 × 2B + 1.35 × 3B + 1.85 × HR
++ 0.42 × BB + 0.42 × HBP + 0.22 × SB
+− 0.08 × SO − 0.32 × GIDP
 ```
 
-The game score is normalized to a 4.2-plate-appearance rate, standardized around 1,000, and converted to a strict-prior player average with `K=5` shrinkage. The official nine-player starting lineup is summarized using mean index, coverage, prior-game count, and minimum side coverage.
+The event total is normalized to a 4.2-plate-appearance rate, standardized using an early-2024 design reference, clipped to `[-500, 3000]`, and converted to a same-season strict-prior mean with `K=5` shrinkage. The official nine-player starting lineup is aggregated using mean performance, coverage, prior-game count, and minimum-side coverage.
 
-### Starting-pitcher index
-
-The start-only game index is:
+### Starting-pitcher game index
 
 ```text
 1000 × (
-  0.216·outs_recorded
-  + 0.132·strikeouts
-  − 1.565·home_runs_allowed
-  − 0.557·(walks + hit_by_pitch)_allowed
+  0.216 × outs
+  + 0.132 × strikeouts
+  − 1.565 × home runs allowed
+  − 0.557 × (walks + hit by pitch allowed)
 )
 ```
 
-Only prior **starting appearances** enter the history. Relief appearances are not mixed into the starting-pitcher index. A `K=10` strict-prior shrinkage mean stabilizes small samples.
+Only starts are included in the history. Relief appearances are not mixed into the starting-pitcher prior. The model uses a `K=10` shrunk prior and coverage/reliability features.
 
-Detailed definitions are in [`docs/player_performance_indices.md`](docs/player_performance_indices.md).
+See [`docs/player_index_design.md`](docs/player_index_design.md).
 
-## Validation Design
+## Validation contract
 
-The target setting is lineup-confirmed pregame forecasting:
+- `source game date < target game date` for every historical feature;
+- target-game outcomes excluded;
+- all outcomes on the same date excluded;
+- doubleheader game 1 not used for game 2 on the same date;
+- imputation, scaling, model selection, and calibration fitted within training data;
+- shuffled splits prohibited for primary evaluation;
+- target-game actual relievers prohibited;
+- cancelled games voided or excluded;
+- date-cluster bootstrap used for paired uncertainty.
 
-- official starting nine for each team
-- official starting pitcher for each team
-- only information available before the target game date
+A crucial distinction is preserved: **2026 predictions have no within-game or same-date leakage, but 2026 was inspected during method comparison.** Therefore it is development evaluation, not a final untouched test.
 
-Hard controls include:
+## Research evolution
 
-- target-game results never enter features
-- all same-date results are excluded
-- doubleheader Game 1 is not used for Game 2 on the same date
-- train-only imputation and scaling
-- temporal cross-validation rather than shuffled primary splits
-- actual target-game relievers are never used as pregame inputs
-- cancelled games are excluded or voided
-- paired date-cluster bootstrap for uncertainty
-
-See [`docs/temporal_validation.md`](docs/temporal_validation.md).
-
-## Model Search
-
-The study compared 42 model and training configurations across:
-
-- L2 and Elastic Net logistic regression
-- Random Forest and Extra Trees
-- Gradient Boosting and Histogram Gradient Boosting
-- XGBoost, LightGBM, and CatBoost
-- stacking, blending, and calibration
-- all-history, recent-window, time-decay, rolling, expanding, and online strategies
-
-Regularized logistic regression was the most stable probability model. More complex families did not consistently improve temporal Log loss or Brier score.
-
-## Research Progress
-
-1. A limited 2026-only model produced weak, compressed probabilities.
-2. Multi-season official data improved estimation stability.
-3. Broad high-dimensional and ensemble searches failed to beat regularized logistic regression.
-4. A role audit found contamination between starting and substitute appearances and between starts and relief appearances.
-5. The starting-pitcher index was rebuilt from start-only history.
-6. The batter index was rebuilt from official lineup and event data.
-7. Player-level relief-pitcher indices produced null or worse results.
-8. Recent-window and full-history training strategies were compared.
-9. The final controlled ablation tested conventional features against batter-only, starter-only, and combined player-index models.
-
-See [`docs/experiment_history.md`](docs/experiment_history.md) and [`docs/failure_analysis.md`](docs/failure_analysis.md).
-
-## Repository Structure
-
-```text
-15pick-kbo-win-probability/
-├── configs/                 # frozen index and model specifications
-├── data/
-│   ├── sample/              # synthetic, non-official example rows
-│   └── schema/              # modeling dataset contract
-├── docs/                    # research design, methods, limitations, benchmarks
-├── experiments/             # curated experiment cards and decisions
-├── models/                  # model registry and scientific status
-├── reports/                 # aggregate results and figures
-├── scripts/                 # reproduction and verification entry points
-├── src/fifteenpick_prediction/
-└── tests/
+```mermaid
+flowchart LR
+    A[2026-only limited sample] --> B[Multi-season official foundation]
+    B --> C[V1-V4 temporal models]
+    C --> D[Identity and role-scope audit]
+    D --> E[Clean start-only pitcher index]
+    E --> F[V7 integration and stacking]
+    F --> G[V8 batter and relief negative results]
+    G --> H[V9 post-starter team run prevention]
+    H --> I[V10 workload/matchup tests rejected]
+    I --> J[V11.1 full batter-index rebuild]
+    J --> K[V12 model and training-strategy comparison]
+    K --> L[Two-model freeze and prospective ledger]
 ```
 
-## Reproduction
+## Scientific status
+
+| Specification | Selection data | Training rule | 2026 Log loss | Status |
+|---|---|---|---:|---|
+| `L2_C0.03_ALL_EQUAL` | 2024–2025 temporal CV | all 2024–2025 decision games | 0.667390 | clean CV-selected candidate |
+| `L2_C0.1_RECENT_720` | selected after 2026 method comparison | most recent 720 pre-2026 games | 0.666135 | best observed development candidate |
+
+No model is described as a future-proven production champion. The next confirmatory stage is an immutable prospective ledger.
+
+## Reproduce the core results
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
 pip install -e ".[dev]"
-make check
+make reproduce
+make verify
 ```
 
-Expected validation:
+`make reproduce` retrains both frozen logistic specifications and all four role-ablation models from the included derived modeling dataset. It regenerates metrics, predictions, date-cluster bootstrap intervals, calibration tables, and standardized coefficients.
+
+`make verify` additionally validates row counts, deterministic temporal ordering, same-date flags, SHA256 artifacts, published metrics, bootstrap values, and saved-model replay to `< 1e-12` maximum probability error.
+
+Full historical V11.1/V12 research scripts are retained under [`research/authoritative/`](research/authoritative/). They are preserved as research evidence; the portable reproduction entry point is under [`scripts/`](scripts/).
+
+## Repository map
 
 ```text
-PASS: published player-index and relief-pitcher results match frozen values
-9 passed
-All checks passed!
+├── data/derived/              # 1,824-game derived modeling table and temporal folds
+├── docs/                      # research design, journey, failures, limitations, claims
+├── experiments/               # hypothesis → evidence → decision cards for every phase
+├── models/frozen/             # saved CV and development model binaries
+├── reports/frozen/            # authoritative V11.1/V12 result tables
+├── reports/reproduced/        # outputs regenerated from the portable pipeline
+├── research/authoritative/    # preserved V11.1/V12 historical execution code
+├── research_records/          # decisions, audits, reports, and negative results
+├── scripts/                   # reproduction, verification, figures, manifests
+├── src/fifteenpick_prediction/# maintained reusable package
+└── tests/                     # formula, temporal, bootstrap, model, artifact tests
 ```
 
-Re-run the controlled ablation with a local modeling dataset:
+## Suggested reading order
 
-```bash
-python scripts/reproduce_player_index_ablation.py \
-  --data /path/to/modeling_dataset.csv \
-  --protocol best-development \
-  --output reports/reproduced_player_index_ablation.csv
-```
+1. [`docs/research_question_and_contribution.md`](docs/research_question_and_contribution.md)
+2. [`docs/research_journey.md`](docs/research_journey.md)
+3. [`docs/failure_root_cause_ledger.md`](docs/failure_root_cause_ledger.md)
+4. [`docs/data_lineage_and_quality.md`](docs/data_lineage_and_quality.md)
+5. [`docs/temporal_validation_and_leakage.md`](docs/temporal_validation_and_leakage.md)
+6. [`docs/model_selection_ablation_and_calibration.md`](docs/model_selection_ablation_and_calibration.md)
+7. [`docs/reproducibility.md`](docs/reproducibility.md)
+8. [`docs/scientific_status_and_claims.md`](docs/scientific_status_and_claims.md)
 
-Required columns are documented in [`data/schema/modeling_dataset_schema.csv`](data/schema/modeling_dataset_schema.csv).
+## Data and licensing
 
-## Limitations
+The repository distinguishes code, derived research tables, and official raw KBO responses. Raw responses and operational-service data are not included. Before making the repository public, review [`docs/data_release_policy.md`](docs/data_release_policy.md) and remove any artifact not covered by the intended release policy.
 
-- The recent-720 specification is retrospective development evidence, not a pristine final test.
-- Historical official lineups were reconstructed from completed game pages rather than a contemporaneously archived confirmation feed.
-- Exact relief-pitcher availability and intended deployment were not historically observable before every game.
-- Market odds, weather, verified injuries, travel, and exact bullpen availability are outside the primary feature set.
-- MLB benchmark values are not directly comparable because their leagues, features, units, and validation protocols differ.
-- Better probability metrics do not automatically imply profitable betting after bookmaker margin and market efficiency.
-- Complete official raw data are not redistributed in this repository.
+## Author
 
-## Next Scientific Step
-
-Freeze the current candidate and comparator, record every future prediction before first pitch with model and input hashes, and evaluate the immutable ledger using Log loss, Brier score, calibration, ROC AUC, accuracy, and date-cluster uncertainty.
-
-## References
-
-- Li, S.-F., Huang, M.-L., & Li, Y.-Z. (2022). *Exploring and Selecting Features to Predict the Next Outcomes of MLB Games*. **Entropy, 24**(2), 288. https://doi.org/10.3390/e24020288
-- Soto Valero, C. (2016). *Predicting Win-Loss Outcomes in MLB Regular Season Games—A Comparative Study Using Data Mining Methods*. **International Journal of Computer Science in Sport, 15**(2), 91–112. https://doi.org/10.1515/ijcss-2016-0007
-- Burris, K., & Coleman, J. (2018). *Out of Gas: Quantifying Fatigue in MLB Relievers*. **Journal of Quantitative Analysis in Sports, 14**(2), 57–64. https://doi.org/10.1515/jqas-2018-0007
-- Hirotsu, N., & Wright, M. (2005). *Modelling a Baseball Game to Optimise Pitcher Substitution Strategies Incorporating Handedness of Players*. **IMA Journal of Management Mathematics, 16**(2), 179–194. https://doi.org/10.1093/imaman/dpi009
-
-## License and Data Use
-
-Code and original documentation are released under the MIT License. Official KBO source data remain subject to their original rights and terms; this repository does not redistribute the complete raw archive.
+Jiho Choi — Data Analytics, The Ohio State University

@@ -1,0 +1,284 @@
+{
+  "version": "rq1_v10_official_game_page_feature_lab_v1_20260719",
+  "data_contract": "KBO official schedule-linked game pages and official player profiles only for executed features",
+  "evaluation": "2024 temporal selection; 2025 untouched season holdout; 2026 post-hoc only",
+  "selected_base_models": {
+    "V2": {
+      "config": "official21",
+      "C": 0.01,
+      "feature_count": 21,
+      "features": [
+        "elo_diff",
+        "prior_win_pct_diff",
+        "prior_run_diff_per_game_diff",
+        "prior_rank_advantage",
+        "bullpen_strength_diff",
+        "lineup_prior_recent_5_income_mean_diff",
+        "starter_prior_recent_5_income_mean_diff",
+        "lineup_history_coverage_diff",
+        "lineup_history_coverage_min",
+        "both_starters_history_available",
+        "lineup_prior_season_income_mean_diff",
+        "starter_prior_season_income_mean_diff",
+        "lineup_cross_blend_k10_mean_diff",
+        "lineup_cross_blend_k10_median_diff",
+        "lineup_cross_blend_k10_weighted_diff",
+        "lineup_top_cross_blend_k10_mean_diff",
+        "lineup_middle_cross_blend_k10_mean_diff",
+        "lineup_bottom_cross_blend_k10_mean_diff",
+        "starter_cross_blend_k10_diff",
+        "lineup_prev_full_mean_mean_diff",
+        "starter_prev_full_mean_diff"
+      ]
+    },
+    "STARTER": {
+      "config": "R20_K10",
+      "C": 0.01,
+      "feature_count": 9,
+      "features": [
+        "elo_diff",
+        "prior_win_pct_diff",
+        "prior_run_diff_per_game_diff",
+        "prior_rank_advantage",
+        "PS_R20_RA_G_diff",
+        "K10_starter_value_diff",
+        "K10_starter_count_diff",
+        "K10_starter_reliability_diff",
+        "K10_both_starters_covered"
+      ]
+    },
+    "WORKLOAD": {
+      "config": "K10",
+      "C": 0.1,
+      "feature_count": 16,
+      "features": [
+        "elo_diff",
+        "prior_win_pct_diff",
+        "prior_run_diff_per_game_diff",
+        "prior_rank_advantage",
+        "PS_R20_RA_G_diff",
+        "WORK_K10_outs_recorded_k_diff",
+        "WORK_K10_outs_r3_diff",
+        "WORK_K10_pitches_r3_diff",
+        "WORK_K10_early_hook_rate_diff",
+        "WORK_K10_six_plus_rate_diff",
+        "WORK_K10_outs_std_diff",
+        "WORK_K10_outs_trend_r3_diff",
+        "WORK_K10_rest_days_diff",
+        "WORK_K10_expected_start_share_diff",
+        "WORK_K10_reliability_diff",
+        "WORK_K10_coverage_min"
+      ]
+    },
+    "MATCHUP": {
+      "config": "K20",
+      "C": 0.003,
+      "feature_count": 17,
+      "features": [
+        "elo_diff",
+        "prior_win_pct_diff",
+        "prior_run_diff_per_game_diff",
+        "prior_rank_advantage",
+        "PS_R20_RA_G_diff",
+        "MATCH_K20_mean_diff",
+        "MATCH_K20_std_diff",
+        "MATCH_K20_top_diff",
+        "MATCH_K20_mid_diff",
+        "MATCH_K20_bottom_diff",
+        "MATCH_K20_order_diff",
+        "MATCH_K20_coverage_diff",
+        "MATCH_K20_count_mean_diff",
+        "MATCH_K20_reliability_diff",
+        "MATCH_K20_platoon_adv_diff",
+        "MATCH_K20_unknown_bat_hand_diff",
+        "MATCH_K20_coverage_min"
+      ]
+    },
+    "LINEUP": {
+      "config": "B_RATE50_ALL_K10_CONT10",
+      "C": 0.003,
+      "feature_count": 18,
+      "features": [
+        "elo_diff",
+        "prior_win_pct_diff",
+        "prior_run_diff_per_game_diff",
+        "prior_rank_advantage",
+        "PS_R20_RA_G_diff",
+        "B_RATE50__ALL_K10__lineup_mean_diff",
+        "B_RATE50__ALL_K10__lineup_std_diff",
+        "B_RATE50__ALL_K10__lineup_top_diff",
+        "B_RATE50__ALL_K10__lineup_mid_diff",
+        "B_RATE50__ALL_K10__lineup_bottom_diff",
+        "B_RATE50__ALL_K10__lineup_order_weighted_diff",
+        "B_RATE50__ALL_K10__lineup_reliability_weighted_diff",
+        "B_RATE50__ALL_K10__lineup_coverage_diff",
+        "B_RATE50__ALL_K10__lineup_coverage_min",
+        "CONT_last_lineup_overlap_diff",
+        "CONT_missing_regular_diff",
+        "CONT_new_lineup_count_diff",
+        "CONT_current_start_freq_mean_diff"
+      ]
+    },
+    "COMBINED": {
+      "config": "selected_blocks",
+      "C": 0.003,
+      "feature_count": 41,
+      "features": [
+        "B_RATE50__ALL_K10__lineup_bottom_diff",
+        "B_RATE50__ALL_K10__lineup_coverage_diff",
+        "B_RATE50__ALL_K10__lineup_coverage_min",
+        "B_RATE50__ALL_K10__lineup_mean_diff",
+        "B_RATE50__ALL_K10__lineup_mid_diff",
+        "B_RATE50__ALL_K10__lineup_order_weighted_diff",
+        "B_RATE50__ALL_K10__lineup_reliability_weighted_diff",
+        "B_RATE50__ALL_K10__lineup_std_diff",
+        "B_RATE50__ALL_K10__lineup_top_diff",
+        "CONT_current_start_freq_mean_diff",
+        "CONT_last_lineup_overlap_diff",
+        "CONT_missing_regular_diff",
+        "CONT_new_lineup_count_diff",
+        "MATCH_K20_bottom_diff",
+        "MATCH_K20_count_mean_diff",
+        "MATCH_K20_coverage_diff",
+        "MATCH_K20_coverage_min",
+        "MATCH_K20_mean_diff",
+        "MATCH_K20_mid_diff",
+        "MATCH_K20_order_diff",
+        "MATCH_K20_platoon_adv_diff",
+        "MATCH_K20_reliability_diff",
+        "MATCH_K20_std_diff",
+        "MATCH_K20_top_diff",
+        "MATCH_K20_unknown_bat_hand_diff",
+        "PS_R20_RA_G_diff",
+        "WORK_K10_coverage_min",
+        "WORK_K10_early_hook_rate_diff",
+        "WORK_K10_expected_start_share_diff",
+        "WORK_K10_outs_r3_diff",
+        "WORK_K10_outs_recorded_k_diff",
+        "WORK_K10_outs_std_diff",
+        "WORK_K10_outs_trend_r3_diff",
+        "WORK_K10_pitches_r3_diff",
+        "WORK_K10_reliability_diff",
+        "WORK_K10_rest_days_diff",
+        "WORK_K10_six_plus_rate_diff",
+        "elo_diff",
+        "prior_rank_advantage",
+        "prior_run_diff_per_game_diff",
+        "prior_win_pct_diff"
+      ]
+    }
+  },
+  "meta_architectures": {
+    "V9_STYLE": {
+      "base_models": [
+        "V2",
+        "STARTER"
+      ],
+      "meta_C": 0.03
+    },
+    "V10_WORKLOAD": {
+      "base_models": [
+        "V2",
+        "STARTER",
+        "WORKLOAD"
+      ],
+      "meta_C": 0.01
+    },
+    "V10_MATCHUP": {
+      "base_models": [
+        "V2",
+        "STARTER",
+        "MATCHUP"
+      ],
+      "meta_C": 0.03
+    },
+    "V10_LINEUP": {
+      "base_models": [
+        "V2",
+        "STARTER",
+        "LINEUP"
+      ],
+      "meta_C": 0.03
+    },
+    "V10_COMBINED_MODEL": {
+      "base_models": [
+        "V2",
+        "STARTER",
+        "COMBINED"
+      ],
+      "meta_C": 0.01
+    },
+    "V10_SEPARATE_BLOCKS": {
+      "base_models": [
+        "V2",
+        "STARTER",
+        "WORKLOAD",
+        "MATCHUP",
+        "LINEUP"
+      ],
+      "meta_C": 0.01
+    }
+  },
+  "best_2025_architecture": "V9_STYLE",
+  "best_2025_metrics": {
+    "architecture": "V9_STYLE",
+    "base_models": "V2|STARTER",
+    "meta_C": 0.03,
+    "log_loss": 0.6673356958884145,
+    "brier": 0.2374121482156219,
+    "roc_auc": 0.6285573447255997,
+    "accuracy": 0.5830945558739254,
+    "n": 698
+  },
+  "v9_style_2025_metrics": {
+    "architecture": "V9_STYLE",
+    "base_models": "V2|STARTER",
+    "meta_C": 0.03,
+    "log_loss": 0.6673356958884145,
+    "brier": 0.23741214821562195,
+    "roc_auc": 0.6285573447255997,
+    "accuracy": 0.5830945558739254,
+    "n": 698
+  },
+  "best_vs_v9_style_bootstrap": null,
+  "availability_audit": {
+    "lineup_rows": 33552,
+    "lineup_bat_hand_known": 30868,
+    "lineup_bat_hand_coverage": 0.920004768717215,
+    "starter_rows": 3728,
+    "starter_throw_hand_known": 3727,
+    "starter_throw_hand_coverage": 0.9997317596566524,
+    "games_with_exactly_18_lineup_rows": 1864,
+    "same_date_update_excluded": true,
+    "current_game_excluded": true,
+    "exact_post_exit_runs_available_in_frozen_boxscore": false,
+    "historical_daily_roster_snapshots_frozen": false
+  },
+  "not_executed": {
+    "exact_runs_after_physical_starter_exit": "Frozen GetBoxScore tables do not contain complete play-by-play scoring timeline.",
+    "historical_official_roster_absence": "Historical daily KBO register snapshots not in freeze; official-lineup continuity proxy tested."
+  },
+  "status": "OFFLINE ACTUAL-DATA LAB; PROSPECTIVE VALIDATION REQUIRED",
+  "best_new_challenger_2025": "V10_COMBINED_MODEL",
+  "best_new_challenger_metrics": {
+    "architecture": "V10_COMBINED_MODEL",
+    "base_models": "V2|STARTER|COMBINED",
+    "meta_C": 0.01,
+    "log_loss": 0.6678166518901683,
+    "brier": 0.2376033881589388,
+    "roc_auc": 0.6292474531712127,
+    "accuracy": 0.5974212034383954,
+    "n": 698
+  },
+  "best_new_challenger_vs_v9_style_bootstrap": {
+    "period": "2025_HOLDOUT",
+    "comparison": "V10_COMBINED_MODEL_minus_V9_STYLE",
+    "point": 0.00048095600175379226,
+    "ci025": -0.0029088844974742086,
+    "ci975": 0.0038790699612805896,
+    "prob_challenger_improves": 0.38475,
+    "iterations": 20000
+  },
+  "decision": "NO_INCREMENTAL_PROBABILITY_IMPROVEMENT_ON_2025_UNTOUCHED_HOLDOUT: retain V9-style architecture. V10 combined improved accuracy and AUC slightly, but worsened log loss and Brier; track only as an accuracy-oriented prospective challenger.",
+  "protocol_note": "V10 metrics use a newly defined stricter protocol: configuration/regularization selection on 2024 temporal folds and full 2025 season as untouched holdout. Therefore absolute V9-style metrics here should not be numerically mixed with prior V9 reports; architecture comparisons within V10 are fair because all candidates use the same rows and protocol."
+}

@@ -1,0 +1,31 @@
+{
+  "version": "rq1_v9_post_starter_team_runs_lab_v1_1_20260719",
+  "key_fact": "The proposed team average runs after the starter is exactly the existing bullpen_strength_diff when using official pitcher-responsibility runs.",
+  "equivalence": {
+    "rows_compared": 1809,
+    "max_abs_difference": 0.0
+  },
+  "best_standalone_variant": {
+    "feature": "PS_R20_RA_G",
+    "meaning": "strict-prior mean post-starter team runs over the most recent 20 games",
+    "2025_log_loss": 0.6875181650356896,
+    "existing_cumulative_2025_log_loss": 0.688013521915156
+  },
+  "v7_replacement": {
+    "official_2025_log_loss": 0.6694826202559611,
+    "r20_2025_log_loss": 0.6690043464337433,
+    "official_2026_posthoc_log_loss": 0.6677851232420587,
+    "r20_2026_posthoc_log_loss": 0.6677714954656994,
+    "2025_bootstrap": {
+      "period": "2025_OOF",
+      "comparison": "R20_REPLACE_minus_OFFICIAL",
+      "point": -0.0004782738222177,
+      "ci025": -0.003101714202429,
+      "ci975": 0.0021447637328459,
+      "prob_challenger_improves": 0.64655,
+      "iterations": 20000
+    },
+    "decision": "R20 is a promising prospective challenger but not proven superior; keep official cumulative measure as primary until prospective evidence."
+  },
+  "status": "OFFLINE ACTUAL-DATA VALIDATED; 2026 POST-HOC ONLY"
+}

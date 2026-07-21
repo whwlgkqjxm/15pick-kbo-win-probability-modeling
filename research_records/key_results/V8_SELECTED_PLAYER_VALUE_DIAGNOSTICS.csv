@@ -1,0 +1,9 @@
+domain,score,diagnostic,n,spearman
+batter,selected_score,2025_half_to_half,161,0.49231078904991954
+batter,selected_score,2024_to_2025,134,0.5668873676729137
+batter,legacy_score,2025_half_to_half,161,0.5647143567821479
+batter,legacy_score,2024_to_2025,134,0.6939263581840174
+bullpen,selected_score,2025_half_to_half,93,0.09070935927579174
+bullpen,selected_score,2024_to_2025,91,0.22551361681796464
+bullpen,legacy_score,2025_half_to_half,93,0.3931097251648712
+bullpen,legacy_score,2024_to_2025,91,0.40512820512820513

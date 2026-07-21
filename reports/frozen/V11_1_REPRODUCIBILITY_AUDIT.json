@@ -1,0 +1,41 @@
+{
+  "status": "PASS",
+  "checks": {
+    "required_files_present": true,
+    "comparison_models_present": true,
+    "prediction_rows_698": true,
+    "prediction_game_ids_unique": true,
+    "prediction_probabilities_valid": true,
+    "selected_prior_rows_33552": true,
+    "selected_prior_18_rows_per_game": true,
+    "selected_prior_9_rows_per_side": true,
+    "selected_prior_player_id_complete": true,
+    "legacy_income_not_used": true,
+    "no_2026_tuning": true,
+    "selected_formula_expected": true,
+    "model_loadable": true,
+    "new_batter_beats_clean_no_batter": true,
+    "new_batter_beats_v9_style_on_2025_validation": true,
+    "reported_delta_matches": true
+  },
+  "key_results": {
+    "n_2025_validation": 698,
+    "v11_1_new_batter_log_loss": 0.6650197832911406,
+    "clean_no_batter_log_loss": 0.668953644311711,
+    "delta_vs_clean_no_batter": -0.003933861020570362,
+    "v9_style_log_loss": 0.6673356958884145,
+    "delta_vs_v9_style": -0.002315912597273817,
+    "v11_1_auc": 0.6326076240552087,
+    "bootstrap_vs_clean": {
+      "new_model": "p_v11_1_new_batter",
+      "reference_model": "p_clean_no_batter",
+      "delta_log_loss": -0.0039338610205703,
+      "ci_low": -0.0105848989723289,
+      "ci_high": 0.0029249068925948,
+      "improvement_probability": 0.8784,
+      "reps": 10000
+    }
+  },
+  "scientific_status": "post-holdout development candidate; prospective confirmation required",
+  "reproducibility_note": "The final V11.1 pipeline was rerun from source. Hash equality is reported per output; CSV/model hashes may differ only if library serialization or floating ordering changes, while metric equality is separately audited."
+}

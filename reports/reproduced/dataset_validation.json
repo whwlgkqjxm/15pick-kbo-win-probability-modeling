@@ -1,0 +1,14 @@
+[
+  {
+    "status":"PASS",
+    "rows":1824,
+    "rows_by_season":{
+      "2024":710,
+      "2025":698,
+      "2026":416
+    },
+    "unique_game_ids":1824,
+    "feature_count":14,
+    "same_date_exclusion":true
+  }
+]

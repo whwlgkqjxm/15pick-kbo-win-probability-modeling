@@ -1,7 +1,8 @@
-# Model Registry
+# Frozen models
 
-This directory records frozen model specifications and evaluation status. Fitted binary objects are not committed because they can become environment-dependent and are not required to audit the research design.
+Two V12 models are preserved for prospective comparison.
 
-The current development candidate is an L2-regularized logistic regression trained on the most recent 720 eligible decision games. It combines conventional pregame team context with strict-prior batter and starting-pitcher performance indices.
+- `V12_CV_SELECTED_MODEL_REFIT_2024_2025.joblib`: the cleaner scientific candidate selected by 2024–2025 temporal CV.
+- `V12_2026_BEST_OBSERVED_RECENT720_MODEL.joblib`: the strongest observed 2026 development model.
 
-The candidate is **not** labeled a final production champion. The 2026 evaluation period was observed during model development, so a frozen prospective ledger is required before making a confirmatory generalization claim.
+The latter is not a final untouched champion. Both binaries are covered by the SHA manifest and replayed against frozen 2026 prediction columns by `make verify`.

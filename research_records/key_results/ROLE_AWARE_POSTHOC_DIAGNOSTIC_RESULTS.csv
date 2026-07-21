@@ -1,0 +1,6 @@
+candidate,feature_count,selected_C,development_selection_score,posthoc_2026_log_loss,posthoc_2026_brier,posthoc_2026_roc_auc,posthoc_2026_accuracy
+original_v2,21,0.01,0.67817,0.67061,0.238738,0.629691,0.598558
+add_role_specific_lineup_features,32,0.01,0.678351,0.67065,0.238738,0.626819,0.588942
+replace_lineup_with_starter_only_history,21,0.01,0.678664,0.672265,0.23964,0.620865,0.591346
+replace_starter_with_start_only_history,21,0.01,0.682405,0.673446,0.240155,0.613984,0.576923
+original_plus_team_bullpen_income_proxies,24,0.01,0.679234,0.671289,0.239043,0.625846,0.596154

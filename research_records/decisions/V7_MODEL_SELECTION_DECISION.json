@@ -1,0 +1,16 @@
+{
+  "version": "rq1_v7_income_to_prediction_integration_lab_v1_1_corrected_20260719",
+  "selected_average_metric": "K10",
+  "selected_feature_block": "STARTER",
+  "selected_direct_integration": "TEAM_PLUS",
+  "selected_C": 0.01,
+  "selected_application_method_2025": "LOGIT_STACK_2024_META",
+  "selected_2025_log_loss": 0.6694826202559611,
+  "v2_2025_log_loss": 0.6784170262333535,
+  "selected_2026_posthoc_log_loss": 0.6677851232420587,
+  "v2_2026_posthoc_log_loss": 0.6706104493891073,
+  "best_alpha_2024": 0.9,
+  "refit_alpha_2024_2025": 0.8,
+  "correction": "2025 fold construction now includes every 2025 date; previous v1 excluded the first date and shifted fold boundaries.",
+  "status": "OFFLINE_ACTUAL_DATA_DIAGNOSTIC; PROSPECTIVE_FREEZE_PENDING"
+}

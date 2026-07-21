@@ -1,0 +1,4 @@
+new_model,reference_model,delta_log_loss,ci_low,ci_high,improvement_probability,reps
+p_cv_champion_with_batter,p_cv_champion_no_batter,-0.005343394707839357,-0.012363740282871526,0.0018563571385245249,0.9264,10000
+p_best_direct_with_batter,p_best_direct_no_batter,-0.007022241545953743,-0.01341604210857871,-0.0005479580254114653,0.9832,10000
+p__L2_C0.1__RECENT_720,p__L2_C0.03__ALL_EQUAL,-0.0012548482986643684,-0.0047895354995371765,0.0023362375799331884,0.7461,10000

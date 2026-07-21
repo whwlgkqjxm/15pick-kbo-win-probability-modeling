@@ -1,0 +1,29 @@
+{
+  "feature_columns": [
+    "elo_diff",
+    "prior_win_pct_diff",
+    "prior_run_diff_per_game_diff",
+    "prior_rank_advantage",
+    "bullpen_strength_diff",
+    "K10_starter_value_diff",
+    "K10_starter_count_diff",
+    "K10_starter_reliability_diff",
+    "K10_both_starters_covered",
+    "PS_R20_RA_G_diff",
+    "mean",
+    "coverage",
+    "count_mean",
+    "coverage_min"
+  ],
+  "training_seasons": [
+    2024,
+    2025
+  ],
+  "excluded_from_training": [
+    2026
+  ],
+  "target": "home_win",
+  "model_family": "L2",
+  "C": 0.01,
+  "random_seed": 20260720
+}

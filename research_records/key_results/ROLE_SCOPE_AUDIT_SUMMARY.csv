@@ -1,0 +1,9 @@
+audit_item,status,finding,value_1,value_2,notes
+raw_income_collection,PASS,Player-game income rows are present and identity/scoring validated.,65554,,"47,353 batter rows and 18,201 pitcher rows."
+starting_batter_role_contamination,FAIL,Starting-lineup prior means include prior substitute appearances.,25870,0.7810754506,"25,870 of 33,121 starting-batter rows with prior history had at least one substitute appearance in the history scope."
+starting_batter_contaminated_mean_difference,FAIL,All-role and starter-only batter means differ materially when contamination is present.,18.7220524705,38.3214779487,Median and mean absolute difference in fantasy-income points for rows with both starter history and prior substitute history.
+starting_pitcher_role_contamination,FAIL,Starting-pitcher prior means include prior bullpen appearances.,726,0.2076659039,"726 of 3,496 starting-pitcher rows with any prior history had prior relief appearances."
+starting_pitcher_contaminated_mean_difference,FAIL,All-role and start-only pitcher means differ substantially when both histories exist.,149.1357142857,294.107500642,Median and mean absolute difference in fantasy-income points among 614 contaminated rows with prior starts.
+bullpen_income_comparison,NOT_IMPLEMENTED,No player-level bullpen fantasy-income average was used in V1/V2.,,,"bullpen_strength_diff is prior team relief runs allowed per team game, not relief-pitcher income."
+v3_bullpen_information,PARTIAL,"V3 added recent bullpen pitches, outs, appearances and unique pitchers, but not role-specific relief income.",,,This does not complete the intended lineup/starter/bullpen income comparison.
+previous_ceiling_decision,RETRACTED_PENDING_REBUILD,The practical-ceiling conclusion is premature until role-aware income histories and proper bullpen features are tested.,,,V5 remains useful as a diagnostic of the existing feature set only.

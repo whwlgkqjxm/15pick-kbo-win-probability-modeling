@@ -1,0 +1,18 @@
+{
+  "rows_total": 1824,
+  "rows_by_season": {
+    "2024": 710,
+    "2025": 698,
+    "2026": 416
+  },
+  "decision_games_only": true,
+  "feature_count": 14,
+  "batter_lineup_rows": 33552,
+  "all_game_side_lineups_equal_9": true,
+  "player_id_missing": 0,
+  "probability_columns": 130,
+  "probability_out_of_bounds": 0,
+  "legacy_batter_income_feature_columns": [],
+  "same_date_adaptive_rule": "predict all games for a date before adding that date outcomes",
+  "status": "PASS"
+}

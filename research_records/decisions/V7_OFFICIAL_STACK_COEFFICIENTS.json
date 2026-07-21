@@ -1,0 +1,30 @@
+{
+  "evaluation_2025_meta": {
+    "fit_period": "2024 temporal OOF only",
+    "meta_C": 0.1,
+    "standardized_intercept": 0.050282976669395595,
+    "standardized_coefficients": {
+      "logit_v2": 0.05089862065651335,
+      "logit_income": 0.21971509076911017
+    },
+    "raw_logit_formula": {
+      "intercept": 0.008259721616619968,
+      "beta_v2": 0.357102679836934,
+      "beta_income": 0.8297067613479155
+    }
+  },
+  "prospective_candidate_meta": {
+    "fit_period": "2024+2025 temporal OOF",
+    "meta_C": 0.1,
+    "standardized_intercept": 0.052977952807816135,
+    "standardized_coefficients": {
+      "logit_v2": 0.1012065267768151,
+      "logit_income": 0.30325644195762513
+    },
+    "raw_logit_formula": {
+      "intercept": -0.009764598965756106,
+      "beta_v2": 0.35175611059743184,
+      "beta_income": 0.8144897400677217
+    }
+  }
+}

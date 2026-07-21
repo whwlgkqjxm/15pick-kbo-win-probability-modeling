@@ -1,43 +1,31 @@
 {
-  "project": "15Pick KBO Win-Probability Prediction",
-  "scientific_status": "best observed retrospective development candidate",
+  "model_id": "L2_C0.1_RECENT_720",
+  "scientific_status": "2026-observed development candidate; not a final untouched test",
   "prediction_target": "pregame home-team win probability",
   "model_family": "L2_LOGISTIC",
   "C": 0.1,
-  "training_strategy": "RECENT_720",
+  "training_strategy": "most recent 720 decision games strictly before 2026-03-28",
   "training_rows": 720,
+  "training_start_game_date": 20240924,
+  "training_end_game_date": 20251004,
   "random_seed": 20260720,
-  "features": {
-    "conventional_team_context": [
-      "elo_diff",
-      "prior_win_pct_diff",
-      "prior_run_diff_per_game_diff",
-      "prior_rank_advantage",
-      "bullpen_strength_diff",
-      "PS_R20_RA_G_diff"
-    ],
-    "starting_pitcher_performance_index": [
-      "K10_starter_value_diff",
-      "K10_starter_count_diff",
-      "K10_starter_reliability_diff",
-      "K10_both_starters_covered"
-    ],
-    "batter_performance_index": [
-      "mean",
-      "coverage",
-      "count_mean",
-      "coverage_min"
-    ]
-  },
-  "external_context": {
-    "published_mlb_accuracy_context": "approximately 0.55-0.62 in prior literature summarized by Li et al. (2022)",
-    "strong_published_mlb_example_accuracy": 0.6575,
-    "strong_published_mlb_example_auc": 0.6501,
-    "comparison_note": "contextual only; league, unit of analysis, features, and validation protocols differ"
-  },
-  "prospective_success_targets": {
-    "primary": "better Log loss and Brier score than the frozen no-player-index baseline",
-    "competitive_context": "approximately 0.60 accuracy and ROC AUC at or above 0.63",
-    "aspirational_context": "approach ROC AUC 0.65 without degrading calibration or proper scoring rules"
-  }
+  "features_in_fitted_order": [
+    "elo_diff",
+    "prior_win_pct_diff",
+    "prior_run_diff_per_game_diff",
+    "prior_rank_advantage",
+    "bullpen_strength_diff",
+    "K10_starter_value_diff",
+    "K10_starter_count_diff",
+    "K10_starter_reliability_diff",
+    "K10_both_starters_covered",
+    "PS_R20_RA_G_diff",
+    "mean",
+    "coverage",
+    "count_mean",
+    "coverage_min"
+  ],
+  "legacy_batter_income_used": false,
+  "new_batter_system": "POWER_OBP__RATE100 / S_K5 / lineup MEAN",
+  "final_generalization_claim": false
 }
