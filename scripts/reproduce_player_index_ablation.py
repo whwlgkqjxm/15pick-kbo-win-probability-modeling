@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Refit the primary feature-group ablation on a local modeling dataset."""
+"""Refit the player-index ablation on a local modeling dataset."""
 
 from __future__ import annotations
 
@@ -8,10 +8,10 @@ from pathlib import Path
 
 import pandas as pd
 
-from fifteenpick_rq1.metrics import probability_metrics
-from fifteenpick_rq1.modeling import build_l2_logistic
+from fifteenpick_prediction.metrics import probability_metrics
+from fifteenpick_prediction.modeling import build_l2_logistic
 
-CONVENTIONAL = [
+CONVENTIONAL_FEATURES = [
     "elo_diff",
     "prior_win_pct_diff",
     "prior_run_diff_per_game_diff",
@@ -19,13 +19,13 @@ CONVENTIONAL = [
     "bullpen_strength_diff",
     "PS_R20_RA_G_diff",
 ]
-STARTER = [
+STARTER_INDEX_FEATURES = [
     "K10_starter_value_diff",
     "K10_starter_count_diff",
     "K10_starter_reliability_diff",
     "K10_both_starters_covered",
 ]
-BATTER = ["mean", "coverage", "count_mean", "coverage_min"]
+BATTER_INDEX_FEATURES = ["mean", "coverage", "count_mean", "coverage_min"]
 
 
 def parse_args() -> argparse.Namespace:
@@ -47,11 +47,11 @@ def main() -> None:
     target = "home_win"
 
     if args.protocol == "best-development":
-        C = 0.1
+        c_value = 0.1
         cutoff = pd.Timestamp("2026-03-28")
         train = frame.loc[frame["game_date"] < cutoff].sort_values("game_date").tail(720)
     else:
-        C = 0.03
+        c_value = 0.03
         train = frame.loc[frame["game_date"] < pd.Timestamp("2026-03-28")].copy()
 
     test = frame.loc[
@@ -60,15 +60,17 @@ def main() -> None:
     ].copy()
 
     groups = {
-        "NO_PLAYER_INCOME": CONVENTIONAL,
-        "STARTER_INCOME_ONLY": CONVENTIONAL + STARTER,
-        "BATTER_INCOME_ONLY": CONVENTIONAL + BATTER,
-        "ALL_PLAYER_INCOME": CONVENTIONAL + STARTER + BATTER,
+        "BASELINE_NO_PLAYER_INDICES": CONVENTIONAL_FEATURES,
+        "STARTER_INDEX_ONLY": CONVENTIONAL_FEATURES + STARTER_INDEX_FEATURES,
+        "BATTER_INDEX_ONLY": CONVENTIONAL_FEATURES + BATTER_INDEX_FEATURES,
+        "BATTER_PLUS_STARTER_INDICES": (
+            CONVENTIONAL_FEATURES + STARTER_INDEX_FEATURES + BATTER_INDEX_FEATURES
+        ),
     }
 
     rows = []
     for model_id, features in groups.items():
-        model = build_l2_logistic(C=C)
+        model = build_l2_logistic(C=c_value)
         model.fit(train[features], train[target])
         probability = model.predict_proba(test[features])[:, 1]
         rows.append(

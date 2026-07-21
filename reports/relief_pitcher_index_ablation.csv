@@ -1,0 +1,4 @@
+evaluation,reference_model,reference_log_loss,relief_pitcher_index_log_loss,delta_index_minus_reference,improvement_probability,interpretation
+2025_bullpen_domain,TEAM_LEVEL_RELIEF_BASELINE,0.687434978,0.687444156,9.178e-06,0.4995,null_or_slightly_worse
+2025_incremental,STARTER_STACK,0.66948262,0.674253,0.00477038,,worse
+2026_posthoc_incremental,STARTER_STACK,0.667785123,0.668898,0.001112877,,worse

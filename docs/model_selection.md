@@ -1,6 +1,6 @@
 # Model and Training-Strategy Selection
 
-## Candidate families
+## Candidate model families
 
 - L2 logistic regression
 - Elastic Net logistic regression
@@ -11,42 +11,44 @@
 - XGBoost
 - LightGBM
 - CatBoost
-- Probability ensembles, stacking, and calibration
+- probability blending, stacking, and calibration
 
 ## Temporal learning strategies
 
-- all history with equal weight
+- all eligible history with equal weight
 - most recent 720 games
 - most recent 1,080 games
 - recent-season weighting
 - exponential time decay
 - daily expanding refit
 - daily rolling-window refit
-- online update
+- online updates
 - calibrated and stacked probabilities
 
 ## Selection principle
 
-Model selection is probability-first. Log loss and Brier score take priority over threshold accuracy because the output is a win probability. All preprocessing is fitted inside the training period, and shuffled cross-validation is not used as the primary evidence.
+Model selection is probability-first. Log loss and Brier score take priority over threshold accuracy because the system produces win probabilities. All preprocessing is fitted inside the training period.
 
 ## Selected specifications
 
-### CV-selected model
+### Temporally CV-selected specification
 
-- L2 logistic regression
+- model: L2 logistic regression
 - `C = 0.03`
-- all available 2024–2025 training games
-- selected without using 2026 labels in the V12 model-family search
+- training: all eligible 2024–2025 rows
+- selection: temporal comparison without using 2026 labels in the model-family search
 
-### Best observed development model
+### Best observed development specification
 
-- L2 logistic regression
+- model: L2 logistic regression
 - `C = 0.1`
-- most recent 720 decision games before 2026-03-28
-- 14 features: 6 conventional/team variables, 4 starter-income variables, 4 batter-income variables
+- training: most recent 720 eligible decision games before the evaluation cutoff
+- features: 6 conventional team/context variables, 4 starting-pitcher index variables, 4 batter index variables
 
-The recent-720 strategy is a retrospective development champion because its selection used 2026 comparisons.
+The recent-720 model is the strongest observed development candidate, not a final production champion, because its selection used repeated inspection of 2026 outcomes.
 
-## External target
+## Why a simpler model won
 
-The current AUC of 0.635 and accuracy of 59.62% fall within the broad range reported by MLB pregame prediction studies and approach stronger published AUC values near 0.65. This is context, not direct confirmation. The final target is to sustain the result on a frozen prospective ledger.
+Regularized logistic regression produced more stable out-of-time probabilities than several higher-capacity tree and ensemble methods. The available sample size, correlated features, seasonal drift, and probability-calibration objective likely favored stronger regularization.
+
+The negative result for complex models is part of the research finding: additional capacity did not compensate for limited independent seasons and changing baseball conditions.

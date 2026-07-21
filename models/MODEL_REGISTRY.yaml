@@ -3,11 +3,17 @@ models:
     family: L2 logistic regression
     C: 0.03
     training_strategy: all_equal_2024_2025
-    status: temporal-CV selected specification
-    2026_log_loss: 0.6673896328
+    feature_set: conventional_team_context_plus_batter_and_starter_indices
+    status: temporal-CV-selected specification
+    evaluation_period: 2026-03-28_to_2026-07-09
+    evaluation_games: 416
+    log_loss: 0.6673896328
   best_observed_development:
     family: L2 logistic regression
     C: 0.1
     training_strategy: recent_720
-    status: retrospective development champion; prospective validation required
-    2026_log_loss: 0.6661347845
+    feature_set: conventional_team_context_plus_batter_and_starter_indices
+    status: retrospective development candidate; prospective validation required
+    evaluation_period: 2026-03-28_to_2026-07-09
+    evaluation_games: 416
+    log_loss: 0.6661347845

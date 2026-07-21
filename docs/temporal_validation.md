@@ -2,28 +2,25 @@
 
 ## Prediction setting
 
-The target setting is lineup-confirmed pregame forecasting:
-
-- official starting nine for each team
-- official starting pitcher for each team
-- information available before the target game
+The target is the home-team win probability after official starting lineups and starting pitchers are known but before first pitch.
 
 ## Hard temporal rules
 
-1. `source_game_date < target_game_date`
+1. Every historical source date must be strictly earlier than the target game date.
 2. Target-game box-score events are never features.
-3. All games on the target date are excluded from history.
+3. All games on the target date are excluded from historical aggregates.
 4. Doubleheader Game 1 is not used for Game 2 on the same date.
-5. Imputation, scaling, feature selection, and calibration are fit on training data only.
-6. Primary evaluation uses temporal splits, never shuffled K-fold validation.
+5. Imputation, scaling, feature selection, and calibration are fitted on training data only.
+6. Primary model comparison uses chronological splits rather than shuffled K-fold validation.
 7. Cancelled games are excluded or voided.
 8. Actual target-game relief pitchers are never used as pregame predictors.
+9. Ties are excluded from the binary target.
 
 ## Evaluation roles
 
-- **2024–2025 temporal CV:** model-family and regularization comparison.
-- **2026 retrospective development evaluation:** leakage-controlled, but repeatedly observed during research.
-- **Future prospective evaluation:** required for a final confirmatory claim.
+- **2024–2025 temporal comparison:** model-family and regularization selection
+- **2026 retrospective development evaluation:** leakage-controlled but repeatedly observed during research
+- **future prospective ledger:** required for confirmatory generalization
 
 ## Metrics
 
@@ -31,12 +28,18 @@ Primary:
 
 - Log loss
 - Brier score
+- calibration intercept and slope
+- reliability bins
 
 Secondary:
 
 - ROC AUC
-- Accuracy
-- Calibration bins
-- Calibration intercept and slope
+- threshold accuracy
 
-Uncertainty uses paired date-cluster bootstrap because games on the same day are not treated as independent resampling units.
+## Uncertainty
+
+Paired differences are bootstrapped by game date rather than by individual game. This preserves same-day clustering and compares candidate and baseline losses on the same resampled dates.
+
+## Scientific interpretation
+
+Leakage control makes the retrospective result more credible, but it does not turn a repeatedly observed development period into an untouched test set. Model selection history must therefore be considered when interpreting 2026 performance.

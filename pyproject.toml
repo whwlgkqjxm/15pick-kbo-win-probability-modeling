@@ -3,9 +3,9 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "fifteenpick-kbo-player-income-research"
-version = "1.1.0"
-description = "Temporal evaluation of role-specific player-income indices for KBO win-probability forecasting"
+name = "fifteenpick-kbo-win-probability"
+version = "1.2.0"
+description = "Leakage-controlled KBO win-probability forecasting with role-aware player performance indices"
 readme = "README.md"
 requires-python = ">=3.11"
 license = {text = "MIT"}

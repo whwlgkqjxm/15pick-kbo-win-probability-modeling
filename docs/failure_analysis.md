@@ -1,45 +1,47 @@
-# Failure Analysis and What Changed
+# Failure Analysis and Corrective Decisions
 
-## 1. Limited-sample overreach
+## 1. Limited one-season development
 
-**Failure:** The first phase used only part of 2026. Candidate probabilities stayed close to 0.5 and could not support a strong deployment claim.
+**Observed problem:** A 2026-only model produced weak discrimination and compressed probabilities.
 
-**Correction:** Expand to complete 2024 and 2025 seasons, retain the initial phase as a negative result, and distinguish retrospective development from future confirmation.
+**Correction:** Expand the foundation to official multi-season data and use temporal validation.
 
-## 2. More features did not mean better probabilities
+## 2. High-dimensional model search
 
-**Failure:** Hundreds of engineered columns and nonlinear ensembles increased variance and worsened Log loss.
+**Observed problem:** Broad feature expansion and complex machine-learning families worsened out-of-time Log loss relative to regularized logistic regression.
 
-**Correction:** Use lower-dimensional role-aware features, strong regularization, and probability-first temporal evaluation.
+**Correction:** Prefer probability-first selection, strong regularization, and explicit feature-group ablation.
 
-## 3. Role contamination
+## 3. Role-contaminated histories
 
-**Failure:** Early player histories combined appearances with different responsibilities, including relief work in starting-pitcher histories.
+**Observed problem:** Early histories mixed official starting batters with substitutes and starting-pitcher appearances with relief appearances.
 
-**Correction:** Define role-specific history scopes and audit every target occurrence against its eligible prior appearances.
+**Why it matters:** Workload, expected opportunity, and performance context differ by role, so pooled histories change the meaning of the index.
 
-## 4. Player-level bullpen income
+**Correction:** Build official-lineup batter histories and start-only pitcher histories.
 
-**Failure:** Relief-pitcher income did not improve the team-only bullpen model and worsened the stronger starter stack.
+## 4. Player-level relief-pitcher index
 
-**Diagnosis:** The actual reliever sequence is unknown pregame and depends on game state, leverage, starter duration, matchups, workload, and managerial choice. Individual reliever samples are also small and volatile. Using actual relievers would leak postgame deployment; using a broad possible pool dilutes the signal.
+**Observed problem:** The feature produced null or worse Log loss in every reported comparison.
 
-**Correction:** Retain team-level strictly prior post-starter responsibility-run features. Treat probabilistic reliever-appearance modeling as future work.
+**Diagnosis:** Reliever identity is not known before the game, actual usage is outcome-dependent, roster-wide aggregation dilutes the relevant arms, and availability varies with recent workload and recovery.
 
-## 5. Daily adaptive retraining
+**Correction:** Exclude the player-level relief feature and retain team-level strict-prior post-starter run-prevention measures.
 
-**Failure:** Expanding and rolling daily updates followed short-term noise and underperformed a fixed recent-window model.
+## 5. Daily retraining
 
-**Correction:** Freeze the recent-720 static development candidate and require future evidence before changing the update policy.
+**Observed problem:** Daily expanding and rolling refits did not outperform the fixed recent-720 strategy.
 
-## 6. Accuracy-only improvements
+**Correction:** Keep the simpler frozen-window candidate and reserve adaptive retraining for prospective testing.
 
-**Failure:** Some feature combinations increased 0.5-threshold accuracy while worsening Log loss.
+## 6. Apparent predictability ceiling
 
-**Correction:** Treat win probability as the primary output. Choose models using Log loss, Brier score, calibration, and paired uncertainty.
+**Observed problem:** An early audit suggested the feature set was near a ceiling.
 
-## 7. External benchmark misuse risk
+**Correction:** Suspend the conclusion after discovering role contamination. The later role-aware rebuild improved performance, showing that representation quality—not only model capacity—was limiting the earlier system.
 
-**Failure avoided:** Published baseball accuracy values can look directly comparable even when leagues, units, features, and splits differ.
+## 7. External benchmark overinterpretation
 
-**Correction:** Use MLB results as contextual target ranges only. The primary scientific comparison remains the within-dataset, same-protocol ablation.
+**Risk:** Published MLB accuracy values can appear directly comparable even when league, unit of analysis, features, and validation differ.
+
+**Correction:** Use MLB results as contextual targets only. The primary evidence remains the same-dataset, same-protocol candidate-versus-baseline ablation.

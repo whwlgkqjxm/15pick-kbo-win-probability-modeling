@@ -1,10 +1,10 @@
 cff-version: 1.2.0
-title: "15Pick: Do Player-Income Indices Improve KBO Win-Probability Forecasts?"
-message: "Please cite this repository if you use the code or research design."
+title: "15Pick: KBO Win-Probability Prediction with Role-Aware Player Performance Indices"
+message: "Please cite this repository if you use the code, data design, or evaluation protocol."
 type: software
 authors:
   - family-names: Choi
     given-names: Jiho
 year: 2026
-version: 1.1.0
-repository-code: "https://github.com/whwlgkqjxm/15pick-kbo-player-income-research"
+version: 1.2.0
+repository-code: "https://github.com/whwlgkqjxm/15pick-kbo-win-probability"

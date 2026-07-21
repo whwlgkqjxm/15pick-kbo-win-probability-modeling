@@ -1,21 +1,21 @@
 # Prospective Validation Plan
 
-For every future game after model freeze:
+For each future game after model freeze:
 
-1. Capture official lineup and starter snapshots before first pitch.
-2. Store source cutoff timestamps and input hashes.
-3. Generate conventional, starter-income, and batter-income features.
-4. Save model version, model hash, feature schema, and predicted probability.
-5. Never modify the original prediction record.
-6. Join the outcome only after game completion.
-7. Void cancelled games.
+1. capture official lineup and starting-pitcher snapshots before first pitch
+2. store source timestamps, input hashes, and schema version
+3. generate conventional team/context, starting-pitcher index, and batter index features
+4. store model version, model hash, and predicted home-win probability
+5. prevent edits to the original prediction record
+6. join the final outcome only after game completion
+7. void cancelled games and exclude ties from binary scoring
 
-Primary comparison:
+## Frozen comparison
 
-- frozen full-income model
-- frozen no-income model
+- candidate: conventional variables plus batter and starting-pitcher indices
+- comparator: identical model and training protocol without player indices
 
-Metrics:
+## Evaluation metrics
 
 - Log loss
 - Brier score
@@ -23,6 +23,8 @@ Metrics:
 - reliability bins
 - ROC AUC
 - accuracy
-- date-cluster confidence intervals
+- paired date-cluster confidence intervals
 
-No model update should occur until a predeclared sample threshold is reached.
+## Stopping and update policy
+
+No model update should occur until a predeclared sample threshold is reached. Any revised model must receive a new version and begin a separate prospective ledger rather than rewriting earlier predictions.

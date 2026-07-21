@@ -1,10 +1,14 @@
 import math
 
-from fifteenpick_rq1.indices import batter_game_income, shrunk_prior_mean, starter_game_income
+from fifteenpick_prediction.indices import (
+    batter_game_performance_index,
+    starter_game_performance_index,
+    strict_prior_shrunk_mean,
+)
 
 
 def test_batter_index_is_finite() -> None:
-    value = batter_game_income(
+    value = batter_game_performance_index(
         at_bats=4,
         singles=1,
         doubles=1,
@@ -20,7 +24,7 @@ def test_batter_index_is_finite() -> None:
 
 
 def test_batter_zero_pa_uses_zero_rate_then_standardizes() -> None:
-    value = batter_game_income(
+    value = batter_game_performance_index(
         at_bats=0,
         singles=0,
         doubles=0,
@@ -37,14 +41,14 @@ def test_batter_zero_pa_uses_zero_rate_then_standardizes() -> None:
 
 
 def test_starter_more_outs_improves_index() -> None:
-    low = starter_game_income(
+    low = starter_game_performance_index(
         outs_recorded=12,
         strikeouts=3,
         home_runs_allowed=1,
         walks_allowed=2,
         hit_by_pitch_allowed=0,
     )
-    high = starter_game_income(
+    high = starter_game_performance_index(
         outs_recorded=18,
         strikeouts=3,
         home_runs_allowed=1,
@@ -54,5 +58,6 @@ def test_starter_more_outs_improves_index() -> None:
     assert high > low
 
 
-def test_shrunk_prior_mean() -> None:
-    assert shrunk_prior_mean(prior_sum=2400, prior_count=2, center=1000, k=5) == 7400 / 7
+def test_strict_prior_shrunk_mean() -> None:
+    actual = strict_prior_shrunk_mean(prior_sum=2400, prior_count=2, center=1000, k=5)
+    assert actual == 7400 / 7

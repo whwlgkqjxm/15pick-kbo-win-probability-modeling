@@ -1,36 +1,65 @@
 # Data Lineage
 
-```mermaid
-flowchart TD
-    S[Official KBO schedule pages] --> G[1,864 completed games]
-    G --> R[Immutable raw GameCenter responses]
-    R --> C[Canonical game, batter, pitcher, and lineup tables]
-    C --> I[Numeric player identity resolution]
-    I --> P[65,554 player-game occurrences]
-    P --> B[Batter and starter game indices]
-    B --> H[Strict-prior same-season and cross-season histories]
-    H --> F[Game-level lineup, starter, bullpen, and team features]
-    F --> M[Temporal probabilistic models]
-    M --> E[Ablation, calibration, bootstrap, and model selection]
+## Source-to-model path
+
+```text
+Official KBO schedule and GameCenter pages
+    ↓
+Immutable game-page cache and source hashes
+    ↓
+Canonical schedule, batter, pitcher, and lineup tables
+    ↓
+Occurrence-level numeric player identity resolution
+    ↓
+Role-specific player-game performance indices
+    ↓
+Strict-prior player and team histories
+    ↓
+Confirmed-lineup and announced-starter aggregation
+    ↓
+Leakage-controlled modeling dataset
+    ↓
+Temporal model comparison and ablation
 ```
 
-## Fixed data interval
+## Source inventory
 
-- 2024-03-23 through 2024-10-01
-- 2025-03-22 through 2025-10-04
-- 2026-03-28 through 2026-07-09
+The official schedule inventory contained 2,047 rows: 1,864 completed games and 183 cancelled or postponed games. Every completed game was matched to a cached official game page before canonical parsing.
 
-## Core counts
+## Canonical tables
 
-- Schedule rows: 2,047
-- Official completed games: 1,864
-- Cancelled or postponed rows: 183
-- Batter occurrences: 47,353
-- Pitcher occurrences: 18,201
-- Starting-lineup rows: 33,552
-- Player-game occurrences: 65,554
-- Final unresolved occurrences: 0
+The canonical foundation contains:
 
-## Public-data policy
+- 47,353 batter appearances
+- 18,201 pitcher appearances
+- 33,552 official starting-lineup rows
+- 65,554 total player-game occurrences
 
-The repository publishes code, schemas, aggregate results, formulas, and synthetic examples. Complete official raw responses and large derived player-level tables are not redistributed in the main branch.
+## Identity resolution
+
+Player identity uses official numeric IDs whenever available. Ambiguous same-name cases were resolved using official occurrence evidence and targeted daily records. The final table contains zero unresolved occurrences and zero name-only forced assignments.
+
+## Role scope
+
+Histories are separated by role:
+
+- official starting batters
+- substitute batter appearances
+- starting pitchers
+- relief pitchers
+
+The public prediction model uses confirmed starting batters and announced starting pitchers. Starting-pitcher history excludes relief appearances.
+
+## Temporal construction
+
+For a target game on date `d`, every historical source row must satisfy:
+
+```text
+source_game_date < d
+```
+
+All games on `d` are excluded from feature history. This rule prevents target leakage and same-date doubleheader contamination.
+
+## Auditability
+
+The public repository contains schemas, aggregate counts, frozen result tables, and verification tests. Full official source pages and local modeling tables are retained outside the public repository because of size and redistribution constraints.

@@ -1,17 +1,23 @@
 # Changelog
 
+## 1.2.0 — 2026-07-21
+
+- Reframed the repository around **KBO pregame win-probability prediction**.
+- Standardized all public terminology around **role-aware player performance indices**.
+- Renamed the Python package to `fifteenpick_prediction`.
+- Renamed ablation reports, scripts, documentation, and model labels for semantic consistency.
+- Clarified that the player indices are predictive inputs, not the project’s final objective.
+- Strengthened the external MLB benchmark section and separated internal evidence from cross-study context.
+- Expanded the relief-pitcher negative result using deployment uncertainty, leakage, availability, fatigue, and small-sample variance.
+- Curated the experiment history into research decisions rather than archived implementation versions.
+
 ## 1.1.0 — 2026-07-21
 
-- Corrected the public project identity from MyPick to 15Pick.
-- Added peer-reviewed MLB forecasting benchmarks and explicit prospective success criteria.
-- Added the player-level bullpen-income negative-result table and academic diagnosis.
-- Expanded limitations around bullpen availability, cross-study comparability, and betting inference.
-- Renamed the maintained Python package to `fifteenpick_rq1`.
-- Removed internal preservation-status language from the public experiment ledger.
+- Corrected the public project identity to 15Pick.
+- Added MLB forecasting context and prospective success criteria.
+- Added the player-level relief-pitcher negative result and academic interpretation.
 
 ## 1.0.0 — 2026-07-20
 
-- Reframed the repository around the player-income research question.
-- Added maintained role-specific index and temporal-evaluation code.
-- Published the full player-income ablation and bootstrap results.
-- Documented multi-season data lineage, negative results, role corrections, and prospective-validation plan.
+- Created the public, leakage-controlled research repository.
+- Added maintained temporal evaluation code, aggregate results, and reproducibility documentation.

@@ -1,30 +1,51 @@
 # Data Card
 
-## Purpose
+## Intended use
 
-The dataset supports retrospective research on pregame KBO win-probability forecasting and the incremental value of role-specific player-income indices.
+The modeling dataset supports retrospective and prospective research on KBO pregame win-probability forecasting and the incremental value of role-aware player performance indices.
 
-## Source
+## Coverage
 
-Official KBO schedule, GameCenter, box-score, and player-profile pages.
+- Official KBO seasons: 2024, 2025, and 2026 through July 9
+- Scheduled-game rows: 2,047
+- Completed games: 1,864
+- Cancelled or postponed games: 183
+- Binary modeling rows after excluding ties: 710 in 2024, 698 in 2025, 416 in 2026
+- Player-game occurrences: 65,554
+- Batter occurrences: 47,353
+- Pitcher occurrences: 18,201
+- Official starting-lineup rows: 33,552
 
 ## Unit of analysis
 
-- Player-event and player-game occurrence tables for feature construction
-- One row per completed game for probability modeling
+One modeling row represents one completed decision game with a binary target:
 
-## Time interval
+- `home_win = 1` when the home team won
+- `home_win = 0` when the away team won
 
-2024-03-23 through 2026-07-09, with season-specific cutoffs documented in the research protocol.
+Ties are excluded from binary fitting and scoring.
 
-## Target
+## Feature timing
 
-Binary home-win outcome for decision games. Ties remain in source data but are excluded from binary model fitting and evaluation.
+All historical aggregates are computed strictly before the target game date. Same-date games are excluded, so doubleheader Game 1 does not enter Game 2 features.
 
-## Sensitive information
+## Identity
 
-No private user account, betting, asset, or transaction data is used in this research dataset.
+Official numeric player IDs are preferred. The final occurrence-level identity table resolves all 65,554 player-game occurrences. Name-only forced merges are not used.
+
+## Public distribution
+
+The repository does not redistribute the complete official KBO raw archive. It publishes:
+
+- modeling schema
+- synthetic example rows
+- frozen aggregate result tables
+- maintained transformation and evaluation code
+- data-lineage documentation
 
 ## Known limitations
 
-Historical lineup confirmation timestamps are not available for every game; official final game pages are used for retrospective lineup reconstruction. Full raw data is not redistributed in the public repository.
+- Historical lineup confirmation timestamps were not archived contemporaneously for every game.
+- Complete historical injury and active-roster availability snapshots are not part of the primary dataset.
+- Exact relief-pitcher intent and deployment are not observable before first pitch.
+- Findings are KBO-specific and may not transfer directly to other leagues.

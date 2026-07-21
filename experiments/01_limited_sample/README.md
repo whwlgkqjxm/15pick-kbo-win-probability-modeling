@@ -1,3 +1,7 @@
-# Limited-sample phase
+# Limited-Sample Baseline
 
-The initial study used only part of the 2026 season. It was methodologically useful for finding identity, scoring, and leakage problems, but the resulting probabilities were weak and compressed near 0.5. The phase is retained as a documented negative result and motivated multi-season expansion.
+**Question:** Could a partial 2026 season support stable pregame win-probability prediction?
+
+**Result:** The model produced weak discrimination and compressed probabilities. The sample was insufficient for reliable role-specific histories and model comparison.
+
+**Decision:** Treat the experiment as a valid negative result and expand to official 2024–2026 data.

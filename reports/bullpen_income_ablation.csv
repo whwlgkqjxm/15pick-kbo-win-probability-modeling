@@ -1,4 +1,0 @@
-evaluation,reference_model,reference_log_loss,bullpen_income_log_loss,delta_bullpen_minus_reference,improvement_probability,interpretation
-2025_bullpen_domain,team_only,0.687434978,0.687444156,0.000009178,0.4995,null_or_slightly_worse
-2025_incremental,V7_starter_stack,0.669482620,0.674253000,0.004770380,,worse
-2026_posthoc_incremental,V7_starter_stack,0.667785123,0.668898000,0.001112877,,worse

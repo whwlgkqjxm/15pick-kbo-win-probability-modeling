@@ -1,12 +1,14 @@
 {
+  "project": "15Pick KBO Win-Probability Prediction",
   "scientific_status": "best observed retrospective development candidate",
+  "prediction_target": "pregame home-team win probability",
   "model_family": "L2_LOGISTIC",
   "C": 0.1,
   "training_strategy": "RECENT_720",
   "training_rows": 720,
   "random_seed": 20260720,
   "features": {
-    "conventional": [
+    "conventional_team_context": [
       "elo_diff",
       "prior_win_pct_diff",
       "prior_run_diff_per_game_diff",
@@ -14,24 +16,28 @@
       "bullpen_strength_diff",
       "PS_R20_RA_G_diff"
     ],
-    "starter_income": [
+    "starting_pitcher_performance_index": [
       "K10_starter_value_diff",
       "K10_starter_count_diff",
       "K10_starter_reliability_diff",
       "K10_both_starters_covered"
     ],
-    "batter_income": [
+    "batter_performance_index": [
       "mean",
       "coverage",
       "count_mean",
       "coverage_min"
     ]
   },
-  "project": "15Pick KBO Player-Income Research",
   "external_context": {
-    "common_mlb_accuracy_range": "0.55-0.62",
-    "strong_published_mlb_accuracy": 0.6575,
-    "strong_published_mlb_auc": 0.6501,
-    "comparison_note": "contextual only; protocols are not directly comparable"
+    "published_mlb_accuracy_context": "approximately 0.55-0.62 in prior literature summarized by Li et al. (2022)",
+    "strong_published_mlb_example_accuracy": 0.6575,
+    "strong_published_mlb_example_auc": 0.6501,
+    "comparison_note": "contextual only; league, unit of analysis, features, and validation protocols differ"
+  },
+  "prospective_success_targets": {
+    "primary": "better Log loss and Brier score than the frozen no-player-index baseline",
+    "competitive_context": "approximately 0.60 accuracy and ROC AUC at or above 0.63",
+    "aspirational_context": "approach ROC AUC 0.65 without degrading calibration or proper scoring rules"
   }
 }

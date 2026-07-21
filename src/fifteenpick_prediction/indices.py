@@ -1,4 +1,4 @@
-"""Role-specific player-income formulas used in the public research pipeline."""
+"""Role-specific player-performance indices used by the public pipeline."""
 
 from __future__ import annotations
 
@@ -9,6 +9,8 @@ import numpy as np
 
 @dataclass(frozen=True)
 class BatterIndexConfig:
+    """Frozen scaling constants for the batter performance index."""
+
     plate_appearance_normalizer: float = 4.2
     reference_mean: float = 0.738432383380831
     reference_sd: float = 0.9411772120687678
@@ -18,7 +20,7 @@ class BatterIndexConfig:
     upper_clip: float = 3000.0
 
 
-def batter_game_income(
+def batter_game_performance_index(
     *,
     at_bats: float,
     singles: float,
@@ -32,10 +34,10 @@ def batter_game_income(
     double_plays: float,
     config: BatterIndexConfig = BatterIndexConfig(),
 ) -> float:
-    """Calculate the selected standardized batter game-income index.
+    """Calculate the selected standardized batter game-performance index.
 
-    The formula uses official event counts, converts them to a 4.2-PA rate,
-    and standardizes against the frozen early-2024 reference distribution.
+    Official event counts are converted to a 4.2-plate-appearance rate and
+    standardized against the frozen early-2024 reference distribution.
     """
 
     pa_approx = float(at_bats) + float(walks) + float(hit_by_pitch)
@@ -61,7 +63,7 @@ def batter_game_income(
     return float(np.clip(standardized, config.lower_clip, config.upper_clip))
 
 
-def starter_game_income(
+def starter_game_performance_index(
     *,
     outs_recorded: float,
     strikeouts: float,
@@ -69,7 +71,7 @@ def starter_game_income(
     walks_allowed: float,
     hit_by_pitch_allowed: float,
 ) -> float:
-    """Calculate the selected start-only pitcher game-income index."""
+    """Calculate the selected start-only pitcher game-performance index."""
 
     return float(
         1000.0
@@ -82,14 +84,10 @@ def starter_game_income(
     )
 
 
-def shrunk_prior_mean(
+def strict_prior_shrunk_mean(
     *, prior_sum: float, prior_count: float, center: float, k: float
 ) -> float:
-    """Return a K-shrunk strict-prior mean.
-
-    Parameters are expected to have been computed only from dates strictly
-    before the target game date.
-    """
+    """Return a K-shrunk mean computed only from dates before the target date."""
 
     if prior_count < 0 or k < 0:
         raise ValueError("prior_count and k must be non-negative")

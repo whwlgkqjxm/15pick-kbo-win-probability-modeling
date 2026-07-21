@@ -9,18 +9,18 @@ from pathlib import Path
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
-RESULTS = ROOT / "reports" / "primary_income_ablation.csv"
-BOOTSTRAP = ROOT / "reports" / "primary_income_ablation_bootstrap.csv"
-BULLPEN = ROOT / "reports" / "bullpen_income_ablation.csv"
+RESULTS = ROOT / "reports" / "player_index_ablation.csv"
+BOOTSTRAP = ROOT / "reports" / "player_index_ablation_bootstrap.csv"
+RELIEF = ROOT / "reports" / "relief_pitcher_index_ablation.csv"
 
 EXPECTED = {
-    "NO_PLAYER_INCOME": {
+    "BASELINE_NO_PLAYER_INDICES": {
         "log_loss": 0.6839421791444644,
         "brier": 0.24531296565005117,
         "roc_auc": 0.575780743211936,
         "accuracy": 0.5432692307692307,
     },
-    "ALL_PLAYER_INCOME": {
+    "BATTER_PLUS_STARTER_INDICES": {
         "log_loss": 0.6661347844671042,
         "brier": 0.23649786240497755,
         "roc_auc": 0.635274766008711,
@@ -42,21 +42,24 @@ def main() -> None:
     row = boot.loc[boot["protocol"] == "BEST_DEVELOPMENT"].iloc[0]
     if not math.isclose(float(row["improvement_probability"]), 0.9869, abs_tol=1e-12):
         raise SystemExit("FAIL bootstrap improvement probability")
-    bullpen = pd.read_csv(BULLPEN).set_index("evaluation")
-    expected_bullpen = {
+
+    relief = pd.read_csv(RELIEF).set_index("evaluation")
+    expected_relief = {
         "2025_bullpen_domain": (0.687434978, 0.687444156),
         "2025_incremental": (0.669482620, 0.674253000),
         "2026_posthoc_incremental": (0.667785123, 0.668898000),
     }
-    for evaluation, (reference, with_bullpen) in expected_bullpen.items():
-        if not math.isclose(float(bullpen.loc[evaluation, "reference_log_loss"]), reference, abs_tol=1e-12):
-            raise SystemExit(f"FAIL bullpen reference: {evaluation}")
-        if not math.isclose(float(bullpen.loc[evaluation, "bullpen_income_log_loss"]), with_bullpen, abs_tol=1e-12):
-            raise SystemExit(f"FAIL bullpen model: {evaluation}")
-        if with_bullpen <= reference:
-            raise SystemExit(f"FAIL expected negative bullpen result: {evaluation}")
+    for evaluation, (reference, with_index) in expected_relief.items():
+        actual_reference = float(relief.loc[evaluation, "reference_log_loss"])
+        actual_index = float(relief.loc[evaluation, "relief_pitcher_index_log_loss"])
+        if not math.isclose(actual_reference, reference, abs_tol=1e-12):
+            raise SystemExit(f"FAIL relief reference: {evaluation}")
+        if not math.isclose(actual_index, with_index, abs_tol=1e-12):
+            raise SystemExit(f"FAIL relief-index model: {evaluation}")
+        if with_index <= reference:
+            raise SystemExit(f"FAIL expected negative relief-index result: {evaluation}")
 
-    print("PASS: published primary and bullpen results match the frozen values")
+    print("PASS: published player-index and relief-pitcher results match frozen values")
 
 
 if __name__ == "__main__":
