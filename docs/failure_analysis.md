@@ -4,25 +4,27 @@
 
 **Failure:** The first phase used only part of 2026. Candidate probabilities stayed close to 0.5 and could not support a strong deployment claim.
 
-**Correction:** Expand to complete 2024 and 2025 seasons and preserve 2026 as a later retrospective interval.
+**Correction:** Expand to complete 2024 and 2025 seasons, retain the initial phase as a negative result, and distinguish retrospective development from future confirmation.
 
-## 2. More features did not mean better probability estimates
+## 2. More features did not mean better probabilities
 
 **Failure:** Hundreds of engineered columns and nonlinear ensembles increased variance and worsened Log loss.
 
-**Correction:** Use lower-dimensional role-aware features and strong regularization. Select models using temporal probability loss rather than complexity or training fit.
+**Correction:** Use lower-dimensional role-aware features, strong regularization, and probability-first temporal evaluation.
 
 ## 3. Role contamination
 
-**Failure:** Early player histories combined appearances with different responsibilities, such as relief work in starting-pitcher histories.
+**Failure:** Early player histories combined appearances with different responsibilities, including relief work in starting-pitcher histories.
 
 **Correction:** Define role-specific history scopes and audit every target occurrence against its eligible prior appearances.
 
 ## 4. Player-level bullpen income
 
-**Failure:** A reconstructed relief-pitcher index did not improve the team-only model.
+**Failure:** Relief-pitcher income did not improve the team-only bullpen model and worsened the stronger starter stack.
 
-**Correction:** Do not force every domain into the final model. Retain team-level prior post-starter responsibility-run features instead.
+**Diagnosis:** The actual reliever sequence is unknown pregame and depends on game state, leverage, starter duration, matchups, workload, and managerial choice. Individual reliever samples are also small and volatile. Using actual relievers would leak postgame deployment; using a broad possible pool dilutes the signal.
+
+**Correction:** Retain team-level strictly prior post-starter responsibility-run features. Treat probabilistic reliever-appearance modeling as future work.
 
 ## 5. Daily adaptive retraining
 
@@ -34,4 +36,10 @@
 
 **Failure:** Some feature combinations increased 0.5-threshold accuracy while worsening Log loss.
 
-**Correction:** Treat win probability as the primary output. Choose models with Log loss, Brier score, and calibration, not accuracy alone.
+**Correction:** Treat win probability as the primary output. Choose models using Log loss, Brier score, calibration, and paired uncertainty.
+
+## 7. External benchmark misuse risk
+
+**Failure avoided:** Published baseball accuracy values can look directly comparable even when leagues, units, features, and splits differ.
+
+**Correction:** Use MLB results as contextual target ranges only. The primary scientific comparison remains the within-dataset, same-protocol ablation.

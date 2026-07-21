@@ -1,19 +1,23 @@
-# Do Player-Income Indices Improve KBO Win-Probability Forecasts?
+# 15Pick — Do Player-Income Indices Improve KBO Win-Probability Forecasts?
 
 [![Python](https://img.shields.io/badge/Python-3.11%2B-blue)](#reproduction)
 [![Task](https://img.shields.io/badge/Task-Probabilistic%20Forecasting-informational)](#research-question)
 [![Validation](https://img.shields.io/badge/Validation-Temporal%20%2B%20Leakage--Controlled-success)](#methodology)
 [![Status](https://img.shields.io/badge/Status-Retrospective%20Development-orange)](#scientific-status)
 
-**MyPick KBO Player-Income Research** studies whether a compact, role-specific summary of player performance contains real predictive information for pregame baseball forecasts.
+**15Pick KBO Player-Income Research** evaluates whether a compact, role-specific summary of player performance preserves information that is useful for pregame baseball forecasting.
 
-I originally built **MyPick**, a fantasy-sports and point-based prediction platform, to translate complex KBO records into a single intuitive **player-income score**. The product goal was simple: help fans compare how strongly different players contributed without requiring them to interpret dozens of batting and pitching statistics.
+## Why this research exists
 
-That product decision led to a research question:
+I originally built **15Pick**, a fantasy-sports and point-based prediction platform, to make complex baseball records easier for fans to understand. Hits, walks, strikeouts, double plays, innings, home runs allowed, and many other events are difficult to compare directly—especially across batters and pitchers.
 
-> **Does this simplified player-income representation preserve meaningful information about future game outcomes, or is it only an easier way to display past performance?**
+15Pick therefore converts official game records into one intuitive **player-income score**. The score was designed as a product interface: a single number that helps users compare how strongly players performed.
 
-This repository answers that question through official KBO data engineering, role-specific index design, strict point-in-time feature construction, temporal machine learning, ablation studies, and probability-focused evaluation.
+That product decision created a scientific question:
+
+> **Does the simplified player-income representation preserve meaningful information about future game outcomes, or is it only a convenient description of past performance?**
+
+The repository tests that question through official KBO data engineering, player-identity resolution, role-specific index design, strict point-in-time features, temporal machine learning, ablation studies, and probability-focused evaluation.
 
 ## Research Question
 
@@ -25,7 +29,7 @@ This repository answers that question through official KBO data engineering, rol
 
 ## Main Finding
 
-**Retrospective evidence supports the hypothesis.** Under the same model family, training window, and team-strength features, adding the prior-average batter and starting-pitcher income indices improved every primary evaluation metric.
+**Retrospective evidence supports the hypothesis.** Under the same model family, training window, and conventional pregame features, adding prior-average batter and starting-pitcher income indices improved every primary metric.
 
 ### Best observed development comparison — 416 games in 2026
 
@@ -51,16 +55,68 @@ Date-cluster bootstrap, 20,000 repetitions:
 | Starting-pitcher income only | 0.673157 | 0.239875 | 0.617343 | 57.93% |
 | **Batter + starting-pitcher income** | **0.666135** | **0.236498** | **0.635275** | **59.62%** |
 
-The result suggests that the two role-specific indices are complementary: starting-pitcher income contributed the larger individual gain, while batter income added further information beyond the starter block.
+Starting-pitcher income produced the larger individual improvement, while batter income supplied additional complementary information.
+
+## How good is a baseball prediction model?
+
+Baseball is intrinsically difficult to predict before first pitch. Published MLB next-game research commonly reports accuracy in roughly the **55–62%** range. A 2016 past-data-only MLB study reported nearly **60%** mean accuracy, while a 2022 study reported a strong result of **65.75% accuracy and 0.6501 AUC** after feature selection.
+
+These studies are useful context, not a direct leaderboard: leagues, seasons, features, and validation designs differ, and many published studies use random or stratified cross-validation rather than the strict temporal evaluation used here.
+
+| Reference level | Accuracy | ROC AUC | Log loss | Brier |
+|---|---:|---:|---:|---:|
+| Neutral 0.5 probability forecast | 50% | 0.500 | 0.6931 | 0.2500 |
+| Common published MLB range | 55–62% | varies | often not reported | often not reported |
+| Strong published MLB example | 65.75% | 0.6501 | not reported | not reported |
+| **15Pick current retrospective model** | **59.62%** | **0.6353** | **0.6661** | **0.2365** |
+
+### Project success criteria
+
+1. **Scientific success:** player-income features must improve Log loss and Brier score against the same-protocol no-income model, preferably with a paired date-cluster interval below zero.
+2. **Competitive baseball forecasting:** frozen future predictions should sustain approximately **60% accuracy and AUC ≥ 0.63**, while remaining calibrated.
+3. **Aspirational target:** approach the stronger published MLB range—approximately **0.65 AUC and 62–65% accuracy**—under stricter temporal, pregame-only validation.
+4. **Final confirmation:** all claims must survive an immutable prospective prediction ledger; retrospective tuning alone is not sufficient.
+
+Accuracy is secondary. The primary outputs are probabilities, so **Log loss, Brier score, and calibration** govern model selection.
+
+![External baseball accuracy context](reports/figures/external_baseball_accuracy_context.png)
+
+Detailed benchmark definitions and references are in [`docs/external_benchmarks_and_success_criteria.md`](docs/external_benchmarks_and_success_criteria.md).
+
+## Why player-level bullpen income was rejected
+
+A player-level relief-pitcher income index did **not** improve prediction quality.
+
+| Evaluation | Reference | + Player-level bullpen income | Change in Log loss |
+|---|---:|---:|---:|
+| 2025 bullpen-domain model | 0.687435 | 0.687444 | **+0.000009** |
+| 2025 added to the starter stack | 0.669483 | 0.674253 | **+0.004770** |
+| 2026 post-hoc added to the starter stack | 0.667785 | 0.668898 | **+0.001113** |
+
+Positive changes are worse. The standalone 2025 comparison produced only a **49.95% probability of improvement**, effectively a null result.
+
+This negative result is plausible for structural reasons:
+
+- The target game's actual relievers are unknown before first pitch.
+- Bullpen deployment depends on the starter's exit time, score, leverage, handedness matchups, and managerial choices that develop during the game.
+- Reliever availability changes with recent workload, consecutive-day use, injury, and recovery.
+- Relief pitchers work in smaller samples than starters, making individual averages noisier and more volatile.
+- Using the relievers who actually appeared would leak postgame deployment information; using a broad pregame pool dilutes the signal across pitchers who may never enter.
+
+The final model therefore uses a **team-level recent post-starter responsibility-run feature** rather than forcing player-level bullpen income into the predictor. The result does not mean relief pitching is unimportant; it means that the tested player-level pregame representation was not sufficiently identifiable or stable.
+
+![Bullpen negative result](reports/figures/bullpen_income_negative_result.png)
+
+See [`docs/bullpen_income_negative_result.md`](docs/bullpen_income_negative_result.md).
 
 ## Scientific Status
 
-The repository distinguishes two claims:
+The repository separates two claims:
 
 1. **CV-selected specification:** model family and regularization were selected using temporal cross-validation on 2024–2025. On 2026, adding all player-income features reduced Log loss from `0.683516` to `0.667390`.
 2. **Best observed development specification:** the recent-720-game strategy produced the strongest 2026 result, reducing Log loss from `0.683942` to `0.666135`.
 
-The second result is the current development champion, but 2026 has been repeatedly observed during research. It is therefore **not presented as an untouched final test**. A frozen prospective prediction ledger is required for the final generalization claim.
+The second result is the current development champion, but 2026 was repeatedly observed during research. It is therefore **not an untouched final test**. A frozen prospective prediction ledger is required for the final generalization claim.
 
 ## Why This Project Is More Than a Sports Prediction Model
 
@@ -98,8 +154,6 @@ The public repository does not redistribute the full official raw dataset. It pr
 ### Batter index
 
 The selected batter system scores official plate-appearance events, converts the score to a 4.2-PA rate, standardizes it around 1,000, and forms a strict-prior player mean with `K=5` shrinkage toward the previous-season mean.
-
-Event weights:
 
 | Event | Weight |
 |---|---:|
@@ -144,9 +198,9 @@ The study compared:
 - Gradient boosting and histogram boosting
 - XGBoost, LightGBM, and CatBoost
 - Probability blending, stacking, and calibration
-- Full-history, recent-window, time-decay, rolling, expanding, and daily-update training strategies
+- Full-history, recent-window, time-decay, rolling, expanding, and daily-update strategies
 
-The strongest and most stable family was a regularized logistic model. The best observed development configuration was:
+The strongest and most stable family was regularized logistic regression. The best observed development configuration was:
 
 ```yaml
 model: L2 logistic regression
@@ -159,14 +213,12 @@ Complexity did not automatically improve generalization; several tree and ensemb
 
 ## Research Progress and Failure Analysis
 
-The project deliberately preserves negative results and design corrections:
-
 1. A 2026-only limited-sample model produced weak, compressed probabilities.
 2. Multi-season data improved estimation stability.
-3. A broad high-dimensional model search underperformed a regularized logistic model.
-4. A role audit found that early income histories mixed substitute/starter and starter/reliever appearances.
+3. A broad high-dimensional model search underperformed regularized logistic regression.
+4. A role audit found that early histories mixed substitute/starter and starter/reliever appearances.
 5. The starting-pitcher index was rebuilt from start-only records.
-6. Player-level bullpen income did not add stable predictive value.
+6. Player-level bullpen income produced a null or negative incremental result.
 7. Additional workload, handedness, and lineup-interaction features did not improve probability loss.
 8. A new batter index was selected from 215 official-event candidates.
 9. Forty-two model and learning-strategy configurations were compared.
@@ -178,36 +230,30 @@ See [`docs/experiment_history.md`](docs/experiment_history.md) and [`docs/failur
 
 ```text
 .
-├── src/mypick_rq1/           # maintained index, temporal, modeling, and evaluation code
+├── src/fifteenpick_rq1/      # maintained index, temporal, modeling, and evaluation code
 ├── scripts/                  # reproducible command-line entry points
 ├── configs/                  # frozen formulas and model specifications
-├── experiments/              # key experiment cards and retained research scripts
+├── experiments/              # key experiment cards and research scripts
 ├── reports/                  # published aggregate results and figures
-├── docs/                     # research design, lineage, failures, and limitations
+├── docs/                     # design, benchmarks, lineage, failures, and limitations
 ├── data/schema/              # public schemas
 ├── data/sample/              # synthetic examples only
 ├── tests/                    # temporal, formula, and result-verification tests
-└── models/                   # model registry; binaries are not required for review
+└── models/                   # model registry
 ```
 
 ## Reproduction
-
-### Install
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
-```
-
-### Verify published results
-
-```bash
 python scripts/verify_published_results.py
 pytest
+ruff check src scripts tests
 ```
 
-### Re-run the primary ablation with a local modeling dataset
+Re-run the primary ablation with a local modeling dataset:
 
 ```bash
 python scripts/reproduce_primary_ablation.py \
@@ -216,19 +262,28 @@ python scripts/reproduce_primary_ablation.py \
   --output reports/reproduced_primary_ablation.csv
 ```
 
-The full official dataset is intentionally not committed. Required columns and file contracts are documented in [`data/schema/modeling_dataset_schema.csv`](data/schema/modeling_dataset_schema.csv).
+The complete official dataset is intentionally not committed. Required columns are documented in [`data/schema/modeling_dataset_schema.csv`](data/schema/modeling_dataset_schema.csv).
 
 ## Limitations
 
-- The strongest recent-720 result is a retrospective development result, not a pristine final test.
-- Historical official lineup records were reconstructed from completed game pages; a future production study should capture immutable pregame timestamps.
+- The strongest recent-720 result is retrospective development evidence, not a pristine final test.
+- Historical official lineups were reconstructed from completed game pages rather than contemporaneously archived confirmation feeds.
 - Exact physical runs after starter exit require play-by-play substitution and scoring timelines.
-- Market odds, weather, injuries, and verified historical roster availability are outside the primary feature set.
+- Market odds, weather, injuries, travel, and verified historical bullpen availability are outside the primary feature set.
+- External MLB comparisons are contextual because their datasets and validation protocols differ.
+- Prediction quality does not by itself establish betting profitability.
 - Final external validity requires frozen prospective predictions.
 
 ## Next Step
 
-Freeze the current model, store each future prediction before first pitch with input and model hashes, and evaluate the immutable ledger using Log loss, Brier score, calibration, AUC, and date-cluster uncertainty.
+Freeze the current model, store each future prediction before first pitch with input and model hashes, and evaluate the immutable ledger using Log loss, Brier score, calibration, AUC, accuracy, and date-cluster uncertainty.
+
+## References
+
+- Soto Valero, C. (2016). *Predicting Win-Loss outcomes in MLB regular season games—A comparative study using data mining methods*. International Journal of Computer Science in Sport, 15(2), 91–112. https://doi.org/10.1515/ijcss-2016-0007
+- Li, S.-F., Huang, M.-L., & Li, Y.-Z. (2022). *Exploring and Selecting Features to Predict the Next Outcomes of MLB Games*. Entropy, 24(2), 288. https://doi.org/10.3390/e24020288
+- Greenhouse, M., Reiter, J. P., & Zahran, S. (2019). *Out of gas: quantifying fatigue in MLB relievers*. Journal of Quantitative Analysis in Sports. https://doi.org/10.1515/jqas-2018-0007
+- Hirotsu, N., & Wright, M. (2005). *Modelling a baseball game to optimise pitcher substitution strategies incorporating handedness of players*. IMA Journal of Management Mathematics, 16(2), 179–194. https://doi.org/10.1093/imaman/dpi009
 
 ## License and Data Use
 

@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from mypick_rq1.temporal import assert_strict_prior, most_recent_training_rows
+from fifteenpick_rq1.temporal import assert_strict_prior, most_recent_training_rows
 
 
 def test_strict_prior_passes() -> None:

@@ -3,8 +3,8 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "mypick-kbo-player-income-research"
-version = "1.0.0"
+name = "fifteenpick-kbo-player-income-research"
+version = "1.1.0"
 description = "Temporal evaluation of role-specific player-income indices for KBO win-probability forecasting"
 readme = "README.md"
 requires-python = ">=3.11"

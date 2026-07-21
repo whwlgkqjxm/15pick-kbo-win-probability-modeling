@@ -11,6 +11,7 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[1]
 RESULTS = ROOT / "reports" / "primary_income_ablation.csv"
 BOOTSTRAP = ROOT / "reports" / "primary_income_ablation_bootstrap.csv"
+BULLPEN = ROOT / "reports" / "bullpen_income_ablation.csv"
 
 EXPECTED = {
     "NO_PLAYER_INCOME": {
@@ -41,7 +42,21 @@ def main() -> None:
     row = boot.loc[boot["protocol"] == "BEST_DEVELOPMENT"].iloc[0]
     if not math.isclose(float(row["improvement_probability"]), 0.9869, abs_tol=1e-12):
         raise SystemExit("FAIL bootstrap improvement probability")
-    print("PASS: published primary results match the frozen values")
+    bullpen = pd.read_csv(BULLPEN).set_index("evaluation")
+    expected_bullpen = {
+        "2025_bullpen_domain": (0.687434978, 0.687444156),
+        "2025_incremental": (0.669482620, 0.674253000),
+        "2026_posthoc_incremental": (0.667785123, 0.668898000),
+    }
+    for evaluation, (reference, with_bullpen) in expected_bullpen.items():
+        if not math.isclose(float(bullpen.loc[evaluation, "reference_log_loss"]), reference, abs_tol=1e-12):
+            raise SystemExit(f"FAIL bullpen reference: {evaluation}")
+        if not math.isclose(float(bullpen.loc[evaluation, "bullpen_income_log_loss"]), with_bullpen, abs_tol=1e-12):
+            raise SystemExit(f"FAIL bullpen model: {evaluation}")
+        if with_bullpen <= reference:
+            raise SystemExit(f"FAIL expected negative bullpen result: {evaluation}")
+
+    print("PASS: published primary and bullpen results match the frozen values")
 
 
 if __name__ == "__main__":

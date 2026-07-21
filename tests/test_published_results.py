@@ -10,3 +10,9 @@ def test_primary_result_ordering() -> None:
     assert dev.loc["ALL_PLAYER_INCOME", "log_loss"] < dev.loc["NO_PLAYER_INCOME", "log_loss"]
     assert dev.loc["ALL_PLAYER_INCOME", "brier"] < dev.loc["NO_PLAYER_INCOME", "brier"]
     assert dev.loc["ALL_PLAYER_INCOME", "roc_auc"] > dev.loc["NO_PLAYER_INCOME", "roc_auc"]
+
+
+def test_bullpen_income_did_not_improve_log_loss() -> None:
+    root = Path(__file__).resolve().parents[1]
+    results = pd.read_csv(root / "reports" / "bullpen_income_ablation.csv")
+    assert (results["bullpen_income_log_loss"] > results["reference_log_loss"]).all()

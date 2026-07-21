@@ -1,6 +1,6 @@
 import math
 
-from mypick_rq1.indices import batter_game_income, shrunk_prior_mean, starter_game_income
+from fifteenpick_rq1.indices import batter_game_income, shrunk_prior_mean, starter_game_income
 
 
 def test_batter_index_is_finite() -> None:

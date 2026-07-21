@@ -26,5 +26,12 @@
       "count_mean",
       "coverage_min"
     ]
+  },
+  "project": "15Pick KBO Player-Income Research",
+  "external_context": {
+    "common_mlb_accuracy_range": "0.55-0.62",
+    "strong_published_mlb_accuracy": 0.6575,
+    "strong_published_mlb_auc": 0.6501,
+    "comparison_note": "contextual only; protocols are not directly comparable"
   }
 }

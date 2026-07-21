@@ -8,8 +8,8 @@ from pathlib import Path
 
 import pandas as pd
 
-from mypick_rq1.metrics import probability_metrics
-from mypick_rq1.modeling import build_l2_logistic
+from fifteenpick_rq1.metrics import probability_metrics
+from fifteenpick_rq1.modeling import build_l2_logistic
 
 CONVENTIONAL = [
     "elo_diff",
