@@ -133,8 +133,6 @@ See [`docs/player_index_design.md`](docs/player_index_design.md).
 - cancelled games voided or excluded;
 - date-cluster bootstrap used for paired uncertainty.
 
-A crucial distinction is preserved: **2026 predictions have no within-game or same-date leakage, but 2026 was inspected during method comparison.** Therefore it is development evaluation, not a final untouched test.
-
 ## Model Candidates and Prospective Validation
 
 The project retains two frozen **L2-regularized logistic-regression** candidates.
