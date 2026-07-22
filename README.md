@@ -195,7 +195,7 @@ These commands reproduce the portable analysis from the included 1,824-game deri
 
 ## Data and licensing
 
-The repository distinguishes code, derived research tables, and official raw KBO responses. Raw responses and operational-service data are not included. Before making the repository public, review [`docs/data_release_policy.md`](docs/data_release_policy.md) and remove any artifact not covered by the intended release policy.
+This repository includes the research code and derived modeling artifacts required to reproduce the published results. Official raw KBO responses and 15Pick operational-service data are not redistributed. The repository’s data-release boundaries are documented in [`docs/data_release_policy.md`](docs/data_release_policy.md).
 
 ## Author
 
