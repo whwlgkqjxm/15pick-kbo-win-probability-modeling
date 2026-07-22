@@ -157,7 +157,7 @@ flowchart LR
 | `L2_C0.03_ALL_EQUAL` | 2024–2025 temporal CV | all 2024–2025 decision games | 0.667390 | clean CV-selected candidate |
 | `L2_C0.1_RECENT_720` | selected after 2026 method comparison | most recent 720 pre-2026 games | 0.666135 | best observed development candidate |
 
-No model is described as a future-proven production champion. The next confirmatory stage is an immutable prospective ledger.
+No model is described as a future-proven production champion. 
 
 ## Reproduce the core results
 
