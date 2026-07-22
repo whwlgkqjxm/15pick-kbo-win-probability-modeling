@@ -74,6 +74,18 @@ def main() -> None:
             train = frame.loc[frame["game_date"] < 20260328].copy()
 
         predictions = test[["game_id", "game_date", "home_win"]].copy()
+        constant_probability = np.full(len(test), 0.5, dtype=float)
+        predictions["CONSTANT_0_5"] = constant_probability
+        metric_rows.append(
+            {
+                "protocol": protocol,
+                "C": C,
+                "training_strategy": strategy,
+                "model": "CONSTANT_0_5",
+                "feature_count": 0,
+                **probability_metrics(test["home_win"], constant_probability),
+            }
+        )
         fitted = {}
         for model_id, features in FEATURE_GROUPS.items():
             model = build_l2_logistic(C=C)

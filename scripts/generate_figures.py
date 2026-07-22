@@ -55,21 +55,126 @@ def _dot_plot(
 def ablation_plot() -> None:
     data = pd.read_csv(REPRODUCED / "player_index_ablation.csv")
     data = data[data["protocol"].eq("BEST_DEVELOPMENT")].copy()
+    order = [
+        "CONSTANT_0_5",
+        "BASELINE_NO_PLAYER_INDICES",
+        "BATTER_INDEX_ONLY",
+        "STARTER_INDEX_ONLY",
+        "BATTER_PLUS_STARTER_INDICES",
+    ]
     label_map = {
-        "BASELINE_NO_PLAYER_INDICES": "Conventional pregame only",
-        "BATTER_INDEX_ONLY": "+ Batter index",
-        "STARTER_INDEX_ONLY": "+ Starting-pitcher index",
-        "BATTER_PLUS_STARTER_INDICES": "+ Batter and starter indices",
+        "CONSTANT_0_5": "Constant p(home)=0.50",
+        "BASELINE_NO_PLAYER_INDICES": "Conventional pregame variables",
+        "BATTER_INDEX_ONLY": "+ batter index",
+        "STARTER_INDEX_ONLY": "+ starting-pitcher index",
+        "BATTER_PLUS_STARTER_INDICES": "+ batter and starting-pitcher indices",
     }
+    data = data.set_index("model").loc[order].reset_index()
     data["display"] = data["model"].map(label_map)
-    _dot_plot(
-        data,
-        label_col="display",
-        value_col="log_loss",
-        title="Role-specific player-index ablation — 2026 development evaluation",
-        xlabel="Log loss (lower is better)",
-        name="player_index_ablation_logloss.png",
+    constant = float(data.loc[data["model"].eq("CONSTANT_0_5"), "log_loss"].iloc[0])
+    data["improvement"] = constant - data["log_loss"]
+
+    fig, ax = plt.subplots(figsize=(10, 5.4))
+    bars = ax.barh(data["display"], data["improvement"])
+    bars[-1].set_hatch("//")
+    ax.invert_yaxis()
+    ax.set_xlim(0, float(data["improvement"].max()) * 1.28)
+    ax.set_xlabel("Log-loss improvement over constant p(home)=0.50 (higher is better)")
+    ax.set_title("Role-specific model comparison", pad=12)
+    ax.grid(axis="x", alpha=0.25)
+    for bar, raw, improvement in zip(
+        bars, data["log_loss"], data["improvement"], strict=True
+    ):
+        ax.text(
+            float(improvement) + 0.00035,
+            bar.get_y() + bar.get_height() / 2,
+            f"Log loss {raw:.6f}",
+            va="center",
+            fontsize=9,
+        )
+    fig.text(
+        0.5,
+        0.01,
+        (
+            "Best-observed model: trained on the most recent 720 pre-2026 games; "
+            "evaluated on 416 decision games in 2026."
+        ),
+        ha="center",
+        fontsize=9,
     )
+    plt.tight_layout(rect=(0, 0.04, 1, 1))
+    plt.savefig(FIGURES / "main_model_comparison.png", dpi=200, bbox_inches="tight")
+    plt.close()
+
+    bullpen_2025 = pd.read_csv(
+        ROOT / "research_records" / "key_results" / "V8_2025_PREDICTION_APPLICATION_RESULTS.csv"
+    ).set_index("method")
+    bullpen_2026 = pd.read_csv(
+        ROOT / "research_records" / "key_results" / "V8_2026_POSTHOC_APPLICATION_RESULTS.csv"
+    ).set_index("method")
+    bullpen = pd.DataFrame(
+        {
+            "evaluation": ["2025 temporal OOF (698 games)", "2026 post-hoc (416 games)"],
+            "starter_stack": [
+                bullpen_2025.loc["LOGIT_STACK_V7_STARTER_C0.1", "log_loss"],
+                bullpen_2026.loc["LOGIT_STACK_V7_STARTER_C0.1", "log_loss"],
+            ],
+            "plus_player_relief_index": [
+                bullpen_2025.loc["LOGIT_STACK_V7_PLUS_BULLPEN_C0.01", "log_loss"],
+                bullpen_2026.loc["LOGIT_STACK_V7_PLUS_BULLPEN_C0.01", "log_loss"],
+            ],
+        }
+    )
+
+    fig, ax = plt.subplots(figsize=(10, 4.2))
+    for idx, row in bullpen.iterrows():
+        ax.plot(
+            [row["starter_stack"], row["plus_player_relief_index"]],
+            [idx, idx],
+            marker="o",
+            linewidth=2.5,
+        )
+        delta = row["plus_player_relief_index"] - row["starter_stack"]
+        ax.text(
+            float(row["starter_stack"]) - 0.00012,
+            idx - 0.12,
+            f"{row['starter_stack']:.6f}",
+            ha="right",
+            fontsize=9,
+        )
+        ax.text(
+            float(row["plus_player_relief_index"]) + 0.00012,
+            idx - 0.12,
+            f"{row['plus_player_relief_index']:.6f}",
+            ha="left",
+            fontsize=9,
+        )
+        ax.text(
+            (float(row["starter_stack"]) + float(row["plus_player_relief_index"])) / 2,
+            idx + 0.18,
+            f"worse by {delta:+.6f}",
+            ha="center",
+            fontsize=9,
+        )
+    ax.set_yticks(range(len(bullpen)), bullpen["evaluation"])
+    ax.set_ylim(1.45, -0.45)
+    ax.set_xlim(0.6665, 0.6758)
+    ax.set_xlabel("Log loss (lower is better)")
+    ax.set_title("Player-level relief-pitcher index was tested and not retained", pad=18)
+    ax.grid(axis="x", alpha=0.25)
+    fig.text(
+        0.5,
+        0.01,
+        (
+            "Historical V8 protocol; displayed separately from V12 to avoid an "
+            "invalid cross-protocol ranking."
+        ),
+        ha="center",
+        fontsize=9,
+    )
+    plt.tight_layout(rect=(0, 0.08, 1, 0.98))
+    plt.savefig(FIGURES / "relief_index_negative_result.png", dpi=200, bbox_inches="tight")
+    plt.close()
 
 
 def model_family_plot() -> None:

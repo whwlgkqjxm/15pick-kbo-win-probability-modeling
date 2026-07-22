@@ -7,11 +7,11 @@
 
 [한국어 README](README.ko.md)
 
-## One-minute summary
+## Summary
 
-This project asks whether **role-specific composite player-performance indices**, built from official KBO game records and averaged strictly before each target game, add predictive information beyond conventional pregame team-strength variables.
+I built [**MyPick KBO**](https://mypickkbo.com/), a fantasy-baseball website that transforms official KBO game records into role-specific composite player-performance indices so users can compare how strongly players performed across batting and pitching roles. This research project tests whether the **strict-prior average of those indices** adds incremental pregame win-probability information beyond conventional team-strength variables.
 
-The project is not a single final model notebook. It is an end-to-end research record covering:
+The repository is not a single final-model notebook. It is an end-to-end research record covering:
 
 - official schedule and BoxScore collection across 2024–2026;
 - 65,554 player-game occurrences with numeric identity resolution;
@@ -28,28 +28,35 @@ The strongest observed 2026 development specification was L2 logistic regression
 
 > **Do role-specific 15Pick composite player-performance indices derived from official KBO game records provide incremental information for pregame win-probability forecasting beyond conventional team-strength features, and which player roles contribute the greatest predictive value?**
 
-The score is not salary, contract value, betting profit, or economic value. It is a reproducible game-performance index. A target game's own score is never used as an input; only performance observed on dates strictly earlier than the target date is allowed.
+The index is not a monetary measure or a valuation of the player. It is a reproducible composite game-performance score. A target game's own score is never used as an input; only performance observed on dates strictly earlier than the target date is allowed.
 
 ## Main evidence
 
-### Role-specific ablation — 2026 development evaluation, 416 decision games
+### Best-observed V12 specification — trained on 720 earlier games, evaluated on 416 games
+
+The number **720** is the training-window size. The number **416** is the separate 2026 development-evaluation size. They describe different parts of the same experiment and should not be compared as if one replaced the other.
 
 | Feature set | Log loss ↓ | Brier ↓ | ROC AUC ↑ | Accuracy ↑ |
 |---|---:|---:|---:|---:|
+| Constant `p(home win)=0.50` | 0.693147 | 0.250000 | 0.500000 | 52.40%* |
 | Conventional pregame variables only | 0.683942 | 0.245313 | 0.575781 | 54.33% |
 | + Batter index only | 0.678611 | 0.242599 | 0.603188 | 57.45% |
 | + Starting-pitcher index only | 0.673157 | 0.239875 | 0.617343 | 57.93% |
 | **+ Batter and starting-pitcher indices** | **0.666135** | **0.236498** | **0.635275** | **59.62%** |
 
-For the combined model versus the no-player-index baseline:
+`*` A constant probability of 0.50 contains no ranking information. With the repository's `>=0.5` classification rule it predicts the home team every time, so its accuracy is simply the 2026 home-win share rather than learned model skill.
+
+For the combined model versus the conventional no-player-index model:
 
 - Log-loss difference: **−0.017807**
 - 95% paired date-cluster bootstrap interval: **[−0.033154, −0.002114]**
 - Probability of lower Log loss: **98.69%**
 
-The narrower V12 batter-block ablation, holding the team and clean-starter block fixed, improved Log loss from `0.673157` to `0.666135`, with a 95% date-cluster interval of `[-0.013416, -0.000548]`.
+The V12 conventional block already contains **team-level bullpen and post-starter run-prevention variables**. A separate **player-level relief-pitcher index** was tested earlier in V8 and was not retained: Log loss worsened from `0.669483` to `0.674253` in 2025 temporal OOF and from `0.667785` to `0.668898` in 2026 post-hoc evaluation. Because V8 used a different historical protocol, that result is shown separately rather than inserted into the V12 ranking table.
 
-![Role-specific ablation](reports/figures/player_index_ablation_logloss.png)
+![Main model comparison](reports/figures/main_model_comparison.png)
+
+![Relief-pitcher index negative result](reports/figures/relief_index_negative_result.png)
 
 ## Why the research process matters
 

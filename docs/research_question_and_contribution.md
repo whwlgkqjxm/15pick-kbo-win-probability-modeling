@@ -1,5 +1,9 @@
 # Research question and contribution
 
+## Project origin
+
+[MyPick KBO](https://mypickkbo.com/) is a fantasy-baseball website built to translate official KBO game events into role-specific composite performance indices. This repository evaluates whether strict-prior averages of those product-originated indices carry incremental pregame predictive information beyond conventional team-strength features.
+
 ## Question
 
 Do role-specific composite player-performance indices derived from official KBO game records provide incremental information for pregame win-probability forecasting beyond conventional team-strength features, and which roles contribute the greatest predictive value?

@@ -45,6 +45,12 @@ EXPECTED = {
         "roc_auc": 0.575780743211936,
         "accuracy": 0.5432692307692307,
     },
+    ("BEST_DEVELOPMENT", "CONSTANT_0_5"): {
+        "log_loss": 0.6931471805599453,
+        "brier": 0.25,
+        "roc_auc": 0.5,
+        "accuracy": 0.5240384615384616,
+    },
 }
 
 

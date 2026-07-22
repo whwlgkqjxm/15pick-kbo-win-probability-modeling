@@ -14,7 +14,7 @@ Games are not independent draws. The same ten teams appear repeatedly, and multi
 
 ## Composite-index interpretation
 
-The batter and starter indices are predictive representations, not causal measures, universal player rankings, salaries, or contract values. Weights were selected within a development process and must be revalidated prospectively.
+The batter and starter indices are predictive representations, not causal measures, universal player rankings, monetary measures, or player valuations. Weights were selected within a development process and must be revalidated prospectively.
 
 ## Post-starter run prevention
 
