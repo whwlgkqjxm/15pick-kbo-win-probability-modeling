@@ -32,7 +32,6 @@ For the complete research process, decisions, and results, see **Entire Process*
 
 > **Do role-specific 15Pick composite player-performance indices derived from official KBO game records provide incremental information for pregame win-probability forecasting beyond conventional team-strength features, and which player roles contribute the greatest predictive value?**
 
-The index is not a monetary measure or a valuation of the player. It is a reproducible composite game-performance score. A target game's own score is never used as an input; only performance observed on dates strictly earlier than the target date is allowed.
 
 ## Main result
 
