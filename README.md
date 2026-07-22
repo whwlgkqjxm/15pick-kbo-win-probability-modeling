@@ -1,6 +1,6 @@
 # KBO Win-Probability Modeling with Player Performance Indices
 
-[![Python](https://img.shields.io/badge/Python-3.11%2B-blue)](#reproduce-the-core-results)
+[![Python](https://img.shields.io/badge/Python-3.11%2B-blue)](#reproduce-and-verify-the-core-results)
 [![Validation](https://img.shields.io/badge/Validation-Temporal%20%2B%20Same--Date%20Excluded-success)](docs/temporal_validation_and_leakage.md)
 [![Artifacts](https://img.shields.io/badge/Artifacts-SHA256%20Manifest-success)](artifacts/RESEARCH_MANIFEST_SHA256.csv)
 [![Scientific status](https://img.shields.io/badge/Status-Development%20%7C%20Prospective%20Freeze-orange)](docs/scientific_status_and_claims.md)
@@ -150,16 +150,22 @@ flowchart LR
     K --> L[Two-model freeze and prospective ledger]
 ```
 
-## Scientific status
+## Model Candidates and Prospective Validation
 
-| Specification | Selection data | Training rule | 2026 Log loss | Status |
+The project retains two frozen **L2-regularized logistic-regression** candidates.
+
+| Specification | How it was selected | Training data | 2026 Log loss | Current role |
 |---|---|---|---:|---|
-| `L2_C0.03_ALL_EQUAL` | 2024–2025 temporal CV | all 2024–2025 decision games | 0.667390 | clean CV-selected candidate |
-| `L2_C0.1_RECENT_720` | selected after 2026 method comparison | most recent 720 pre-2026 games | 0.666135 | best observed development candidate |
+| `L2_C0.03_ALL_EQUAL` | selected using 2024–2025 temporal CV only | all 2024–2025 decision games | 0.667390 | CV-selected reference candidate |
+| `L2_C0.1_RECENT_720` | selected after comparing training strategies on 2026 results | most recent 720 games before 2026 | 0.666135 | best observed development candidate |
 
-No model is described as a future-proven production champion. 
+The first candidate was selected without using 2026 outcomes for model selection. The second produced the lowest observed 2026 Log loss, but 2026 was part of the method comparison. Therefore, neither result is an untouched prospective test.
 
-## Reproduce the core results
+The remaining validation asks whether the player-index improvement persists on future games predicted before first pitch, which candidate performs better prospectively, and whether calibration remains stable over time. Until that stage is complete, neither candidate is described as a future-validated production model.
+
+See [model selection, ablation, and calibration](docs/model_selection_ablation_and_calibration.md) for the completed model comparison. The unresolved questions, immutable pregame ledger, and future results are documented in [prospective validation](docs/prospective_validation.md).
+
+## Reproduce and verify the core results
 
 ```bash
 python3 -m venv .venv
@@ -170,11 +176,11 @@ make reproduce
 make verify
 ```
 
-`make reproduce` retrains both frozen logistic specifications and all four role-ablation models from the included derived modeling dataset. It regenerates metrics, predictions, date-cluster bootstrap intervals, calibration tables, and standardized coefficients.
+`make reproduce` reruns both frozen specifications across the same four feature sets: conventional pregame variables, batter index only, starting-pitcher index only, and both player indices. It regenerates metrics, game-level predictions, paired date-cluster bootstrap intervals, calibration tables, and standardized coefficients.
 
-`make verify` additionally validates row counts, deterministic temporal ordering, same-date flags, SHA256 artifacts, published metrics, bootstrap values, and saved-model replay to `< 1e-12` maximum probability error.
+`make verify` is fail-closed. It checks dataset row counts, deterministic temporal ordering, same-date exclusion flags, SHA256 artifacts, published metrics, bootstrap values, and saved-model replay with a maximum probability error below `1e-12`.
 
-Full historical V11.1/V12 research scripts are retained under [`research/authoritative/`](research/authoritative/). They are preserved as research evidence; the portable reproduction entry point is under [`scripts/`](scripts/).
+These commands reproduce the portable analysis from the included 1,824-game derived modeling dataset. They do not reconstruct the official raw KBO responses, which are not redistributed in this repository. See [reproducibility and artifact provenance](docs/reproducibility.md) for details.
 
 ## Repository map
 
@@ -202,6 +208,7 @@ Full historical V11.1/V12 research scripts are retained under [`research/authori
 6. [`docs/model_selection_ablation_and_calibration.md`](docs/model_selection_ablation_and_calibration.md)
 7. [`docs/reproducibility.md`](docs/reproducibility.md)
 8. [`docs/scientific_status_and_claims.md`](docs/scientific_status_and_claims.md)
+9. [`docs/prospective_validation.md`](docs/prospective_validation.md)
 
 ## Data and licensing
 

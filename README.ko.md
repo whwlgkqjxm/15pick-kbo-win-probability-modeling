@@ -122,16 +122,22 @@ V12 주요 모델은 **팀 단위 불펜 전력과 선발 이후 실점 방지 �
 
 **2026 각 경기 내부에는 누수가 없지만, 2026 결과는 학습전략 비교 과정에서 관찰됐다.** 따라서 2026은 development evaluation이며 final untouched test가 아니다.
 
-## 모델 지위
+## 모델 후보와 Prospective Validation
 
-| 모델 | 선택 근거 | 학습 | 2026 Log loss | 지위 |
+이 프로젝트는 두 개의 **L2-regularized logistic regression** 후보를 고정해 보존한다.
+
+| 모델 | 선정 방법 | 학습 데이터 | 2026 Log loss | 현재 역할 |
 |---|---|---|---:|---|
-| `L2_C0.03_ALL_EQUAL` | 2024–2025 temporal CV | 2024+2025 전체 | 0.667390 | 과학적으로 깨끗한 기준 후보 |
-| `L2_C0.1_RECENT_720` | 2026 방법 비교 후 선택 | 최근 720경기 | 0.666135 | 현재 최고 관측 개발 후보 |
+| `L2_C0.03_ALL_EQUAL` | 2024–2025 temporal CV만 사용해 선정 | 2024–2025 decision game 전체 | 0.667390 | CV-selected 기준 후보 |
+| `L2_C0.1_RECENT_720` | 2026 결과로 training strategy를 비교한 뒤 선정 | 2026년 이전 최근 720경기 | 0.666135 | 현재 최고 관측 development 후보 |
 
-미래 성능이 검증된 production champion은 아직 없다. 다음 단계는 두 모델의 immutable prospective ledger다.
+첫 번째 후보는 2026 결과를 model selection에 사용하지 않고 선정했다. 두 번째 후보는 2026 평가에서 가장 낮은 Log loss를 기록했지만, 2026 결과가 method comparison에 사용됐다. 따라서 두 결과 모두 untouched prospective test 결과는 아니다.
 
-## 핵심 결과 재현
+앞으로 확인해야 할 핵심은 역할별 선수 지표의 성능 개선이 경기 시작 전에 예측한 미래 경기에서도 유지되는지, 두 후보 중 어느 모델이 prospective evaluation에서 더 좋은지, 그리고 calibration이 시간에 따라 안정적으로 유지되는지다. 이 검증이 끝나기 전에는 어느 후보도 미래 성능이 검증된 production model로 표현하지 않는다.
+
+완료된 모델 비교와 선정 과정은 [model selection, ablation, and calibration](docs/model_selection_ablation_and_calibration.md)에 정리돼 있다. 아직 검증되지 않은 질문, immutable pregame ledger, 향후 결과는 [prospective validation](docs/prospective_validation.md)에 기록한다.
+
+## 핵심 결과 재현 및 검증
 
 ```bash
 python3 -m venv .venv
@@ -142,9 +148,11 @@ make reproduce
 make verify
 ```
 
-`make reproduce`는 포함된 1,824경기 파생 모델링 데이터에서 두 동결 모델과 4개 역할별 ablation 모델을 다시 학습하고 metric, prediction, bootstrap, calibration, coefficient를 생성한다.
+`make reproduce`는 두 frozen specification 각각에 동일한 4개 feature set을 적용한다. 비교 대상은 기존 경기 전 변수, 타자 지표만 추가한 모델, 선발투수 지표만 추가한 모델, 두 선수 지표를 모두 추가한 모델이다. 이 과정에서 metric, 경기별 prediction, paired date-cluster bootstrap interval, calibration table, standardized coefficient를 다시 생성한다.
 
-`make verify`는 row count, 시간순 정렬, same-date flag, SHA256, 공개 metric, bootstrap, model binary replay를 fail-closed 방식으로 검사한다.
+`make verify`는 불일치가 있으면 즉시 실패하도록 구성돼 있다. dataset row count, deterministic temporal ordering, same-date exclusion flag, SHA256 artifact, 공개 metric, bootstrap 값, 저장 모델 replay가 최대 확률 오차 `1e-12` 미만인지 확인한다.
+
+이 명령은 저장소에 포함된 1,824경기 derived modeling dataset으로 portable analysis를 재현한다. 저장소에서 재배포하지 않는 공식 KBO raw response를 다시 수집하거나 구축하는 과정은 포함하지 않는다. 자세한 내용은 [reproducibility and artifact provenance](docs/reproducibility.md)를 참고한다.
 
 ## 권장 읽기 순서
 
@@ -156,6 +164,7 @@ make verify
 6. [`docs/model_selection_ablation_and_calibration.md`](docs/model_selection_ablation_and_calibration.md)
 7. [`docs/reproducibility.md`](docs/reproducibility.md)
 8. [`docs/scientific_status_and_claims.md`](docs/scientific_status_and_claims.md)
+9. [`docs/prospective_validation.md`](docs/prospective_validation.md)
 
 ## 작성자
 
