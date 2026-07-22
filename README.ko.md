@@ -4,20 +4,23 @@
 
 ## Summary
 
-내가 직접 만든 판타지 야구 웹사이트 [**MyPick KBO**](https://mypickkbo.com/)에서는 공식 KBO 경기 기록을 역할별 복합 선수 활약도 지표로 변환해 타자와 투수의 경기 활약 정도를 비교할 수 있도록 했다. 이 연구 프로젝트는 그 지표의 **목표 경기 이전 strict-prior 평균**이 기존 팀 전력 변수에 추가적인 경기 전 승리확률 예측 정보를 제공하는지 검증한다.
+내가 직접 만든 판타지 야구 웹사이트 [**15Pick KBO**](https://mypickkbo.com/)는 공식 KBO 경기 기록을 역할별 복합 선수 활약도 지표로 변환하여 타자와 투수의 경기 활약을 비교할 수 있도록 한다. 이 연구 프로젝트는 해당 지표의 **목표 경기 이전 strict-prior 평균**이 기존 팀 전력 변수에 추가적인 경기 전 승리확률 예측 정보를 제공하는지 검증한다.
 
-단순히 최종 모델 하나의 성능을 보여주는 저장소가 아니라, 다음 전체 과정을 재현 가능한 연구 기록으로 남긴다.
+이 프로젝트의 핵심 기여는 다음과 같다.
 
-- 2024–2026 공식 일정·BoxScore 수집과 canonicalization
-- 65,554개 선수-경기 occurrence의 numeric identity 해결
-- 현재 경기·같은 날짜·미래 결과를 제외한 strict-prior feature 구축
-- 홈/원정 선발투수 identity 비대칭과 역할 혼합 문제 발견·수정
-- 신규 타자 점수 215개, 평균법 20개, 라인업 집계법과 모델 적용 방식 비교
-- 42개 모델 설정 및 static·rolling·decay·daily retraining·online·calibration·ensemble 비교
-- 역할별 ablation, 날짜 단위 bootstrap, calibration, model binary replay, SHA 기반 provenance
-- 성능이 나쁘거나 설계가 잘못된 실험도 삭제하지 않고 원인과 판단을 기록
+- 공식 KBO 완료 경기 1,864경기와 선수-경기 기록 65,554건을 활용한 end-to-end 데이터 파이프라인 구축
+- 숫자형 선수 ID 기반 identity resolution과 선발·구원·교체 출전을 구분한 역할별 history 구축
+- 목표 경기, 같은 날짜 경기, 미래 정보를 제외한 leakage-controlled feature engineering
+- 공식 경기 이벤트로부터 재현 가능한 타자 및 선발투수 복합 활약도 지표 설계
+- 선수 지표가 기존 팀 전력 정보에 추가적인 예측 가치를 제공하는지 temporal validation과 role ablation으로 검증
+- 홈·원정 identity 비대칭과 역할 혼합 문제를 발견하고 수정하여 이전 가정을 재검토
+- negative result, bootstrap uncertainty, calibration, model serialization, prediction replay, SHA 기반 provenance 보존
 
-현재 최고 관측 개발 모델은 최근 720경기로 학습한 L2 Logistic Regression `C=0.1`이고, 더 깨끗한 과학적 기준 후보는 2024–2025 temporal CV만으로 선택한 `C=0.03` 모델이다. 두 모델 모두 미래 immutable prospective ledger에서 비교해야 한다.
+현재 최고 관측 개발 모델은 최근 과거 경기로 학습한 regularized logistic regression으로 2026 개발 평가에서 **Log loss 0.6661**을 기록했다. 2024–2025 temporal cross-validation만으로 선택한 별도 모델도 더 과학적으로 깨끗한 비교 기준으로 함께 보존했으며, 두 모델은 향후 변경 불가능한 경기 전 예측에서 비교할 예정이다.
+
+프로젝트의 전체 과정, 주요 판단, 결과에 대한 자세한 내용은 아래 **Entire Process**를 참고하세요.
+
+[![Entire Process](https://img.shields.io/badge/Entire%20Process-%EC%9E%90%EC%84%B8%ED%9E%88%20%EB%B3%B4%EA%B8%B0-2f81f7?style=for-the-badge)](#권장-읽기-순서)
 
 ## 연구 질문
 

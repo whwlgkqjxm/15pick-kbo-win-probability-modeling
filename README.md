@@ -9,20 +9,23 @@
 
 ## Summary
 
-I built [**MyPick KBO**](https://mypickkbo.com/), a fantasy-baseball website that transforms official KBO game records into role-specific composite player-performance indices so users can compare how strongly players performed across batting and pitching roles. This research project tests whether the **strict-prior average of those indices** adds incremental pregame win-probability information beyond conventional team-strength variables.
+I built [**15Pick KBO**](https://mypickkbo.com/), a fantasy-baseball website that transforms official KBO game records into role-specific composite player-performance indices so users can compare performance across batting and pitching roles. This research project tests whether the **strict-prior average of those indices** adds incremental pregame win-probability information beyond conventional team-strength variables.
 
-The repository is not a single final-model notebook. It is an end-to-end research record covering:
+The project's core contributions are:
 
-- official schedule and BoxScore collection across 2024–2026;
-- 65,554 player-game occurrences with numeric identity resolution;
-- strict-prior, same-date-excluded feature engineering;
-- detection and correction of home/away identity asymmetry and role contamination;
-- 215 batter-score candidates, 20 prior-average methods, and multiple lineup aggregations;
-- 42 model configurations and static, rolling, decay, adaptive, online, calibration, and ensemble strategies;
-- ablation, date-cluster bootstrap, calibration, model serialization, replay, and SHA-based provenance;
-- negative results and suspended conclusions when audits invalidated earlier assumptions.
+- an end-to-end official-data pipeline covering 1,864 completed KBO games and 65,554 player-game records;
+- numeric player-identity resolution and role-aware histories that separate starting, relief, and substitute appearances;
+- leakage-controlled feature engineering that excludes the target game, all same-date results, and future information;
+- construction of reproducible batter and starting-pitcher performance indices from official game events;
+- temporal model comparison and role ablation to quantify whether player-level signals add predictive value beyond conventional team strength;
+- detection and correction of home/away identity asymmetry and role contamination that invalidated earlier assumptions;
+- transparent preservation of negative results, uncertainty estimates, serialized models, prediction replay, and SHA-based provenance.
 
-The strongest observed 2026 development specification was L2 logistic regression (`C=0.1`) trained on the most recent 720 decision games. The scientifically cleaner specification was selected using only 2024–2025 temporal CV (`C=0.03`, all prior rows). Both are preserved and must be compared on future immutable predictions.
+The best observed development model achieved a 2026 Log loss of **0.6661** using regularized logistic regression trained on the most recent historical games. A second model selected only through 2024–2025 temporal cross-validation is preserved as a scientifically cleaner comparator. Both will be evaluated on future immutable pregame predictions.
+
+For the complete research process, decisions, and results, see **Entire Process** below.
+
+[![Entire Process](https://img.shields.io/badge/Entire%20Process-View%20Details-2f81f7?style=for-the-badge)](#suggested-reading-order)
 
 ## Research question
 
