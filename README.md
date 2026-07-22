@@ -119,7 +119,7 @@ Only starts are included in the history. Relief appearances are not mixed into t
 
 See [`docs/player_index_design.md`](docs/player_index_design.md).
 
-## Validation contract
+## Temporal Validation and Data-Leakage Controls
 
 - `source game date < target game date` for every historical feature;
 - target-game outcomes excluded;
