@@ -1,4 +1,4 @@
-# 15Pick — Leakage-Controlled KBO Win-Probability Research
+# KBO Win-Probability Modeling with Role-Specific Player Performance Indices
 
 [![Python](https://img.shields.io/badge/Python-3.11%2B-blue)](#reproduce-the-core-results)
 [![Validation](https://img.shields.io/badge/Validation-Temporal%20%2B%20Same--Date%20Excluded-success)](docs/temporal_validation_and_leakage.md)
