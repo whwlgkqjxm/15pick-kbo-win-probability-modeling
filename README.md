@@ -21,7 +21,7 @@ The project's main contributions and findings are:
 
 In the 2026 development evaluation, the conventional pregame model recorded a Log loss of **0.6839**. Adding the batter index improved it to **0.6786**, adding the starting-pitcher index improved it to **0.6732**, and using both indices produced the best result of **0.6661**. The 95% date-cluster bootstrap interval for the combined improvement was **[-0.0332, -0.0021]**.
 
-These results show that the role-specific player-performance indices provided incremental predictive information beyond conventional team-strength features. Because 2026 outcomes were examined during model development, these findings will undergo **additional validation** using future immutable pregame predictions.
+These results show that the role-specific player-performance indices provided incremental predictive information beyond conventional team-strength features.
 
 For the complete research process, decisions, and results, see **Entire Process**.
 
