@@ -6,21 +6,21 @@
 
 내가 직접 만든 판타지 야구 웹사이트 [**15Pick KBO**](https://mypickkbo.com/)는 공식 KBO 경기 기록을 역할별 복합 선수 활약도 지표로 변환하여 타자와 투수의 경기 활약을 비교할 수 있도록 한다. 이 연구 프로젝트는 해당 지표의 **목표 경기 이전 strict-prior 평균**이 기존 팀 전력 변수에 추가적인 경기 전 승리확률 예측 정보를 제공하는지 검증한다.
 
-이 프로젝트의 핵심 기여는 다음과 같다.
+이 프로젝트의 핵심 기여와 결과는 다음과 같다.
 
-- 공식 KBO 완료 경기 1,864경기와 선수-경기 기록 65,554건을 활용한 end-to-end 데이터 파이프라인 구축
-- 숫자형 선수 ID 기반 identity resolution과 선발·구원·교체 출전을 구분한 역할별 history 구축
-- 목표 경기, 같은 날짜 경기, 미래 정보를 제외한 leakage-controlled feature engineering
-- 공식 경기 이벤트로부터 재현 가능한 타자 및 선발투수 복합 활약도 지표 설계
-- 선수 지표가 기존 팀 전력 정보에 추가적인 예측 가치를 제공하는지 temporal validation과 role ablation으로 검증
-- 홈·원정 identity 비대칭과 역할 혼합 문제를 발견하고 수정하여 이전 가정을 재검토
-- negative result, bootstrap uncertainty, calibration, model serialization, prediction replay, SHA 기반 provenance 보존
+- 공식 KBO 완료 경기 1,864경기와 선수-경기 기록 65,554건을 수집·정제한 end-to-end 데이터 파이프라인 구축
+- 선수 identity 오류와 선발·구원·교체 출전의 역할 혼합 문제를 발견하고 수정
+- 각 경기 이전에 확인할 수 있는 정보만 사용하는 누수 통제형 타자·선발투수 활약도 지표 설계
+- 역할별 선수 활약도 지표가 기존 팀 전력 변수만 사용한 모델보다 승리확률 예측 성능을 개선한다는 결과 확인
+- 실패한 실험, 불확실성, 모델 및 예측 결과를 재현 가능한 형태로 보존
 
-현재 최고 관측 개발 모델은 최근 과거 경기로 학습한 regularized logistic regression으로 2026 개발 평가에서 **Log loss 0.6661**을 기록했다. 2024–2025 temporal cross-validation만으로 선택한 별도 모델도 더 과학적으로 깨끗한 비교 기준으로 함께 보존했으며, 두 모델은 향후 변경 불가능한 경기 전 예측에서 비교할 예정이다.
+2026 개발 평가에서 기존 경기 전 변수만 사용한 모델의 Log loss는 **0.6839**였다. 타자 지표를 추가했을 때 **0.6786**, 선발투수 지표를 추가했을 때 **0.6732**로 개선됐으며, 두 지표를 모두 사용한 모델이 **0.6661**로 가장 좋은 결과를 기록했다. 결합 모델의 개선에 대한 날짜 단위 bootstrap 95% 구간은 **[-0.0332, -0.0021]**이었다.
 
-프로젝트의 전체 과정, 주요 판단, 결과에 대한 자세한 내용은 아래 **Entire Process**를 참고하세요.
+이 결과는 역할별 선수 활약도 지표가 기존 팀 전력 정보에 추가적인 승부예측 정보를 제공했음을 보여준다. 다만 2026 결과가 모델 개발 과정에서 관찰됐으므로, 향후 변경 불가능한 경기 전 예측을 통해 **추가 검증**할 예정이다.
 
-[![Entire Process](https://img.shields.io/badge/Entire%20Process-%EC%9E%90%EC%84%B8%ED%9E%88%20%EB%B3%B4%EA%B8%B0-2f81f7?style=for-the-badge)](#권장-읽기-순서)
+프로젝트의 전체 과정, 주요 판단 및 결과는 **Entire Process**에서 확인할 수 있습니다.
+
+[![Read the Entire Process](https://img.shields.io/badge/-READ%20THE%20ENTIRE%20PROCESS%20%E2%86%92-1F6FEB?style=for-the-badge&logo=bookstack&logoColor=white)](#권장-읽기-순서)
 
 ## 연구 질문
 

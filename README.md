@@ -11,21 +11,21 @@
 
 I built [**15Pick KBO**](https://mypickkbo.com/), a fantasy-baseball website that transforms official KBO game records into role-specific composite player-performance indices so users can compare performance across batting and pitching roles. This research project tests whether the **strict-prior average of those indices** adds incremental pregame win-probability information beyond conventional team-strength variables.
 
-The project's core contributions are:
+The project's main contributions and findings are:
 
-- an end-to-end official-data pipeline covering 1,864 completed KBO games and 65,554 player-game records;
-- numeric player-identity resolution and role-aware histories that separate starting, relief, and substitute appearances;
-- leakage-controlled feature engineering that excludes the target game, all same-date results, and future information;
-- construction of reproducible batter and starting-pitcher performance indices from official game events;
-- temporal model comparison and role ablation to quantify whether player-level signals add predictive value beyond conventional team strength;
-- detection and correction of home/away identity asymmetry and role contamination that invalidated earlier assumptions;
-- transparent preservation of negative results, uncertainty estimates, serialized models, prediction replay, and SHA-based provenance.
+- an end-to-end data pipeline built from 1,864 completed KBO games and 65,554 player-game records;
+- detection and correction of player-identity errors and role contamination across starting, relief, and substitute appearances;
+- leakage-controlled batter and starting-pitcher performance indices constructed only from information available before each game;
+- evidence that the role-specific player-performance indices improved win-probability prediction beyond conventional team-strength variables;
+- reproducible preservation of unsuccessful experiments, uncertainty estimates, models, and prediction outputs.
 
-The best observed development model achieved a 2026 Log loss of **0.6661** using regularized logistic regression trained on the most recent historical games. A second model selected only through 2024–2025 temporal cross-validation is preserved as a scientifically cleaner comparator. Both will be evaluated on future immutable pregame predictions.
+In the 2026 development evaluation, the conventional pregame model recorded a Log loss of **0.6839**. Adding the batter index improved it to **0.6786**, adding the starting-pitcher index improved it to **0.6732**, and using both indices produced the best result of **0.6661**. The 95% date-cluster bootstrap interval for the combined improvement was **[-0.0332, -0.0021]**.
 
-For the complete research process, decisions, and results, see **Entire Process** below.
+These results show that the role-specific player-performance indices provided incremental predictive information beyond conventional team-strength features. Because 2026 outcomes were examined during model development, these findings will undergo **additional validation** using future immutable pregame predictions.
 
-[![Entire Process](https://img.shields.io/badge/Entire%20Process-View%20Details-2f81f7?style=for-the-badge)](#suggested-reading-order)
+For the complete research process, decisions, and results, see **Entire Process**.
+
+[![Read the Entire Process](https://img.shields.io/badge/-READ%20THE%20ENTIRE%20PROCESS%20%E2%86%92-1F6FEB?style=for-the-badge&logo=bookstack&logoColor=white)](#suggested-reading-order)
 
 ## Research question
 
