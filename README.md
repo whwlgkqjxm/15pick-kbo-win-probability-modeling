@@ -90,7 +90,7 @@ The full causal record is in [`docs/research_journey.md`](docs/research_journey.
 | Strict-prior history rows | 65,554 |
 | Temporal violations | 0 |
 
-The included V12 derived modeling table has 1,824 decision games: 710 in 2024, 698 in 2025, and 416 in 2026. Complete official raw responses are not redistributed in this repository.
+The included V12 derived modeling table has 1,824 decision games: 710 in 2024, 698 in 2025, and 416 in 2026. 
 
 ## Player-performance indices
 
