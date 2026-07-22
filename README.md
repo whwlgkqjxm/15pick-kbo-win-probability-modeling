@@ -34,11 +34,9 @@ For the complete research process, decisions, and results, see **Entire Process*
 
 The index is not a monetary measure or a valuation of the player. It is a reproducible composite game-performance score. A target game's own score is never used as an input; only performance observed on dates strictly earlier than the target date is allowed.
 
-## Main evidence
+## Main result
 
 ### Best-observed V12 specification — trained on 720 earlier games, evaluated on 416 games
-
-The number **720** is the training-window size. The number **416** is the separate 2026 development-evaluation size. They describe different parts of the same experiment and should not be compared as if one replaced the other.
 
 | Feature set | Log loss ↓ | Brier ↓ | ROC AUC ↑ | Accuracy ↑ |
 |---|---:|---:|---:|---:|
