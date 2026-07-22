@@ -30,7 +30,7 @@ For the complete research process, decisions, and results, see **Entire Process*
 
 ## Research question
 
-> **Do role-specific 15Pick composite player-performance indices derived from official KBO game records provide incremental information for pregame win-probability forecasting beyond conventional team-strength features, and which player roles contribute the greatest predictive value?**
+**Do role-specific 15Pick composite player-performance indices derived from official KBO game records provide incremental information for pregame win-probability forecasting beyond conventional team-strength features, and which player roles contribute the greatest predictive value?**
 
 
 ## Main result
@@ -57,22 +57,24 @@ The primary V12 specification already represents bullpen strength through **team
 
 ![Relief-pitcher index negative result](reports/figures/relief_index_negative_result.png)
 
-## Why the research process matters
+## Research evolution
 
-The strongest part of this project is not that every experiment worked. It is that failures changed the research design.
+```mermaid
+flowchart LR
+    A[2026-only limited sample] --> B[Multi-season official foundation]
+    B --> C[V1-V4 temporal models]
+    C --> D[Identity and role-scope audit]
+    D --> E[Clean start-only pitcher index]
+    E --> F[V7 integration and stacking]
+    F --> G[V8 batter and relief negative results]
+    G --> H[V9 post-starter team run prevention]
+    H --> I[V10 workload/matchup tests rejected]
+    I --> J[V11.1 full batter-index rebuild]
+    J --> K[V12 model and training-strategy comparison]
+    K --> L[Two-model freeze and prospective ledger]
+```
 
-| Problem discovered | Evidence | Root cause | Corrective action | Outcome |
-|---|---|---|---|---|
-| Weak 2026-only model | probabilities concentrated near 0.5; complex model degraded | small repeated-team sample and adaptive search | expanded to 2024–2026 official data | stronger and more stable temporal evidence |
-| Away-starting-pitcher history missing | home starter eligibility 416, away 0 | asymmetric raw identity tokens | numeric identity reconstruction and side-specific audits | 832/832 model-period starters eligible |
-| Role-contaminated histories | 78.11% of experienced starting-batter rows contained substitute history; 20.77% of starting-pitcher rows contained relief history | history key omitted role | role-aware parallel histories and start-only redesign | clean starter index became a strong signal |
-| Broad complex-model search failed | V3 Log loss 0.677185 versus V2 0.670610 | feature proliferation and limited independent information | retained regulated logistic baseline | negative result preserved rather than hidden |
-| Ceiling conclusion became invalid | earlier audit suggested little signal remained | ceiling was measured on contaminated features | suspended the claim | research question reopened after data repair |
-| Initial batter candidate failed to add value | V8 batter addition worsened the V7 stack | limited score/mean/aggregation search | full V11.1 rebuild from official batting events | new batter block showed incremental value |
-| Player-level relief index failed | 2025 domain delta +0.000009; stack worsened | actual reliever deployment unknown pregame | retained team-level prior post-starter run prevention | negative result documented and scope narrowed |
-| Daily retraining failed to help | expanding/rolling adaptive models trailed static recent-window model | adaptation followed noise in a modest sample | preserved both clean CV and observed development candidates | future prospective comparison required |
-
-The full causal record is in [`docs/research_journey.md`](docs/research_journey.md) and [`docs/failure_root_cause_ledger.md`](docs/failure_root_cause_ledger.md).
+For the complete research process and detailed records of failure analysis, root causes, and corrective actions, see the [research journey](docs/research_journey.md) and [failure and root-cause ledger](docs/failure_root_cause_ledger.md).
 
 ## Data foundation
 
@@ -132,23 +134,6 @@ See [`docs/player_index_design.md`](docs/player_index_design.md).
 - date-cluster bootstrap used for paired uncertainty.
 
 A crucial distinction is preserved: **2026 predictions have no within-game or same-date leakage, but 2026 was inspected during method comparison.** Therefore it is development evaluation, not a final untouched test.
-
-## Research evolution
-
-```mermaid
-flowchart LR
-    A[2026-only limited sample] --> B[Multi-season official foundation]
-    B --> C[V1-V4 temporal models]
-    C --> D[Identity and role-scope audit]
-    D --> E[Clean start-only pitcher index]
-    E --> F[V7 integration and stacking]
-    F --> G[V8 batter and relief negative results]
-    G --> H[V9 post-starter team run prevention]
-    H --> I[V10 workload/matchup tests rejected]
-    I --> J[V11.1 full batter-index rebuild]
-    J --> K[V12 model and training-strategy comparison]
-    K --> L[Two-model freeze and prospective ledger]
-```
 
 ## Model Candidates and Prospective Validation
 
