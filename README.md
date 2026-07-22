@@ -51,7 +51,7 @@ For the combined model versus the conventional no-player-index model:
 - 95% paired date-cluster bootstrap interval: **[−0.033154, −0.002114]**
 - Probability of lower Log loss: **98.69%**
 
-The V12 conventional block already contains **team-level bullpen and post-starter run-prevention variables**. A separate **player-level relief-pitcher index** was tested earlier in V8 and was not retained: Log loss worsened from `0.669483` to `0.674253` in 2025 temporal OOF and from `0.667785` to `0.668898` in 2026 post-hoc evaluation. Because V8 used a different historical protocol, that result is shown separately rather than inserted into the V12 ranking table.
+The primary V12 specification already represents bullpen strength through **team-level pregame measures of bullpen and post-starter run prevention**. Player-level relief pitching was evaluated separately under the earlier V8 protocol. Adding the relief-pitcher index increased Log loss from `0.669483` to `0.674253` in the 2025 temporal OOF evaluation and from `0.667785` to `0.668898` in the 2026 post-hoc evaluation, so the index was not retained. Because V8 and V12 used different historical protocols, the V8 result is reported separately rather than ranked with the V12 role ablations. For detailed diagnostics and the broader record of unsuccessful experiments, see the [failure and root-cause ledger](docs/failure_root_cause_ledger.md).
 
 ![Main model comparison](reports/figures/main_model_comparison.png)
 

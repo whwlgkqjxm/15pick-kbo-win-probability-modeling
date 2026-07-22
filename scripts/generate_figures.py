@@ -55,55 +55,117 @@ def _dot_plot(
 def ablation_plot() -> None:
     data = pd.read_csv(REPRODUCED / "player_index_ablation.csv")
     data = data[data["protocol"].eq("BEST_DEVELOPMENT")].copy()
-    order = [
-        "CONSTANT_0_5",
-        "BASELINE_NO_PLAYER_INDICES",
-        "BATTER_INDEX_ONLY",
-        "STARTER_INDEX_ONLY",
-        "BATTER_PLUS_STARTER_INDICES",
-    ]
-    label_map = {
-        "CONSTANT_0_5": "Constant p(home)=0.50",
-        "BASELINE_NO_PLAYER_INDICES": "Conventional pregame variables",
-        "BATTER_INDEX_ONLY": "+ batter index",
-        "STARTER_INDEX_ONLY": "+ starting-pitcher index",
-        "BATTER_PLUS_STARTER_INDICES": "+ batter and starting-pitcher indices",
-    }
-    data = data.set_index("model").loc[order].reset_index()
-    data["display"] = data["model"].map(label_map)
-    constant = float(data.loc[data["model"].eq("CONSTANT_0_5"), "log_loss"].iloc[0])
-    data["improvement"] = constant - data["log_loss"]
+    data = data.set_index("model")
 
-    fig, ax = plt.subplots(figsize=(10, 5.4))
-    bars = ax.barh(data["display"], data["improvement"])
+    baseline_log_loss = float(data.loc["BASELINE_NO_PLAYER_INDICES", "log_loss"])
+    models = pd.DataFrame(
+        {
+            "display": [
+                "Batter index",
+                "Starting-pitcher index",
+                "Batter + starting-pitcher indices",
+            ],
+            "log_loss": [
+                data.loc["BATTER_INDEX_ONLY", "log_loss"],
+                data.loc["STARTER_INDEX_ONLY", "log_loss"],
+                data.loc["BATTER_PLUS_STARTER_INDICES", "log_loss"],
+            ],
+        }
+    )
+    models["improvement"] = baseline_log_loss - models["log_loss"]
+
+    bootstrap = pd.read_csv(REPRODUCED / "player_index_ablation_bootstrap.csv")
+    combined_bootstrap = bootstrap.loc[
+        bootstrap["protocol"].eq("BEST_DEVELOPMENT")
+    ].iloc[0]
+    combined_ci_low = -float(combined_bootstrap["ci_high"])
+    combined_ci_high = -float(combined_bootstrap["ci_low"])
+
+    fig, ax = plt.subplots(figsize=(10.8, 5.2))
+    y_positions = list(range(len(models)))
+    colors = ["#4C78A8", "#F58518", "#54A24B"]
+    bars = ax.barh(
+        y_positions,
+        models["improvement"],
+        color=colors,
+        height=0.58,
+    )
     bars[-1].set_hatch("//")
+    bars[-1].set_edgecolor("#2F4B35")
+    bars[-1].set_linewidth(1.0)
+
+    combined_value = float(models.iloc[-1]["improvement"])
+    ax.errorbar(
+        combined_value,
+        y_positions[-1],
+        xerr=[
+            [combined_value - combined_ci_low],
+            [combined_ci_high - combined_value],
+        ],
+        fmt="none",
+        ecolor="#222222",
+        elinewidth=1.8,
+        capsize=5,
+        capthick=1.8,
+        zorder=4,
+    )
+
+    ax.set_yticks(y_positions, models["display"])
     ax.invert_yaxis()
-    ax.set_xlim(0, float(data["improvement"].max()) * 1.28)
-    ax.set_xlabel("Log-loss improvement over constant p(home)=0.50 (higher is better)")
-    ax.set_title("Role-specific model comparison", pad=12)
-    ax.grid(axis="x", alpha=0.25)
-    for bar, raw, improvement in zip(
-        bars, data["log_loss"], data["improvement"], strict=True
-    ):
+    ax.axvline(0, color="#333333", linewidth=1.0)
+    ax.set_xlim(0, max(combined_ci_high * 1.08, float(models["improvement"].max()) * 1.55))
+    ax.set_xlabel(
+        "Log-loss improvement over the conventional pregame model (higher is better)"
+    )
+    ax.set_title(
+        "Incremental predictive value of role-specific player indices",
+        pad=22,
+        fontweight="bold",
+    )
+    ax.text(
+        0.0,
+        1.035,
+        (
+            f"Reference model Log loss: {baseline_log_loss:.6f}  |  "
+            "2026 development evaluation: 416 games"
+        ),
+        transform=ax.transAxes,
+        fontsize=9.5,
+        color="#444444",
+        va="bottom",
+    )
+    ax.grid(axis="x", alpha=0.22)
+    ax.set_axisbelow(True)
+
+    label_offset = ax.get_xlim()[1] * 0.012
+    for index, (bar, row) in enumerate(zip(bars, models.itertuples(index=False), strict=True)):
+        value = float(row.improvement)
+        label_x = min(value + label_offset, ax.get_xlim()[1] * 0.86)
+        label_y = bar.get_y() + bar.get_height() / 2
+        if index == len(models) - 1:
+            label_y -= 0.38
         ax.text(
-            float(improvement) + 0.00035,
-            bar.get_y() + bar.get_height() / 2,
-            f"Log loss {raw:.6f}",
+            label_x,
+            label_y,
+            f"+{value:.6f}  |  Log loss {float(row.log_loss):.6f}",
             va="center",
-            fontsize=9,
+            fontsize=9.3,
+            fontweight="bold" if index == len(models) - 1 else "normal",
         )
+
     fig.text(
         0.5,
-        0.01,
+        0.015,
         (
-            "Best-observed model: trained on the most recent 720 pre-2026 games; "
-            "evaluated on 416 decision games in 2026."
+            "Combined model 95% paired date-cluster bootstrap interval for improvement: "
+            f"+{combined_ci_low:.6f} to +{combined_ci_high:.6f}."
         ),
         ha="center",
         fontsize=9,
+        color="#444444",
     )
-    plt.tight_layout(rect=(0, 0.04, 1, 1))
-    plt.savefig(FIGURES / "main_model_comparison.png", dpi=200, bbox_inches="tight")
+    plt.tight_layout(rect=(0, 0.06, 1, 0.97))
+    plt.savefig(FIGURES / "main_model_comparison.png", dpi=220, bbox_inches="tight")
     plt.close()
 
     bullpen_2025 = pd.read_csv(
@@ -114,66 +176,79 @@ def ablation_plot() -> None:
     ).set_index("method")
     bullpen = pd.DataFrame(
         {
-            "evaluation": ["2025 temporal OOF (698 games)", "2026 post-hoc (416 games)"],
-            "starter_stack": [
+            "evaluation": [
+                "2025 temporal OOF (698 games)\n0.669483 → 0.674253",
+                "2026 post-hoc (416 games)\n0.667785 → 0.668898",
+            ],
+            "reference": [
                 bullpen_2025.loc["LOGIT_STACK_V7_STARTER_C0.1", "log_loss"],
                 bullpen_2026.loc["LOGIT_STACK_V7_STARTER_C0.1", "log_loss"],
             ],
-            "plus_player_relief_index": [
+            "plus_relief_index": [
                 bullpen_2025.loc["LOGIT_STACK_V7_PLUS_BULLPEN_C0.01", "log_loss"],
                 bullpen_2026.loc["LOGIT_STACK_V7_PLUS_BULLPEN_C0.01", "log_loss"],
             ],
         }
     )
+    bullpen["delta"] = bullpen["plus_relief_index"] - bullpen["reference"]
 
-    fig, ax = plt.subplots(figsize=(10, 4.2))
-    for idx, row in bullpen.iterrows():
-        ax.plot(
-            [row["starter_stack"], row["plus_player_relief_index"]],
-            [idx, idx],
-            marker="o",
-            linewidth=2.5,
-        )
-        delta = row["plus_player_relief_index"] - row["starter_stack"]
+    fig, ax = plt.subplots(figsize=(10.8, 4.6))
+    y_positions = list(range(len(bullpen)))
+    bars = ax.barh(
+        y_positions,
+        bullpen["delta"],
+        color=["#E45756", "#F28E2B"],
+        height=0.5,
+    )
+    ax.set_yticks(y_positions, bullpen["evaluation"])
+    ax.invert_yaxis()
+    ax.axvline(0, color="#333333", linewidth=1.1)
+    ax.set_xlim(0, float(bullpen["delta"].max()) * 1.52)
+    ax.set_xlabel(
+        "Increase in Log loss after adding the relief-pitcher index (positive is worse)"
+    )
+    ax.set_title(
+        "Player-level relief-pitcher index did not improve prediction",
+        pad=22,
+        fontweight="bold",
+    )
+    ax.text(
+        0.0,
+        1.04,
+        "V8 evaluation results; each bar shows the performance change after adding the index.",
+        transform=ax.transAxes,
+        fontsize=9.5,
+        color="#444444",
+        va="bottom",
+    )
+    ax.grid(axis="x", alpha=0.22)
+    ax.set_axisbelow(True)
+
+    label_offset = ax.get_xlim()[1] * 0.015
+    for bar, row in zip(bars, bullpen.itertuples(index=False), strict=True):
+        delta = float(row.delta)
         ax.text(
-            float(row["starter_stack"]) - 0.00012,
-            idx - 0.12,
-            f"{row['starter_stack']:.6f}",
-            ha="right",
-            fontsize=9,
+            delta + label_offset,
+            bar.get_y() + bar.get_height() / 2,
+            f"Δ +{delta:.6f}  (worse)",
+            va="center",
+            fontsize=9.5,
+            fontweight="bold",
         )
-        ax.text(
-            float(row["plus_player_relief_index"]) + 0.00012,
-            idx - 0.12,
-            f"{row['plus_player_relief_index']:.6f}",
-            ha="left",
-            fontsize=9,
-        )
-        ax.text(
-            (float(row["starter_stack"]) + float(row["plus_player_relief_index"])) / 2,
-            idx + 0.18,
-            f"worse by {delta:+.6f}",
-            ha="center",
-            fontsize=9,
-        )
-    ax.set_yticks(range(len(bullpen)), bullpen["evaluation"])
-    ax.set_ylim(1.45, -0.45)
-    ax.set_xlim(0.6665, 0.6758)
-    ax.set_xlabel("Log loss (lower is better)")
-    ax.set_title("Player-level relief-pitcher index was tested and not retained", pad=18)
-    ax.grid(axis="x", alpha=0.25)
+
     fig.text(
         0.5,
-        0.01,
+        0.015,
         (
-            "Historical V8 protocol; displayed separately from V12 to avoid an "
-            "invalid cross-protocol ranking."
+            "Reported separately because the historical V8 and V12 protocols are not "
+            "directly comparable."
         ),
         ha="center",
         fontsize=9,
+        color="#444444",
     )
-    plt.tight_layout(rect=(0, 0.08, 1, 0.98))
-    plt.savefig(FIGURES / "relief_index_negative_result.png", dpi=200, bbox_inches="tight")
+    plt.tight_layout(rect=(0, 0.07, 1, 0.96))
+    plt.savefig(FIGURES / "relief_index_negative_result.png", dpi=220, bbox_inches="tight")
     plt.close()
 
 
