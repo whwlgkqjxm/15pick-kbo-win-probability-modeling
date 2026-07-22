@@ -9,15 +9,16 @@
 
 ## Summary
 
-I built [**15Pick KBO**](https://mypickkbo.com/), a fantasy-baseball website that transforms official KBO game records into role-specific composite player-performance indices so users can compare performance across batting and pitching roles. This research project tests whether the **strict-prior average of those indices** adds incremental pregame win-probability information beyond conventional team-strength variables.
+I built [**15Pick KBO**](https://mypickkbo.com/), a fantasy-baseball website that transforms official KBO game records into role-specific composite player-performance indices so users can compare performance across batting and pitching roles. This research project directly designs a win-probability model and tests whether strict-prior averages of these indices provide additional pregame predictive information beyond conventional team-strength variables.
 
 The project's main contributions and findings are:
 
 - an end-to-end data pipeline built from 1,864 completed KBO games and 65,554 player-game records.
-- detection and correction of player-identity errors and role contamination across starting, relief, and substitute appearances.
-- leakage-controlled batter and starting-pitcher performance indices constructed only from information available before each game.
+- creating a reliable analytical dataset through accurate player identification and role classification.
+- designing leakage-controlled indices using only information available before each target game.
+- directly experimenting with and comparing multiple models and training strategies to select the final win-probability model.
 - evidence that the role-specific player-performance indices improved win-probability prediction beyond conventional team-strength variables.
-- reproducible preservation of unsuccessful experiments, uncertainty estimates, models, and prediction outputs.
+- reproducible preservation of unsuccessful experiments, models, and prediction outputs.
 
 In the 2026 development evaluation, the conventional pregame model recorded a Log loss of **0.6839**. Adding the batter index improved it to **0.6786**, adding the starting-pitcher index improved it to **0.6732**, and using both indices produced the best result of **0.6661**. The 95% date-cluster bootstrap interval for the combined improvement was **[-0.0332, -0.0021]**.
 
