@@ -45,8 +45,6 @@ For the complete research process, decisions, and results, see **Entire Process*
 | + Starting-pitcher index only | 0.673157 | 0.239875 | 0.617343 | 57.93% |
 | **+ Batter and starting-pitcher indices** | **0.666135** | **0.236498** | **0.635275** | **59.62%** |
 
-`*` A constant probability of 0.50 contains no ranking information. With the repository's `>=0.5` classification rule it predicts the home team every time, so its accuracy is simply the 2026 home-win share rather than learned model skill.
-
 For the combined model versus the conventional no-player-index model:
 
 - Log-loss difference: **−0.017807**
