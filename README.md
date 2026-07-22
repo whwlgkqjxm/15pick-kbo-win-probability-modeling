@@ -13,10 +13,10 @@ I built [**15Pick KBO**](https://mypickkbo.com/), a fantasy-baseball website tha
 
 The project's main contributions and findings are:
 
-- an end-to-end data pipeline built from 1,864 completed KBO games and 65,554 player-game records;
-- detection and correction of player-identity errors and role contamination across starting, relief, and substitute appearances;
-- leakage-controlled batter and starting-pitcher performance indices constructed only from information available before each game;
-- evidence that the role-specific player-performance indices improved win-probability prediction beyond conventional team-strength variables;
+- an end-to-end data pipeline built from 1,864 completed KBO games and 65,554 player-game records.
+- detection and correction of player-identity errors and role contamination across starting, relief, and substitute appearances.
+- leakage-controlled batter and starting-pitcher performance indices constructed only from information available before each game.
+- evidence that the role-specific player-performance indices improved win-probability prediction beyond conventional team-strength variables.
 - reproducible preservation of unsuccessful experiments, uncertainty estimates, models, and prediction outputs.
 
 In the 2026 development evaluation, the conventional pregame model recorded a Log loss of **0.6839**. Adding the batter index improved it to **0.6786**, adding the starting-pitcher index improved it to **0.6732**, and using both indices produced the best result of **0.6661**. The 95% date-cluster bootstrap interval for the combined improvement was **[-0.0332, -0.0021]**.
