@@ -2,8 +2,6 @@
 
 This document explains why each research stage was conducted, what evidence changed the project direction, and which conclusions remain scientifically valid. It is a decision history rather than a list of model versions.
 
-The central question remained consistent throughout the project: whether role-specific player-performance indices, summarized only from games strictly before the target date, add pregame win-probability information beyond conventional team-strength variables.
-
 For the exact research question and contribution statement, see [research question and contribution](research_question_and_contribution.md). Defects and failed experiments are documented in greater detail in the [failure and root-cause ledger](failure_root_cause_ledger.md).
 
 ## Research arc at a glance
