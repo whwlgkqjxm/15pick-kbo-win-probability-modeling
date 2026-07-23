@@ -10,11 +10,11 @@ Do role-specific composite player-performance indices derived from official KBO 
 
 ## Unit of analysis
 
-One completed KBO game is one model row. The binary target is whether the home team wins. Ties remain in the canonical game table but are excluded from binary fitting under a declared rule. Cancelled or postponed games are not evaluated.
+The canonical dataset contains one row per completed KBO game. Binary modeling uses the 1,824 decision games among 1,864 completed games, with the target defined as whether the home team wins. The 40 ties remain in the canonical game table but are excluded from binary fitting under a prespecified rule. Cancelled or postponed games are excluded from evaluation.
 
 ## Prediction timestamp
 
-The intended prediction setting is lineup-confirmed pregame: both official starting lineups and starting pitchers are known, but first pitch has not occurred. Historical reconstruction uses official game records and enforces date-level strict-prior exclusion.
+The target setting is lineup-confirmed pregame: both official starting lineups and starting pitchers are known, and the prediction is generated before first pitch. In the retrospective study, these inputs are reconstructed from official KBO game records, and all features use only information from dates strictly earlier than the target game date; the historical records are therefore not independently timestamped pregame snapshots. For future games, pregame inputs and predictions will be timestamped and stored before first pitch in the prospective ledger described in [`prospective_validation.md`](prospective_validation.md).
 
 ## Contributions
 
