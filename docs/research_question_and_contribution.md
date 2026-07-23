@@ -18,13 +18,13 @@ The target setting is lineup-confirmed pregame: both official starting lineups a
 
 ## Contributions
 
-1. **Official-data engineering:** the project built a multi-season KBO data foundation covering 1,864 completed games and 65,554 player-game occurrences, with numeric player identity resolved for all 65,554 occurrences.
+1. **Official data engineering:** the project built a multi-season KBO data foundation covering 1,864 completed games and 65,554 player-game occurrences, with numeric player identity resolved for all 65,554 occurrences.
 2. **Strict temporal leakage control:** all target-game and same-date results are excluded from feature construction, including the first game of a same-day doubleheader when predicting the second game.
 3. **Audit-driven data correction:** the project detected home-away identity asymmetry and role-contaminated player histories, invalidated an earlier ceiling claim, and rebuilt role-specific historical features.
-4. **Role-specific player-index redesign:** official KBO records were used to redesign both a clean start-only starting-pitcher index and a fully new batter index. The batter study compared 215 game-score candidates and 20 prior-averaging methods before selecting a rate-normalized score with K=5 shrinkage and official nine-player lineup aggregation.
-5. **Temporal model and training-strategy comparison:** 42 model configurations and multiple static, rolling, expanding, adaptive, online, calibration, and ensemble strategies were evaluated under temporal protocols.
-6. **Incremental-value testing:** no-player, batter-only, starter-only, and combined batter-plus-starter models were compared under identical V12 learning rules to measure the additional predictive contribution of each player-index block.
-7. **Probability-focused evaluation:** models were evaluated primarily using log loss, Brier score, calibration, and temporally clustered uncertainty analysis rather than accuracy alone.
+4. **Role-specific index redesign:** official KBO records were used to redesign both a clean start-only starting-pitcher index and a fully new batter index. The batter study compared 215 game-score candidates and 20 prior-averaging methods before selecting a rate-normalized score with K=5 shrinkage and aggregation over the official nine-player starting lineup.
+5. **Temporal model and training-strategy comparison:** 42 model configurations were evaluated using static, rolling, expanding, adaptive, and online training strategies, together with calibration and ensemble methods.
+6. **Incremental-value testing:** no-player, batter-only, starter-only, and combined batter-plus-starter models were compared under the same V12 learning protocol to measure the additional predictive contribution of each player-index block.
+7. **Probability-focused evaluation:** models were evaluated using log loss and Brier score as primary metrics, together with calibration analysis and temporally clustered uncertainty estimates, rather than accuracy alone.
 8. **Reproducibility:** derived modeling data, frozen predictions, fitted model binaries, replay checks, environment records, SHA manifests, and portable reproduction code are preserved.
 9. **Transparent negative-result reporting:** unsuccessful complex models, player-level relief-pitcher indices, feature families, and adaptive retraining strategies are documented and preserved rather than omitted.
 
