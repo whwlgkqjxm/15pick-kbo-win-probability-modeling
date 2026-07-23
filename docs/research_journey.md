@@ -6,15 +6,17 @@ For the exact research question and contribution statement, see [research questi
 
 ## Research arc at a glance
 
-| Stage | Main question | Evidence-driven outcome |
+| Stage | Main question | Outcome |
 |---|---|---|
-| Phase 1 | Can a 2026-only sample support a strong model? | No; the branch was closed as a valid negative result. |
-| Phase 2 | Can a reliable multi-season foundation be built? | Yes; 1,864 games and 65,554 player-game occurrences were canonicalized and resolved. |
-| V1–V4 | Do stabilized player-history features or more complex learning strategies improve prediction? | Stabilization helped, but added complexity and retraining did not consistently help. |
-| V5 and role audit | Had the existing feature set reached a predictive ceiling? | The ceiling claim was withdrawn after role-contaminated histories were discovered. |
-| V6–V10 | Can cleaner role-specific representations improve the model? | A clean starter index added signal; first batter and relief implementations did not survive integration. |
-| V11.1–V12 | Can the batter index be rebuilt and the full model compared fairly? | A new batter index added complementary signal; regularized logistic regression remained strongest. |
-| Current freeze | What remains before a final generalization claim? | Two specifications are frozen for immutable prospective evaluation. |
+| Phase 1 | Was the 2026-only sample sufficient? | No; weak temporal performance led to a valid negative result. |
+| Phase 2 | Could a reliable multi-season foundation be built? | Yes; 1,864 games and 65,554 player-game records were converted into strict-prior data. |
+| V1–V4 | Would stabilized histories or greater model complexity help? | Stabilized priors helped, but complex models and adaptive training did not. |
+| V5 audit | Had the model reached its predictive ceiling? | The claim was withdrawn after role-contaminated histories were discovered. |
+| V6–V7 | Could a clean starter index improve prediction? | Yes; the start-only index and probability stacking improved Log loss. |
+| V8 | Did the initial batter and player-level bullpen indices help? | No; both worsened the integrated model and were rejected. |
+| V9–V10 | Could team-level bullpen and richer pregame features help? | The post-starter measure remained a challenger, but the added features did not improve probability quality. |
+| V11.1–V12 | Could the batter index be rebuilt and role value compared? | The new batter index added signal; the starter was stronger alone, and both together performed best. |
+| Current freeze | What remains? | Frozen models await prospective evaluation on future games. |
 
 ## Phase 1 — 2026-only limited-sample study
 
