@@ -30,8 +30,11 @@ The target setting is lineup-confirmed pregame: both official starting lineups a
 
 ## What this project does not claim
 
-- The indices are not economic player value.
-- 2026 is not a fully untouched final test because it was inspected during method comparison.
-- The best observed recent-720 model is not yet a future-proven production champion.
-- Failure of the tested relief-pitcher index does not imply relief pitching is unimportant.
-- Accuracy alone is not the model-selection criterion; probability quality and calibration are primary.
+- The player-performance indices do not represent economic, contractual, or market value.
+- The 2026 evaluation is not a fully untouched final test because its outcomes were inspected during method and training-strategy comparison.
+- Operational deployment of the recent-720 model does not imply that its future generalization has already been demonstrated.
+- Failure of the tested player-level relief-pitcher index does not imply that relief pitching is unimportant.
+- Historical lineups are reconstructed from official game records rather than independently archived pregame snapshots.
+- The results demonstrate predictive association, not a causal effect of the indices on game outcomes.
+
+Unresolved limitations and their planned follow-up are documented in [`prospective_validation.md`](prospective_validation.md).
