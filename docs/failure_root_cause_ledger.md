@@ -56,7 +56,7 @@ This document records issues that changed the data foundation, feature definitio
 - **Diagnosis — confirmed defect:** the historical key separated season, player, and broad position type, but did not distinguish starter from substitute batting appearances or starter from relief pitching appearances.
 - **Change:** rebuild date-batched strict-prior histories by role and design a start-only pitcher score.
 - **Verified outcome:** V2 was retained only as a historical baseline, not as a clean role-specific specification. The corrected histories became the foundation for the V6–V12 role redesign.
-- **Records:** [role-scope audit](role_scope_audit.md).
+- **Records:** [role-scope audit table](../research_records/key_results/ROLE_SCOPE_AUDIT_SUMMARY.csv) and [role-aware audit report](../research_records/reports/RQ1_ROLE_AWARE_INCOME_AUDIT_REPORT.md).
 
 ## F05 — complexity without temporal improvement
 
