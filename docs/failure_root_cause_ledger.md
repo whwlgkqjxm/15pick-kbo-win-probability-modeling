@@ -1,16 +1,16 @@
-# Failure, defect, and root-cause ledger
+# Failure and root-cause ledger
 
-A strong applied data-science project should document not only its best model, but also how observed failures were investigated, which causes were confirmed, which explanations remained inferential, and how each finding changed the research design.
+This ledger records the failures and defects that changed the project’s data pipeline, feature definitions, validation design, model selection, or scientific claims.
 
-## Interpretation rules
+Each entry documents the observed problem, quantitative evidence, cause assessment, corrective action, verification, and resulting research decision.
 
-This ledger separates three levels of causal certainty:
+## Cause classification
 
 - **Confirmed defect:** a data, implementation, or validation failure that was directly reproduced or isolated.
-- **Supported interpretation:** a mechanism consistent with the evidence, but not experimentally isolated as the sole cause.
-- **Governance risk:** a model-selection or evaluation issue controlled through process rather than claimed away.
+- **Supported interpretation:** an explanation consistent with the evidence but not isolated as the sole cause.
+- **Governance risk:** a model-selection or evaluation risk controlled through an explicit research process.
 
-Each entry follows: **problem → evidence → cause status → resolution → verification → scientific consequence**. Metrics from different historical protocols are not treated as one common leaderboard.
+Results produced under different historical evaluation protocols are reported in their original context and are not treated as directly comparable.
 
 ## At a glance
 
