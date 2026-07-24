@@ -163,14 +163,13 @@ The first is the cleaner scientific reference candidate. The second is the best 
 
 The next stage is an immutable pregame prediction ledger with separate postgame settlement, predefined metrics, separately versioned future-data challengers, and versioned product-deployment records. These activities are documented in [prospective validation](prospective_validation.md).
 
-## What the research sequence establishes
+## Data science lessons from the project
 
-The final value of the project is not only its best model. It is the auditable sequence of decisions:
+This project produced several lessons that extend beyond baseball forecasting:
 
-- limited-sample failure led to multi-season official-data engineering;
-- weak gains led to root-cause auditing rather than unchecked model expansion;
-- role contamination led to withdrawal of an earlier scientific claim;
-- role-specific redesign isolated a strong starter signal;
-- failed batter and relief implementations were preserved and diagnosed rather than hidden;
-- the batter representation was rebuilt from official events and retested under a common protocol;
-- development evidence was separated from future generalization through a prospective freeze.
+- Data quality and feature representation can matter more than additional model complexity.
+- Temporal validation must reproduce the real prediction setting, including strict-prior features and same-date exclusions.
+- Domain definitions are part of the model; mixing starting, substitute, and relief roles can invalidate an otherwise careful analysis.
+- A factor can matter in the real world yet remain difficult to represent before the event, as shown by the player-level bullpen experiment.
+- Regularized, interpretable models can outperform more complex learners when the sample is limited and the signal is noisy.
+- Reliable data science requires preserving negative results, reporting uncertainty, withdrawing unsupported claims, and separating development evidence from future prospective validation.
