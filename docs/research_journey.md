@@ -62,77 +62,82 @@ The project compared time decay, recent windows, expanding online retraining, se
 
 **Decision:** conclude that weighting, window changes, and frequent retraining could not repair limitations in the underlying player representation by themselves.
 
-## V5 — ceiling audit and withdrawal of the conclusion
+## V5 — ceiling audit, role contamination, and research pivot
 
 An initial ceiling audit suggested that performance flattened after roughly 600 games and that 224 additional features could not predict V2 errors. The tentative interpretation was that the remaining BoxScore information might contain little incremental signal.
 
-A later role-scope audit invalidated the premise of that conclusion. Because the historical features themselves mixed distinct player roles, a ceiling measured on those features could not be treated as a ceiling of the corrected research question.
-
-**Decision:** withdraw the final ceiling claim after its assumptions failed. The withdrawal was preserved as part of the scientific record rather than hidden.
-
-## Role-scope audit — the pivotal correction
-
-The history key separated season, player, and position type, but did not distinguish starting from substitute batting appearances or starting from relief pitching appearances. As a result:
+A role-scope audit then invalidated that premise. The history key separated season, player, and broad position type, but did not separate starting from substitute batting appearances or starting from relief pitching appearances. As a result:
 
 - 25,870 of 33,121 experienced starting-batter rows included substitute history (`78.11%`);
 - 726 of 3,496 experienced starting-pitcher rows included relief history (`20.77%`);
 - among 614 pitchers with both roles, the median absolute difference between all-role and start-only averages was `149.14`, and the 90th percentile was `779.51`.
 
-**Decision:** rebuild role-specific histories and redesign the starting-pitcher and relief representations. This audit changed the interpretation of earlier models and became the main turning point of the project.
+The earlier models had therefore tested contaminated batter and starter histories, not clean role-specific representations. The bullpen feature at that stage was a team-level prior run-prevention measure, not a player-level relief-pitcher index. A ceiling measured on those features could not answer the corrected research question.
 
-## V6 — clean starting-pitcher index design
+**Decision:** withdraw the ceiling claim, rebuild role-specific histories from official records, and evaluate batter, starter, and relief representations separately. This was the main turning point from model tuning to feature redesign.
 
-Six scoring families derived from official KBO records were compared. The selected `KBO_CONSTRAINED` starter index used only prior starts and combined outs, strikeouts, home runs allowed, walks, and hit batters.
+## V6 — role-specific redesign and starter-index selection
 
-Adding the clean starter representation to the team baseline improved 2025 Log loss by `−0.009401`, with a paired bootstrap interval excluding zero.
+V6 compared six official-record scoring families under role-aware strict-prior construction. The purpose was not only to choose a formula, but to identify which role was responsible for any incremental improvement.
 
-**Decision:** freeze the clean start-only score as the leading starting-pitcher index candidate.
+In the 2025 domain ablation against the same team baseline:
+
+| Added role block | Difference in Log loss | Interpretation |
+|---|---:|---|
+| Clean start-only pitcher index | `−0.009401` | Improved; 95% interval `[−0.014817, −0.003986]` |
+| Starting-lineup batter index | `+0.000417` | No improvement |
+| Player-level relief-pitcher index | `+0.000967` | No improvement |
+
+The gain came almost entirely from correcting and redesigning the starting-pitcher representation. The selected `KBO_CONSTRAINED` score used only prior starts and combined outs, strikeouts, home runs allowed, walks, and hit batters. It also showed stronger starter stability and next-game association than the role-aware legacy score.
+
+**Decision:** freeze the start-only `KBO_CONSTRAINED` score with a K=10 prior as the leading starter-index candidate. Do not advance the V6 batter or relief-pitcher formulations.
 
 ## V7 — integrating the starter index into prediction
 
-Sixteen strict-prior averaging candidates and several application methods were compared. The strongest historical integration kept the stabilized V2 component and clean starter-index model separate, then combined their out-of-fold logits. The 2025 temporal OOF Log loss improved from `0.678417` to `0.669483`.
+V7 compared 16 strict-prior averaging candidates and several application methods. The strongest structure did not force all variables into one joint feature matrix. It trained the stabilized V2 component and the clean starter-index component separately, then combined their temporal out-of-fold logits.
 
-**Decision:** preserve separate role-specific model components rather than forcing every feature into a single joint-feature model.
+On 2025 temporal OOF evaluation, Log loss improved from `0.678417` for V2 to `0.669483` for the logit stack. The difference was `−0.008934`; the paired date-cluster 95% interval was `[−0.017472, −0.000544]`, with a `98.14%` probability of improvement.
 
-## V8 — first batter and relief-pitcher index systems
+**Decision:** preserve separate role-specific model components when that structure generalizes better than direct feature concatenation.
 
-The first rebuilt batter candidate slightly improved its standalone team baseline, but adding it to the V7 stack worsened 2025 Log loss. The player-level relief-pitcher index was effectively null as a standalone block and also worsened the stack.
+## V8 — initial batter and player-level relief negative results
 
-**Decision:** do not retain either tested implementation in the primary model. This was interpreted as failure of those specific representations, not evidence that batting or relief pitching is unimportant.
+After the starter redesign succeeded, V8 asked whether separately designed batter and player-level relief-pitcher indices could add further value to the V7 structure.
 
-## V9 — team-level post-starter run prevention
+The selected batter candidate improved its standalone domain model from the team baseline `0.687435` to `0.682866`, but standalone performance did not translate into incremental value once the stronger V7 starter structure was present. The 2025 temporal integration results were:
 
-The study evaluated a domain-motivated alternative to uncertain player-level relief scores: team performance after the starter. An audit showed that the cumulative responsibility-run version was mathematically identical to an existing bullpen-strength feature. Recent-window alternatives were then compared, and a recent-20 responsibility-runs-per-game feature became the strongest observed challenger.
+| Model | Log loss | Difference from V7 |
+|---|---:|---:|
+| V7 starter stack | `0.669483` | — |
+| V7 + initial batter index | `0.673388` | `+0.003905` |
+| V7 + player-level relief-pitcher index | `0.674253` | `+0.004770` |
+| V7 + batter + relief | `0.674833` | `+0.005350` |
 
-**Limitation:** official responsibility runs are not equivalent to all physical runs scored after the starter leaves the game. Exact physical post-exit runs require play-by-play substitution and scoring timelines.
+Positive differences are worse. The relief block was also effectively null by itself: `0.687444` versus `0.687435` for the team baseline, with a `49.95%` improvement probability.
 
-## V10 — official game-page feature lab
+The batter result indicated that the first search over scoring, prior construction, and lineup aggregation was not robust enough for integration. The relief result was consistent with a deeper pregame representation problem: the starting pitcher and starting lineup are known before first pitch, but the relievers who will actually appear are not. A leakage-safe player-level feature must therefore approximate a candidate pool from earlier appearances, workload, rest, and roster information, which can include pitchers who never enter the target game.
 
-Starter workload, pitch count, batter and pitcher handedness, lineup sections, batting order, lineup continuity, missing-regular proxies, and stacking were evaluated under a stricter 2025 holdout protocol.
+**Decision:** reject both V8 additions. Rebuild the batter index from scratch, and treat the relief result as failure of the tested pregame representation—not evidence that relief pitching is unimportant.
 
-The combined model improved accuracy but worsened Log loss and Brier score relative to the V9-style probability model.
+## V9–V10 — team-level bullpen context and richer pregame features
 
-**Decision:** retain the V9-style probability architecture and preserve V10 only as an accuracy-oriented challenger. Accuracy alone was not used to select a probability model.
+V9 replaced the uncertain player-level relief approach with a team-level post-starter run-prevention representation. An audit first established that its cumulative responsibility-run definition was mathematically identical to the existing `bullpen_strength` feature. Recent windows were then tested, and the recent-20 version modestly improved the V7 architecture from `0.669483` to `0.669004` in 2025 temporal OOF evaluation.
 
-## V11.1 — complete batter-index rebuild
+The improvement was small: `−0.000478`, with a 95% interval of `[−0.003102, 0.002145]` and a `64.66%` improvement probability. It therefore remained a challenger rather than a confirmed replacement. The measure is based on runs assigned to non-starters; exact physical runs after the starter exits would require play-by-play substitution and scoring timelines.
 
-The earlier batter branch was replaced rather than incrementally patched. No legacy batter score was used. Official batting events were used to construct 215 game-score candidates, followed by 30 full temporal score searches, 18 leading scores crossed with 20 prior-averaging methods, six lineup blocks, linear and nonlinear model families, direct integration, blending, stacking, and ensemble methods.
+V10 then tested starter workload, pitch count, handedness matchups, lineup sections, batting order, continuity, and missing-regular proxies under a stricter protocol that selected settings on 2024 temporal folds and held out the full 2025 season. Within that common protocol, the V9-style model recorded Log loss `0.667336` and Brier score `0.237412`, while the combined V10 model recorded `0.667817` and `0.237603`. Accuracy rose from `58.31%` to `59.74%`, but probability quality worsened.
 
-The selected batter system used:
+**Decision:** retain the probability-first V9-style architecture, preserve the recent-20 measure as a modest challenger, and reject the expanded V10 feature set as the primary probability model.
 
-- game index: `POWER_OBP__RATE100`;
-- strict-prior average: `S_K5`;
-- lineup aggregation: the mean of the official nine-player starting lineup.
+## V11.1–V12 — full batter rebuild, model comparison, and role ablation
 
-Against a clean no-batter model on 2025 validation, the new batter system improved Log loss by `−0.003934`, with an improvement probability of `87.84%`. The interval included zero, so the result was not described as confirmed superiority.
+V11.1 replaced the failed V8 batter representation rather than patching it. No legacy batter score was used. Official batting events generated 215 game-index candidates; leading scores were crossed with 20 strict-prior averaging methods, six lineup blocks, and linear, nonlinear, stacking, blending, and ensemble approaches.
 
-**Decision:** freeze the rebuilt batter representation as a development candidate and evaluate it within a common final modeling protocol.
+The selected system used `POWER_OBP__RATE100`, K=5 previous-season shrinkage (`S_K5`), and the mean of the official nine-player starting lineup. On 698 games in the 2025 validation period, Log loss improved from `0.668954` without the batter block to `0.665020` with it. The difference was `−0.003934`, with an `87.84%` improvement probability; the 95% interval `[−0.010585, 0.002925]` still included zero.
 
-## V12 — model, learning-strategy, and role-ablation comparison
+V12 then held the rebuilt batter and clean starter definitions fixed while comparing 42 model and training configurations. Strongly regularized logistic regression remained more stable than the tested tree, boosting, ensemble, calibration, and frequent adaptive-retraining alternatives.
 
-The V11.1 batter definition and the clean starter definition were held fixed while model families and training strategies were compared. The 2024–2025 temporal-CV champion was L2-regularized logistic regression with `C=0.03`. After comparing learning strategies on the 2026 development period, the best observed method was L2 logistic regression with `C=0.1`, trained on the most recent 720 pre-2026 decision games.
-
-Under this same `RECENT_720` protocol, the role-ablation results were:
+Under the best-observed `RECENT_720` development protocol on 416 games in 2026, the role ablation was:
 
 | Feature set | Log loss | Brier score | ROC AUC | Accuracy |
 |---|---:|---:|---:|---:|
@@ -141,34 +146,31 @@ Under this same `RECENT_720` protocol, the role-ablation results were:
 | + Starting-pitcher index only | `0.673157` | `0.239875` | `0.617343` | `57.93%` |
 | + Batter and starting-pitcher indices | **`0.666135`** | **`0.236498`** | **`0.635275`** | **`59.62%`** |
 
-The starting-pitcher block produced the larger standalone improvement, while the combined model performed best. Compared with conventional pregame variables, the combined Log-loss difference was `−0.017807`; the paired date-cluster 95% interval was `[−0.033154, −0.002114]`, with a `98.69%` probability of lower Log loss.
+The starter block produced the larger standalone gain, while the combined model performed best. Relative to conventional pregame variables, the combined Log-loss difference was `−0.017807`; the paired date-cluster 95% interval was `[−0.033154, −0.002114]`, with a `98.69%` probability of lower Log loss.
 
-The player-level relief-pitcher index was tested under the separate earlier V8 protocol and is therefore not directly ranked in the V12 role-ablation table.
+The V8 player-level relief-pitcher index was evaluated under an earlier, separate protocol and is therefore not ranked in this V12 role-ablation table.
 
-Complex tree and boosting models, as well as frequent adaptive retraining, did not improve probability quality in this data regime.
-
-**Decision:** freeze both the temporal-CV-selected specification and the best-observed development specification. Stop further tuning on 2026 outcomes.
+**Decision:** freeze both the 2026-independent temporal-CV reference model and the best-observed 2026 development model. Stop further tuning on observed 2026 outcomes.
 
 ## Current scientific freeze
 
 Two model specifications are preserved:
 
-1. **`L2_C0.03_ALL_EQUAL`** — selected using 2024–2025 temporal cross-validation without using 2026 outcomes for model selection.
-2. **`L2_C0.1_RECENT_720`** — the strongest observed 2026 development method, selected after comparing strategies on 2026 results.
+1. **`L2_C0.03_ALL_EQUAL`** — selected using 2024–2025 temporal cross-validation without 2026 outcomes in model selection; 2026 development Log loss `0.667390`.
+2. **`L2_C0.1_RECENT_720`** — the strongest observed 2026 development method after strategy comparison; Log loss `0.666135`.
 
 The first is the cleaner scientific reference candidate. The second is the best observed development candidate. Neither is described as a future-validated production champion.
 
-The next stage is not another retrospective tuning loop. Future games will be handled through an immutable pregame prediction ledger, separate postgame settlement, predefined evaluation metrics, separately versioned future-data challengers, and versioned product-deployment records. These activities are documented in [prospective validation](prospective_validation.md).
+The next stage is an immutable pregame prediction ledger with separate postgame settlement, predefined metrics, separately versioned future-data challengers, and versioned product-deployment records. These activities are documented in [prospective validation](prospective_validation.md).
 
 ## What the research sequence establishes
 
-The project did not progress through a single uninterrupted sequence of improving scores. Its strongest evidence came from distinguishing different kinds of failure and responding appropriately:
+The final value of the project is not only its best model. It is the auditable sequence of decisions:
 
-- a small-sample modeling limitation led to multi-season data collection;
-- an impossible home-away coverage pattern led to identity repair;
-- role-contaminated histories led to withdrawal of an earlier scientific claim;
-- failed complex models led to retention of regularized logistic regression;
-- failed batter and relief representations led to redesign rather than overgeneralized rejection;
-- repeated observation of 2026 results led to an explicit development label and prospective freeze.
-
-The resulting contribution is therefore not only the final model. It is the complete, reproducible path from official-data engineering and defect discovery to role-specific feature design, temporal evaluation, uncertainty reporting, negative-result preservation, and a prospective validation protocol.
+- limited-sample failure led to multi-season official-data engineering;
+- weak gains led to root-cause auditing rather than unchecked model expansion;
+- role contamination led to withdrawal of an earlier scientific claim;
+- role-specific redesign isolated a strong starter signal;
+- failed batter and relief implementations were preserved and diagnosed rather than hidden;
+- the batter representation was rebuilt from official events and retested under a common protocol;
+- development evidence was separated from future generalization through a prospective freeze.
