@@ -1,6 +1,6 @@
 # Failure analysis and corrective actions
 
-This document records issues that changed the data foundation, feature definitions, validation protocol, model selection, or reported conclusions. Each comparison below uses results produced on the same evaluation protocol; metrics from different stages are not ranked against one another.
+This document records issues that changed the data foundation, feature definitions, validation protocol, model selection, or reported conclusions. The observed result in each entry is factual, while the diagnosis indicates whether the underlying cause was confirmed, supported by the evidence, or treated as an evaluation risk. Direct model comparisons are made only within the same evaluation protocol; results from different stages are reported separately.
 
 `Confirmed` marks a defect, invalid premise, or evaluation conflict established directly from the audits. `Supported explanation` marks a mechanism consistent with the evidence but not isolated as the sole cause. `Evaluation risk` marks a limitation controlled through the study design and future validation.
 
@@ -19,8 +19,8 @@ This document records issues that changed the data foundation, feature definitio
 | F09 | Accuracy improved while probability scores worsened | Confirmed evaluation conflict | Select models primarily by Log loss and Brier score |
 | F10 | Adaptive retraining did not beat the best static window | Supported explanation | Preserve the frozen static candidates |
 | F11 | Public reproduction code diverged from the frozen V12 execution | Confirmed defect | Restore exact ordering, solver behavior, and replay tests |
-| F12 | Source, scoring, identity, and snapshot parity failed | Confirmed defects | Correct derived data while preserving the original evidence |
-| F13 | 2026 outcomes were reused during method selection | Evaluation risk | Freeze both models and move to prospective validation |
+| F12 | Canonical replay disagreed with the preserved 2026 stream | Confirmed data-integrity defects | Correct derived data while preserving the original evidence |
+| F13 | 2026 served as a development period during method selection | Evaluation risk | Freeze both models and move to prospective validation |
 
 ## F01 — instability in the 2026-only branch
 
@@ -121,11 +121,11 @@ This document records issues that changed the data foundation, feature definitio
 - **Verified outcome:** reproduced metrics match the frozen values within `1e-12`. The saved models replay the 416 frozen probabilities with maximum absolute errors of `1.67e-16` for the CV model and `2.78e-16` for the development model.
 - **Records:** [reproduction procedure](reproducibility.md) and [model replay audit](../reports/frozen/V12_MODEL_BINARY_REPRODUCTION_AUDIT.json).
 
-## F12 — source and scoring parity defects
+## F12 — canonical replay disagreed with the preserved 2026 stream
 
 - **Problem:** canonical replay and the historical 2026 stream disagreed on several player-game scores and identities.
 - **Evidence:** the audits found incomplete strikeout-token coverage, stolen-base suffix differences, double-play detail differences, five incorrect legacy player-ID rows, display-name formatting differences, a stale July 8 snapshot, and 127 initially unresolved occurrences.
-- **Diagnosis — confirmed defects:** each discrepancy was traced to a specific parsing, identity, formatting, or snapshot problem rather than treated as random noise.
+- **Diagnosis — confirmed data-integrity defects:** each discrepancy was traced to a specific parsing, identity, formatting, or snapshot problem rather than treated as random noise.
 - **Change:** correct analytical tables from official evidence while preserving the original historical stream and audit trail.
 - **Verified outcome:** all `65,554/65,554` player-game occurrences were resolved, with zero name-only forced merges and zero detected strict-prior temporal violations.
 - **Records:** [data lineage and quality checks](data_lineage_and_quality.md).
