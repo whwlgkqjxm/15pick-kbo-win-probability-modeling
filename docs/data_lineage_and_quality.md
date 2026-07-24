@@ -36,4 +36,4 @@ The audit compared canonical replay against the legacy 2026 stream. Differences 
 
 `data/derived/V12_MODELING_DATASET.csv` contains one row per decision game and the features required to reproduce the core V12 logistic models. It is deterministically sorted by `game_date, game_id` and has 1,824 rows.
 
-The derived table is included to make the portfolio technically reviewable. It is not a substitute for permission to redistribute complete official raw responses. Review the release policy before making the repository public.
+The derived table is included to make the analysis independently reviewable. It is not a substitute for permission to redistribute complete official raw responses. Review the release policy before making the repository public.

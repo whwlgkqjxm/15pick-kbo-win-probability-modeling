@@ -1,5 +1,5 @@
 # Research records
 
-This directory preserves machine-readable decisions, exact reports, key result tables, calibration evidence, status matrices, artifact availability, and known gaps from the verified v15 archive.
+This directory contains the historical decision files, audit reports, key result tables, and calibration outputs used in the research journey and root-cause ledger.
 
-The records are intentionally richer than the main README. They support audit and historical reconstruction without forcing every intermediate artifact into the top-level narrative.
+The main narrative is kept in `docs/`; this directory preserves the underlying evidence for specific stages and decisions.

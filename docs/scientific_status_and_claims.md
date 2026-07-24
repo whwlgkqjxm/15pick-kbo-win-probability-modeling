@@ -5,7 +5,7 @@
 - Official multi-season records and strict-prior player summaries contain predictive signal.
 - A clean start-only starter block improved the tested team baseline.
 - The V11.1 official-event batter block added incremental value in the V12 development evaluation.
-- Strongly regulated logistic regression was more stable than the tested complex families under the temporal protocol.
+- Strongly regularized logistic regression was more stable than the tested complex families under the temporal protocol.
 - The tested player-level relief index did not add value and was rejected.
 - Identity and role-scope audits materially changed the research conclusions.
 

@@ -9,9 +9,8 @@
 - Added exact metric, bootstrap, SHA, dataset, and model-replay verification.
 - Added calibration, coefficient, model-family, learning-strategy, and feature-importance outputs.
 - Expanded the research journey, failure/root-cause ledger, scientific status, data lineage, release policy, and prospective protocol.
-- Rebuilt experiment cards for Phase 1 through V12.
 - Expanded the model registry with training, scientific-status, and provenance fields.
 
 ## 1.2.0
 
-Initial portfolio-oriented repository with maintained formulas, aggregate results, documentation, and basic tests.
+Initial public repository with maintained formulas, aggregate results, documentation, and basic tests.

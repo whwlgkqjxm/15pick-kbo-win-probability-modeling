@@ -2,7 +2,7 @@
 
 ## Model-family selection
 
-V12 held the V11.1 batter representation fixed and compared regulated logistic regression, elastic net, random forest, extra trees, gradient boosting, histogram gradient boosting, XGBoost, LightGBM, CatBoost, online SGD, ensembles, and calibration methods.
+V12 held the V11.1 batter representation fixed and compared regularized logistic regression, elastic net, random forest, extra trees, gradient boosting, histogram gradient boosting, XGBoost, LightGBM, CatBoost, online SGD, ensembles, and calibration methods.
 
 The 2024–2025 temporal-CV champion was L2 Logistic Regression with `C=0.03`. Complex tree and boosting families did not produce better temporal probability quality in this sample.
 

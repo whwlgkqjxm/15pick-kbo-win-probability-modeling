@@ -170,12 +170,11 @@ These commands reproduce the portable analysis from the included 1,824-game deri
 ```text
 ├── data/derived/              # 1,824-game derived modeling table and temporal folds
 ├── docs/                      # research design, journey, failures, limitations, claims
-├── experiments/               # hypothesis → evidence → decision cards for every phase
 ├── models/frozen/             # saved CV and development model binaries
 ├── reports/frozen/            # authoritative V11.1/V12 result tables
 ├── reports/reproduced/        # outputs regenerated from the portable pipeline
 ├── research/authoritative/    # preserved V11.1/V12 historical execution code
-├── research_records/          # decisions, audits, reports, and negative results
+├── research_records/          # historical decisions, audits, reports, and result tables
 ├── scripts/                   # reproduction, verification, figures, manifests
 ├── src/fifteenpick_prediction/# maintained reusable package
 └── tests/                     # formula, temporal, bootstrap, model, artifact tests

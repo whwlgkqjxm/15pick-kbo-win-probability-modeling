@@ -30,4 +30,4 @@ The frozen primary model does not include point-in-time weather, travel, park ef
 
 ## Redistribution
 
-Complete official raw KBO responses are not included. The derived table is provided for technical review in the current portfolio package, but the release policy should be reviewed before a fully public launch.
+Complete official raw KBO responses are not included. The derived table is provided for technical review in this repository, but the release policy should be reviewed before a fully public launch.
