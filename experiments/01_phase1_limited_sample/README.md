@@ -1,27 +1,33 @@
-# Phase 1 — Limited-sample negative result
+# Phase 1 — 2026-only limited-sample experiment
 
-## Hypothesis
+## Research question
 
-Could a 2026-only official-data model produce deployable pregame probabilities?
+Could official 2026 KBO data support stable pregame win-probability prediction?
 
-## Data and protocol
+## Data
 
-424 completed games; 416 binary games; repeatedly observed development folds.
+- Completed games: `424`
+- Decision games: `416`
+- Temporal outer predictions: `281`
 
-The experiment follows the date-level strict-prior contract applicable at that stage. Protocol differences are not hidden; absolute metrics from different protocols are not ranked as if they were one common leaderboard.
+All target-game features were constructed from information available before the target game date.
 
 ## Result
 
-The strongest point estimate remained weak and compressed; the research-grade model degraded to Log loss 0.693281.
+The strongest development candidate, `RANK_ADAPTIVE_V1`, recorded:
+
+- Log loss: `0.685090`
+- Brier score: `0.246008`
+- ROC AUC: `0.573867`
+
+Predicted probabilities remained concentrated near `0.5`. A later research-grade model using 337 features and a broader effect search recorded Log loss `0.693281`.
 
 ## Decision
 
-Close the branch as a valid negative result and expand to multi-season official data.
+The 2026-only branch was closed as a negative result. Further model development was moved to an official 2024–2026 multi-season foundation.
 
-## What changed next
+## Evidence
 
-The limited sample, repeated teams/dates, adaptive search, and missing contextual data made strong claims indefensible.
-
-## Reproducibility status
-
-See `research_records/control/MASTER_EXPERIMENT_LEDGER_v15.csv` for artifact status and the relevant exact reports, decision JSON files, and result CSVs under `research_records/` and `reports/frozen/`.
+- [`MASTER_EXPERIMENT_LEDGER_v15.csv`](../../research_records/control/MASTER_EXPERIMENT_LEDGER_v15.csv)
+- [`research_journey.md`](../../docs/research_journey.md)
+- [`failure_root_cause_ledger.md`](../../docs/failure_root_cause_ledger.md)
