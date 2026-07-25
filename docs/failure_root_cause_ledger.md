@@ -1,6 +1,6 @@
 # Research failures, negative results, and corrective actions
 
-This document is a selective analytical ledger, not a chronological bug log and not a record of website operations. It includes only defects, negative experiments, invalidated assumptions, and evaluation risks that materially changed the analytical dataset, feature definitions, validation protocol, model selection, reproducibility status, or scientific claims.
+This ledger records the defects, invalidated assumptions, negative results, and evaluation risks that materially changed the dataset, feature definitions, validation protocol, model selection, reproducibility status, or scientific conclusions.
 
 Each entry separates five questions:
 
