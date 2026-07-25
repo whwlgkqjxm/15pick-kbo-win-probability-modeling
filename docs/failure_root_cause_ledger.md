@@ -21,27 +21,6 @@ The diagnosis labels distinguish evidence from interpretation:
 
 Direct model comparisons below are made only within the same evaluation protocol. Metrics from different stages are not combined into one leaderboard.
 
-## Research path at a glance
-
-`2026-only weak result → multi-season data foundation → identity and parsing repairs → stabilized priors → complex-model negative results → role-contamination discovery → role-specific redesign → batter and bullpen representation failures → final model comparison → prospective freeze`
-
-| ID | Turning point | Key evidence | Decision |
-|---|---|---|---|
-| F01 | The 2026-only sample was not sufficient for a strong model. | Best development Log loss `0.685090`; a 337-feature model worsened to `0.693281`. | Closed Phase 1 and expanded to official 2024–2026 data. |
-| F02 | Starter identity depended on whether the pitcher was home or away. | History eligibility was home `416/416`, away `0/416`. | Rebuilt occurrence-level identity resolution and discarded affected claims. |
-| F03 | Baseball innings notation was not parsed reliably. | Valid `1/3` and `2/3` representations failed preflight. | Standardized innings as integer outs and added fail-closed tests. |
-| F04 | Canonical replay disagreed with preserved derived data. | `39` batter-input, `21` pitcher-input, and `40` score mismatches. | Corrected derived tables from official evidence while preserving historical versions. |
-| F05 | V1 was promising but statistically inconclusive. | Core Log loss `0.681950` vs baseline `0.685329`; bootstrap interval crossed zero. | Stabilized low-count histories and cold starts in V2. |
-| F06 | More features, more complex models, and new training schedules did not improve V2. | V3 `0.677185` vs V2 `0.670610`; all V4 strategies were also worse. | Stopped tuning the learner and audited the feature representation. |
-| F07 | Player histories mixed different game roles, invalidating the V5 ceiling claim. | Substitute history affected `78.11%` of experienced starting-batter rows; relief history affected `20.77%` of experienced starter rows. | Withdrew the ceiling claim and rebuilt histories by role. |
-| F08 | The corrected starting-pitcher index provided the strongest role-specific gain. | Team baseline `0.687049`; clean starter model `0.677648`; V7 stack `0.669483`. | Froze the start-only index and used temporal probability stacking. |
-| F09 | The first batter index helped alone but harmed the integrated model. | Standalone `0.682866`; V7 worsened from `0.669483` to `0.673388` after addition. | Rejected it and rebuilt the batter index from official events in V11.1. |
-| F10 | The player-level relief index did not provide a reliable pregame signal. | Standalone `0.687444` vs baseline `0.687435`; V7 worsened to `0.674253`. | Removed the player-level index and moved to team-level post-starter run prevention. |
-| F11 | Richer workload, matchup, and lineup features improved Accuracy but worsened probability quality. | V9 Log loss `0.667336`; V10 `0.667817`; Accuracy rose `58.31% → 59.74%`. | Kept probability metrics primary and retained V10 only as a challenger. |
-| F12 | Tree models, calibration, ensembles, and frequent retraining did not beat static regularized logistic regression. | Static recent-720 L2 `0.666135`; best daily retraining `0.668838`. | Froze two simple static L2 candidates. |
-| F13 | Validation and development periods were reused while methods were evolving. | V11.1 uses 2025 as validation; V12 used 2026 for strategy selection. | Stopped further tuning and moved the final comparison to prospective data. |
-| F14 | Historical lineups were reconstructed without an immutable pre-first-pitch timestamp for every game. | Official starters are known retrospectively, but historical capture times are incomplete. | Qualified the retrospective setting and required timestamped future snapshots. |
-| F15 | Maintained repository code initially failed exact replay of the frozen V12 execution. | Solver and row-order differences changed probabilities. | Restored the execution contract and added metric and model-replay tests. |
 
 ---
 
