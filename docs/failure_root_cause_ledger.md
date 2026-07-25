@@ -20,9 +20,6 @@ The diagnosis labels are used deliberately:
 
 Direct model comparisons below are made only within the same evaluation protocol. Metrics from different stages are not treated as a single leaderboard.
 
-## Evidence note
-
-Each linked CSV or JSON was checked against the metric quoted in the corresponding entry. Links to narrative documents provide context and interpretation; where the public repository does not contain the original machine-readable failure artifact, the entry is presented as a documented historical audit rather than as a newly reproduced result.
 
 ## Executive summary
 
