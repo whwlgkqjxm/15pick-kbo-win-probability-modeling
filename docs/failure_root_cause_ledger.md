@@ -330,30 +330,30 @@ In the 2026 development comparison:
 
 ## F13 — leakage-safe feature rows did not make reused periods untouched tests
 
-**What happened.** Current-game, same-date, and future outcomes were excluded from each feature row, but labeled evaluation periods were inspected while the method was still evolving.
+**What happened:** Current-game, same-date, and future outcomes were excluded from each feature row, but labeled evaluation periods were inspected while the method was still evolving.
 
 **Evidence.** Two forms of reuse occurred:
 
 1. V11.1 examined a 2024-developed batter candidate on 2025 and then reviewed the prior-averaging structure; the final 2025 result is validation evidence.
 2. V12 used 2026 outcomes to compare regularization, windows, adaptive strategies, calibration, and ensembles; recent-720 is therefore development-selected.
 
-**Diagnosis — evaluation risk, not row-level leakage.** Each prediction used strict-prior information, but repeated method selection on a labeled period can make observed performance optimistic.
+**Diagnosis — evaluation risk, not row-level leakage:** Each prediction used strict-prior information, but repeated method selection on a labeled period can make observed performance optimistic.
 
-**Research impact.** The project cannot call 2025 in V11.1 or 2026 in V12 a final untouched test. The recent-720 model is a development champion, not a future-validated production model.
+**Research impact:** The project cannot call 2025 in V11.1 or 2026 in V12 a final untouched test. The recent-720 model is a development champion, not a future-validated production model.
 
-**Change and verification.** Both the CV-selected and development-selected models were frozen. Further adjustment of the batter formula, shrinkage rule, regularization, or training window using observed 2026 results was prohibited. Final comparison moved to an immutable prospective ledger.
+**Change and verification:** Both the CV-selected and development-selected models were frozen. Further adjustment of the batter formula, shrinkage rule, regularization, or training window using observed 2026 results was prohibited. Final comparison moved to an immutable prospective ledger.
 
 **Supporting material:** [temporal-validation contract](temporal_validation_and_leakage.md) · [prospective-validation protocol](prospective_validation.md)
 
 ## F14 — historical lineups did not have an immutable pregame timestamp for every game
 
-**What happened.** Official historical records identify the starting lineup and starting pitcher, but the archive does not contain an independent pre-first-pitch capture timestamp for every game.
+**What happened:** Official historical records identify the starting lineup and starting pitcher, but the archive does not contain an independent pre-first-pitch capture timestamp for every game.
 
-**Evidence.** The canonical foundation contains exact starting-lineup rows for all `1,864` games, but historical confirmation time is not independently archived for every row.
+**Evidence:** The canonical foundation contains exact starting-lineup rows for all `1,864` games, but historical confirmation time is not independently archived for every row.
 
-**Diagnosis — evaluation risk.** The retrospective features are outcome-leakage controlled, but the historical input feed cannot be represented as an immutable timestamped pregame capture in the same way as future predictions.
+**Diagnosis — evaluation risk:** The retrospective features are outcome-leakage controlled, but the historical input feed cannot be represented as an immutable timestamped pregame capture in the same way as future predictions.
 
-**Research impact.** Historical evaluation must be described as reconstructed lineup-confirmed pregame analysis, not as proof that every input was captured and sealed before first pitch.
+**Research impact:** Historical evaluation must be described as reconstructed lineup-confirmed pregame analysis, not as proof that every input was captured and sealed before first pitch.
 
 **Change and verification.** The prospective protocol requires prediction time, source cutoff time, lineup and starter snapshot hashes, model and feature hashes, and separate postgame settlement. The original prediction record cannot be edited after the result becomes known.
 
@@ -361,15 +361,15 @@ In the 2026 development comparison:
 
 ## F15 — maintained repository code initially diverged from the frozen execution
 
-**What happened.** An early maintained reproduction path ran without an error but did not exactly reproduce the frozen V12 probabilities and metrics.
+**What happened:** An early maintained reproduction path ran without an error but did not exactly reproduce the frozen V12 probabilities and metrics.
 
-**Evidence.** The maintained path forced `solver="liblinear"` and selected the recent training window using date-only ordering. The frozen execution used its original solver behavior and deterministic ordering by `game_date, game_id`.
+**Evidence:** The maintained path forced `solver="liblinear"` and selected the recent training window using date-only ordering. The frozen execution used its original solver behavior and deterministic ordering by `game_date, game_id`.
 
-**Diagnosis — confirmed defect.** The repository implementation had drifted from the historical execution contract.
+**Diagnosis — confirmed defect:** The repository implementation had drifted from the historical execution contract.
 
-**Research impact.** A reader could successfully run the code and still obtain values different from the frozen reports, weakening the reproducibility claim.
+**Research impact:** A reader could successfully run the code and still obtain values different from the frozen reports, weakening the reproducibility claim.
 
-**Change and verification.** The solver override was removed, deterministic two-key ordering was restored, and exact metric and model-replay tests were added. Reproduced metrics match within `1e-12`; maximum absolute probability replay error is `1.67e-16` for the CV model and `2.78e-16` for the development model.
+**Change and verification:** The solver override was removed, deterministic two-key ordering was restored, and exact metric and model-replay tests were added. Reproduced metrics match within `1e-12`; maximum absolute probability replay error is `1.67e-16` for the CV model and `2.78e-16` for the development model.
 
 **Supporting material:** [reproducibility guide](reproducibility.md) · [saved-model replay test](../tests/test_saved_model_replay.py)
 
@@ -377,11 +377,22 @@ In the 2026 development comparison:
 
 # What the project learned from these failures
 
-1. The project expanded from a weak 2026-only study to a multi-season temporal design.
-2. Identity, parsing, and scoring audits became fail-closed prerequisites rather than cleanup steps.
-3. Role definitions became part of the model specification; starting, substitute, and relief appearances were no longer mixed.
-4. The starter index was retained because it improved a common baseline; the initial batter and player-level relief representations were rejected because they did not add incremental value.
-5. The batter role was redesigned rather than dismissed after its first failed representation.
-6. The relief result led to a team-level pregame proxy because actual reliever deployment is unknown without leakage.
-7. More complex models, richer feature sets, and more frequent retraining were not accepted unless they improved temporal probability metrics.
-8. Development evidence was separated from future generalization, and exact reproducibility became part of the scientific result.
+# Methodological lessons for data science
+
+1. **Feature quality matters more than model complexity:**  
+   Incorrectly defined or contaminated features cannot be fixed by using a more sophisticated model.
+
+2. **Only information available at prediction time should be used:**  
+   Pregame models must exclude variables that depend on future player deployment or game outcomes.
+
+3. **Features should be tested for incremental value:**  
+   Strong standalone performance does not guarantee improvement when a feature is added to an existing model.
+
+4. **Validation must match the prediction setting:**  
+   Temporal splits, strict-prior features, and same-date exclusion were necessary to prevent leakage and estimate realistic performance.
+
+5. **Evaluation metrics must match the research objective:**  
+   Because the goal was probability forecasting, Log loss and Brier score were prioritized over Accuracy.
+
+6. **Negative results and reproducibility strengthen the study:**  
+   Failed experiments helped refine feature design, while uncertainty analysis and exact replay limited overconfident conclusions.
