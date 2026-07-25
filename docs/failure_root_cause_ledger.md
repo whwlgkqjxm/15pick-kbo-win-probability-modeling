@@ -375,8 +375,6 @@ In the 2026 development comparison:
 
 ---
 
-# What the project learned from these failures
-
 # Methodological lessons for data science
 
 1. **Feature quality matters more than model complexity:**  
