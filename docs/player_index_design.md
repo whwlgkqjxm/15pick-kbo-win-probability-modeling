@@ -2,7 +2,7 @@
 
 ## Design principle
 
-The goal is not to create a universal economic ranking. The goal is to compress official role-specific game events into a reproducible signal that can be averaged strictly before a target game and tested for incremental prediction value.
+The goal is to compress official role-specific game events into a reproducible signal that can be averaged strictly before a target game and tested for incremental prediction value.
 
 ## Batter index: POWER_OBP__RATE100
 
