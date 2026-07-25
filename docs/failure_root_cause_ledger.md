@@ -2,657 +2,407 @@
 
 This ledger records the defects, invalidated assumptions, negative results, and evaluation risks that materially changed the dataset, feature definitions, validation protocol, model selection, reproducibility status, or scientific conclusions.
 
-Each entry separates five questions:
+Each entry answers five questions:
 
 1. **What happened?**
 2. **What evidence established the problem or result?**
 3. **What was the diagnosis, and how certain was it?**
 4. **How did it affect the research?**
-5. **What was changed, and what was verified afterward?**
+5. **What changed, and what was verified afterward?**
 
-The diagnosis labels are used deliberately:
+The diagnosis labels distinguish evidence from interpretation:
 
-- **Confirmed defect:** a data, implementation, or reproducibility problem established directly by an audit.
-- **Confirmed premise failure:** a scientific conclusion was based on a feature definition later shown to be invalid for that claim.
-- **Confirmed evaluation conflict:** evaluation criteria favored different models, requiring an explicit metric-priority decision.
-- **Supported explanation:** the evidence supports a mechanism, but the study did not isolate it as the only cause.
-- **Evaluation risk:** the pipeline prevents row-level leakage, but the evaluation design still permits optimism or limits the strength of the claim.
+- **Confirmed defect:** an audit directly established a data, parsing, implementation, or reproducibility error.
+- **Confirmed negative result:** the tested feature, model, or training strategy failed to improve the primary objective under its stated protocol.
+- **Invalidated claim:** later evidence showed that an earlier conclusion rested on an unsuitable feature definition or evaluation premise.
+- **Evaluation conflict:** different metrics favored different choices, requiring an explicit decision about the research objective.
+- **Supported explanation:** the evidence supports a likely mechanism, but does not prove it was the only cause.
+- **Evaluation risk:** the analysis may be leakage-safe at the row level while still having limits that weaken a final generalization claim.
 
-Direct model comparisons below are made only within the same evaluation protocol. Metrics from different stages are not treated as a single leaderboard.
+Direct model comparisons below are made only within the same evaluation protocol. Metrics from different stages are not combined into one leaderboard.
 
+## Research path at a glance
 
-## Executive summary
+`2026-only weak result → multi-season data foundation → identity and parsing repairs → stabilized priors → complex-model negative results → role-contamination discovery → role-specific redesign → batter and bullpen representation failures → final model comparison → prospective freeze`
 
-| ID | Type | Stage | Failure or negative result | Research impact | Resolution |
-|---|---|---|---|---|---|
-| F01 | Data defect | 2026 starter foundation | Home and away starter identities followed different eligibility paths | Starter-history features were invalid on one side of every game | Rebuilt occurrence-level identity resolution and discarded affected claims |
-| F02 | Parsing defect | Pitcher feature construction | Valid baseball innings notation and ambiguous schema fields failed validation | Pitcher workload and rate features could not be trusted | Standardized innings as integer outs and added fail-closed domain tests |
-| F03 | Feature-definition defect | Role audit | Batter and pitcher histories mixed different game roles | “Starter” features did not represent starter-only history | Rebuilt strict-prior histories by role and reinterpreted earlier models |
-| F04 | Reproducibility defect | V12 repository release | Maintained reproduction code diverged from the frozen execution | Published code did not exactly replay the frozen probabilities | Restored solver behavior, deterministic ordering, and exact replay tests |
-| F05 | Data-integrity defect | Canonical reconciliation | Canonical replay disagreed with preserved 2026 derived data | Some scores and identities were inconsistent across data versions | Corrected derived tables from official evidence while preserving the originals |
-| F06 | Invalidated premise | V5 ceiling audit | A predictive-ceiling claim relied on role-contaminated features | The claim overstated the limit of clean player-role information | Withdrew the claim and redesigned the player-role features |
-| F07 | Metric conflict | V10 model selection | Accuracy improved while Log loss and Brier score worsened | A classification-oriented choice would conflict with the probability objective | Kept probability scores primary and retained V10 only as a challenger |
-| F08 | Evaluation risk | V11.1–V12 selection | Validation and development periods were reused during method comparison | Reported gains may be optimistic despite leakage-safe feature rows | Froze two candidates and moved final comparison to prospective data |
-| F09 | Evaluation risk | Historical lineup reconstruction | Historical lineups were not independently timestamped before first pitch | Retrospective inputs cannot be described as an immutable historical pregame feed | Qualified the retrospective setting and designed timestamped prospective capture |
-| F10 | Negative research result | 2026-only Phase 1 | Repeated search on a small temporal sample produced unstable weak probabilities | Continued tuning would increase selection risk without stronger evidence | Closed the branch as a negative result and expanded to multi-season data |
-| F11 | Negative modeling result | V3 broad search | More features and more complex models performed worse than V2 | Complexity did not earn better out-of-time probability quality | Required temporal improvement before accepting added complexity |
-| F12 | Negative modeling result | V8 batter integration | The first batter index helped alone but hurt the stronger integrated model | Standalone domain performance did not translate into incremental value | Rejected it and rebuilt the batter index from official batting events |
-| F13 | Negative modeling result | V6–V9 relief modeling | Player-level relief indices added no reliable leakage-safe pregame signal | The tested representation could not identify useful incremental value | Rejected the player-level index and retained team-level context as a challenger |
-| F14 | Negative modeling result | V12 training strategies | Daily and online adaptation did not beat the best static window | Automatic retraining would add complexity without demonstrated benefit | Preserved static frozen candidates and versioned adaptive methods separately |
+| ID | Turning point | Key evidence | Decision |
+|---|---|---|---|
+| F01 | The 2026-only sample was not sufficient for a strong model. | Best development Log loss `0.685090`; a 337-feature model worsened to `0.693281`. | Closed Phase 1 and expanded to official 2024–2026 data. |
+| F02 | Starter identity depended on whether the pitcher was home or away. | History eligibility was home `416/416`, away `0/416`. | Rebuilt occurrence-level identity resolution and discarded affected claims. |
+| F03 | Baseball innings notation was not parsed reliably. | Valid `1/3` and `2/3` representations failed preflight. | Standardized innings as integer outs and added fail-closed tests. |
+| F04 | Canonical replay disagreed with preserved derived data. | `39` batter-input, `21` pitcher-input, and `40` score mismatches. | Corrected derived tables from official evidence while preserving historical versions. |
+| F05 | V1 was promising but statistically inconclusive. | Core Log loss `0.681950` vs baseline `0.685329`; bootstrap interval crossed zero. | Stabilized low-count histories and cold starts in V2. |
+| F06 | More features, more complex models, and new training schedules did not improve V2. | V3 `0.677185` vs V2 `0.670610`; all V4 strategies were also worse. | Stopped tuning the learner and audited the feature representation. |
+| F07 | Player histories mixed different game roles, invalidating the V5 ceiling claim. | Substitute history affected `78.11%` of experienced starting-batter rows; relief history affected `20.77%` of experienced starter rows. | Withdrew the ceiling claim and rebuilt histories by role. |
+| F08 | The corrected starting-pitcher index provided the strongest role-specific gain. | Team baseline `0.687049`; clean starter model `0.677648`; V7 stack `0.669483`. | Froze the start-only index and used temporal probability stacking. |
+| F09 | The first batter index helped alone but harmed the integrated model. | Standalone `0.682866`; V7 worsened from `0.669483` to `0.673388` after addition. | Rejected it and rebuilt the batter index from official events in V11.1. |
+| F10 | The player-level relief index did not provide a reliable pregame signal. | Standalone `0.687444` vs baseline `0.687435`; V7 worsened to `0.674253`. | Removed the player-level index and moved to team-level post-starter run prevention. |
+| F11 | Richer workload, matchup, and lineup features improved Accuracy but worsened probability quality. | V9 Log loss `0.667336`; V10 `0.667817`; Accuracy rose `58.31% → 59.74%`. | Kept probability metrics primary and retained V10 only as a challenger. |
+| F12 | Tree models, calibration, ensembles, and frequent retraining did not beat static regularized logistic regression. | Static recent-720 L2 `0.666135`; best daily retraining `0.668838`. | Froze two simple static L2 candidates. |
+| F13 | Validation and development periods were reused while methods were evolving. | V11.1 uses 2025 as validation; V12 used 2026 for strategy selection. | Stopped further tuning and moved the final comparison to prospective data. |
+| F14 | Historical lineups were reconstructed without an immutable pre-first-pitch timestamp for every game. | Official starters are known retrospectively, but historical capture times are incomplete. | Qualified the retrospective setting and required timestamped future snapshots. |
+| F15 | Maintained repository code initially failed exact replay of the frozen V12 execution. | Solver and row-order differences changed probabilities. | Restored the execution contract and added metric and model-replay tests. |
 
 ---
 
-# A. Data and implementation defects
+# 1. Why the study changed direction
 
-## F01 — home/away starter identity asymmetry
+## F01 — the 2026-only study produced weak and unstable probabilities
 
-### What happened
+**What happened.** The project began with `424` completed 2026 games through July 9 and `416` non-tie decisions. It tested team, lineup, starter, player-index, price, rank, nonlinear, ensemble, and effect-shape branches.
 
-Starter history was available for every home starter and no away starter in the 416-game binary model period.
+**Evidence.** The strongest development point estimate remained weak:
 
-### Evidence
+| Phase 1 model | Log loss | Brier score | ROC AUC | Accuracy |
+|---|---:|---:|---:|---:|
+| `RANK_ADAPTIVE_V1` | `0.685090` | `0.246008` | `0.573867` | `58.72%` |
+| 337-feature research model | `0.693281` | `0.249958` | `0.529567` | `51.60%` |
 
-- Home starter eligibility: `416/416`
-- Away starter eligibility: `0/416`
+Most probabilities remained close to `0.5`, and the larger model performed approximately at the constant-probability benchmark.
 
-This side-specific pattern was impossible as a baseball result and therefore indicated a data-processing defect rather than ordinary missingness.
+**Diagnosis — confirmed negative result with a supported explanation.** The tested models did not provide strong out-of-time probability forecasts. The limited temporal sample, repeated observations of the same teams and dates, and extensive candidate search plausibly increased selection variance. The study did not claim that sample size was the only cause.
 
-### Diagnosis — confirmed defect
+**Research impact.** Continuing to search the same inspected 2026 period would have increased selection risk without creating independent evidence.
 
-Home starter tokens often contained numeric KBO player IDs, while away starter tokens often appeared as names. The original eligibility path accepted the numeric identifiers but rejected many name-based tokens.
+**Change and verification.** Phase 1 was closed as a valid negative result. The project then collected official 2024 and 2025 records and rebuilt the study on `1,864` completed games, `65,554` player-game occurrences, and `1,824` non-tie modeling rows.
 
-### Research impact
+**Records:** [research journey](research_journey.md#phase-1--2026-only-limited-sample-study), [data lineage and quality](data_lineage_and_quality.md)
 
-Any feature or conclusion that depended on the asymmetric starter history could reflect token format rather than pitcher ability. Those claims were discarded.
+---
 
-### Corrective action
+# 2. Data-foundation defects
 
-The identity pipeline was rebuilt using, in order of evidentiary strength:
+## F02 — starter identity was asymmetric between home and away teams
 
-1. numeric KBO player IDs;
-2. unique season-team-name mappings;
-3. official player profiles;
-4. targeted daily official evidence;
-5. occurrence-level fingerprints and contiguous pitcher-order evidence.
+**What happened.** The first 2026 starter-history pipeline processed home and away pitcher tokens through different eligibility paths.
 
-Name-only forced cross-game merges were prohibited.
+**Evidence.** The audit found an impossible pattern:
 
-### Verification
+- home starter history eligibility: `416/416`;
+- away starter history eligibility: `0/416`;
+- prior-start difference: positive `331`, zero `85`, negative `0`.
 
-- Official source starters resolved: `848/848`
-- Binary-game starter eligibility: home `416/416`, away `416/416`
-- Final multi-season player-game occurrences resolved: `65,554/65,554`
-- Name-only forced merges: `0`
+**Diagnosis — confirmed defect.** Home starter tokens usually contained numeric KBO IDs, while away starter tokens often appeared as names. The original history-eligibility path accepted the former and rejected the latter.
 
-### Records
+**Research impact.** Starter-history variables could reflect source-token format rather than pitcher performance. All affected starter claims were discarded.
 
-- [Data lineage and identity checks](data_lineage_and_quality.md)
-- [Repository overview of the starter-identity correction](../README.ko.md)
+**Change and verification.** Identity resolution was rebuilt with official IDs, season-team evidence, profile records, targeted daily records, and occurrence-level fingerprints. Source starters were resolved `848/848`; model-period starters became eligible home `416/416` and away `416/416`; final multi-season identity resolution reached `65,554/65,554`, with zero name-only forced merges.
 
-## F02 — innings parsing and schema-validation failures
+**Records:** [research journey](research_journey.md#phase-1--2026-only-limited-sample-study), [data lineage and quality](data_lineage_and_quality.md)
 
-### What happened
+## F03 — innings parsing failed on valid baseball notation
 
-Pitcher feature construction stopped when it encountered ambiguous innings fields and valid one-third or two-thirds inning representations.
+**What happened.** An early structured-model run completed even though the intended starter-income and run-prevention domains were empty or constant. Later pitcher-feature preflight then encountered ambiguous innings fields and valid fractions such as `1/3`, `2/3`, `5 1/3`, and `5 2/3`.
 
-### Evidence
+**Evidence.** The first validator did not stop the empty critical domain, so that run was invalid for any starter-value claim. The later fail-closed preflight correctly stopped before model fitting because the schema resolver could not consistently distinguish raw innings notation from already-converted outs, and the parser did not cover every one-third and two-thirds representation.
 
-The preflight checks failed before model fitting rather than silently coercing unresolved values. The failure affected valid baseball notation such as one-third and two-thirds innings and exposed ambiguity between raw innings strings and already-derived outs fields.
+**Diagnosis — confirmed defect.** The pipeline lacked one canonical internal unit. Baseball notation such as `5.1` cannot be interpreted as 5.1 decimal innings.
 
-### Diagnosis — confirmed defect
+**Research impact.** Workload, rate, and run-prevention variables from the affected path could not be trusted. These failed runs were treated as implementation diagnostics, not evidence that pitcher data lacked predictive value.
 
-The schema resolver did not identify every innings representation consistently, and the parser did not cover all official fractional formats. Baseball notation also cannot be interpreted as ordinary decimal arithmetic: for example, `5.1` conventionally represents five innings and one out, not 5.1 decimal innings.
+**Change and verification.** All internal innings calculations were standardized as integer outs. Exact source-column resolution, fraction unit tests, actual-data preflight, and fail-closed minimum-coverage gates were added before model training. The earlier structured result remains preserved as an invalid implementation attempt, not a negative result about pitcher information.
 
-### Research impact
+**Records:** [data lineage and quality](data_lineage_and_quality.md), [research journey](research_journey.md#phase-1--2026-only-limited-sample-study)
 
-Incorrect innings conversion would contaminate workload, rate, and starting-pitcher performance features. Continuing with a fallback value would have produced plausible-looking but invalid model inputs.
+## F04 — canonical replay exposed scoring and identity disagreements
 
-### Corrective action
+**What happened.** The official multi-season canonical replay did not exactly match the previously preserved 2026 derived dataset.
 
-- Standardize internal innings representation as integer outs.
-- Require exact schema resolution before feature construction.
-- Add unit tests for one-third, two-thirds, mixed-number, and decimal-like baseball notation.
-- Fail closed when a critical pitcher field cannot be resolved.
-
-### Verification
-
-The corrected 2026 pitcher foundation joined `4,110` pitcher rows and resolved all `832` starter sides in the `416` decision games.
-
-### Records
-
-- [Data lineage and validation checks](data_lineage_and_quality.md)
-
-## F03 — role contamination in player histories
-
-### What happened
-
-Features intended to describe starting batters and starting pitchers included prior appearances from different roles.
-
-### Evidence
-
-- Starting-batter feature rows with prior history: `33,121`
-- Rows whose history included substitute appearances: `25,870` (`78.11%`)
-- Starting-pitcher rows with prior history: `3,496`
-- Rows whose history included relief appearances: `726` (`20.77%`)
-- Pitchers with both starter and relief history: `614`
-- Median absolute difference between all-role and start-only pitcher averages: `149.14`
-- 90th percentile absolute difference: `779.51`
-
-### Diagnosis — confirmed defect
-
-The historical key separated season, player, and broad position type, but did not distinguish:
-
-- starting-lineup batting appearances from substitute appearances; or
-- starting-pitcher appearances from relief appearances.
-
-### Research impact
-
-Earlier models could still be retained as historical baselines, but their player-history variables could not be described as clean role-specific indices. The defect also invalidated later conclusions that assumed the representation already separated player roles.
-
-### Corrective action
-
-- Rebuild date-batched strict-prior histories by role.
-- Use start-only appearances for the starting-pitcher index.
-- Preserve all-role and role-specific histories as separate analytical objects.
-- Reevaluate batter, starter, and relief contributions independently.
-
-### Verification
-
-The corrected role histories became the foundation for the V6–V12 redesign. V2 remained documented as a historical baseline rather than being relabeled as a clean role-specific model.
-
-### Records
-
-- [Role-scope audit table](../research_records/key_results/ROLE_SCOPE_AUDIT_SUMMARY.csv)
-- [Role-aware audit report](../research_records/reports/RQ1_ROLE_AWARE_INCOME_AUDIT_REPORT.md)
-
-## F04 — repository reproduction drift
-
-### What happened
-
-An early maintained reproduction script did not regenerate the frozen V12 predictions and metrics exactly.
-
-### Evidence
-
-The reproduction path:
-
-- forced `solver="liblinear"`; and
-- selected the recent training window using date-only ordering.
-
-The frozen execution used the original solver behavior and deterministic ordering by `game_date, game_id`. These differences changed the fitted probabilities and evaluation metrics.
-
-### Diagnosis — confirmed defect
-
-The maintained repository code had diverged from the historical execution environment and row-order contract.
-
-### Research impact
-
-A reader could run the repository successfully but obtain results different from the frozen reports. That would weaken the reproducibility claim even though the original result artifacts were preserved.
-
-### Corrective action
-
-- Remove the solver override.
-- Restore deterministic two-key ordering.
-- Reproduce the original date-cluster bootstrap procedure.
-- Add exact published-metric tests.
-- Add saved-model probability replay tests.
-
-### Verification
-
-- Reproduced metrics match the frozen values within `1e-12`.
-- Maximum absolute probability replay error for the CV model: `1.67e-16`
-- Maximum absolute probability replay error for the development model: `2.78e-16`
-
-### Records
-
-- [Reproduction procedure](reproducibility.md)
-- [Repository correction history](../CHANGELOG.md)
-- [Model replay audit](../reports/frozen/V12_MODEL_BINARY_REPRODUCTION_AUDIT.json)
-
-## F05 — canonical replay and identity reconciliation
-
-### What happened
-
-Canonical replay disagreed with the previously preserved 2026 derived-data stream on a small set of player-game scores and identities.
-
-### Evidence
-
-The initial 2026 reconciliation found:
+**Evidence.** Initial reconciliation found:
 
 - batter-input mismatches: `39`;
 - pitcher-input mismatches: `21`;
-- score mismatches: `40` among `14,891` replay rows; and
-- `127` initially unresolved player-game occurrences in the broader identity-recovery stage.
+- score mismatches: `40` among `14,891` replay rows;
+- initially unresolved player-game occurrences: `127`.
 
-The discrepancies included:
+The traced causes included strikeout-token coverage, stolen-base suffix interpretation, double-play details, five incorrect historical player IDs, display-name formatting, and a stale July 8 source snapshot.
 
-- incomplete strikeout-token coverage;
-- stolen-base suffix interpretation;
-- double-play and triple-play details;
-- five incorrect historical player-ID rows;
-- display-name formatting differences; and
-- a stale July 8 source snapshot.
+**Diagnosis — confirmed defect.** Each discrepancy was tied to a concrete parsing, identity, formatting, or source-snapshot cause.
 
-### Diagnosis — confirmed data-integrity defects
+**Research impact.** Without reconciliation, the same official game could produce different player identities or scores depending on the preserved data version.
 
-The discrepancies were traceable to specific parsing, identity, formatting, or source-snapshot problems. They were not treated as random noise and were not resolved by forcing the canonical data to match the older stream.
+**Change and verification.** Official canonical records plus final numeric identity became the analytical source of truth. Corrected derived tables were created without overwriting historical evidence. Final checks recorded `65,554/65,554` resolved occurrences, `0` unresolved occurrences, `0` name-only forced merges, `0` scoring-component mismatches, and `0` strict-prior temporal violations.
 
-### Research impact
-
-Without reconciliation, the same official game could produce different player scores or player identities depending on which preserved data version was used.
-
-### Corrective action
-
-- Treat official canonical records plus final numeric identity as the analytical source of truth.
-- Correct the derived analytical tables rather than overwrite the historical evidence.
-- Preserve reconciliation tables and the original data version.
-- Resolve ambiguous identities only with occurrence-level or official evidence.
-
-### Verification
-
-- Final player-game occurrences resolved: `65,554/65,554`
-- Unresolved occurrences: `0`
-- Name-only forced merges: `0`
-- Score-component mismatches in the corrected foundation: `0`
-- Detected strict-prior temporal violations: `0`
-
-### Records
-
-- [Data lineage and quality checks](data_lineage_and_quality.md)
+**Records:** [data lineage and quality](data_lineage_and_quality.md)
 
 ---
 
-# B. Invalidated assumptions and evaluation risks
+# 3. Early model-development results
 
-## F06 — predictive-ceiling claim invalidated
+## F05 — V1 suggested signal, but the result was not conclusive
 
-### What happened
+**What happened.** The first multi-season lineup-confirmed model tested whether strict-prior player averages improved a conventional team baseline.
 
-The V5 audit initially suggested that model performance had flattened after roughly 600 games and that 224 additional features could not explain the remaining V2 errors.
+**Evidence.** On `416` non-tie 2026 games:
 
-### Evidence
+| V1 model | Log loss | Brier score | ROC AUC | Accuracy |
+|---|---:|---:|---:|---:|
+| Team baseline | `0.685329` | `0.246102` | `0.572792` | `56.01%` |
+| Income Core | `0.681950` | `0.244315` | `0.594917` | `58.41%` |
+| Income Extended | `0.680663` | `0.243667` | `0.594245` | `56.49%` |
 
-The error-prediction models produced ROC AUC values near `0.5`, and additional features provided little improvement under the existing representation.
+The Core-versus-baseline date-cluster bootstrap interval crossed zero.
 
-### Diagnosis — confirmed premise failure
+**Diagnosis — supported explanation.** The favorable point estimates suggested incremental player signal, but low early-season sample counts and cold starts made the prior averages unstable.
 
-The audit relied on the role-contaminated histories later identified in F03. It measured the limit of that feature representation, not the limit of clean batter, starter, and relief information.
+**Research impact.** The result was reported as directionally positive but statistically inconclusive. The project did not treat V1 as proof.
 
-### Research impact
+**Change and verification.** V2 introduced train-fitted imputation, missing indicators, previous-season information, and K-shrunk cross-season averages. In the already-observed 2026 comparison, V2 improved Log loss from V1 Extended `0.680663` to `0.670610`; the paired interval was `[−0.018242, −0.002074]`. V2 was retained as a stabilized historical baseline, not as the final clean-role model.
 
-The original conclusion could have incorrectly discouraged further player-role feature engineering. It was therefore withdrawn rather than preserved as a final ceiling claim.
+**Records:** [research journey — V1 and V2](research_journey.md#v1--first-lineup-confirmed-temporal-model)
 
-### Corrective action
+## F06 — more complexity and different learning schedules did not improve V2
 
-Shift the next stage from broader model tuning to role-specific feature redesign.
+**What happened.** V3 expanded the feature and algorithm search; V4 changed weighting, windows, retraining, ensembling, and the first Poisson implementation.
 
-### Verification
+**Evidence.** V3 evaluated `763` candidate columns, `162` selected features, `9` model families, `37` configurations, and roughly `610` temporal fits:
 
-Under the common V6 2025 temporal-OOF protocol:
+| Model or strategy | 2026 Log loss |
+|---|---:|
+| V2 reference | **`0.670610`** |
+| V3 ensemble | `0.677185` |
+| V4 730-day decay | `0.670973` |
+| V4 online expanding | `0.672144` |
+| V4 learned stack | `0.672703` |
+| V4 recent 1,000 games | `0.674724` |
+| V4 Poisson alpha 10 | `0.679821` |
 
-- Team baseline Log loss: `0.687049`
-- Team baseline plus clean start-only starter block: `0.677648`
-- Difference: `−0.009401`
+**Diagnosis — confirmed negative result with a supported explanation.** The tested extra complexity and training schedules did not improve out-of-time probability quality. Redundant features, limited independent signal, selection variance, and excess capacity are plausible explanations, but no single cause was isolated.
 
-The later official-event batter redesign also added predictive signal. These results show that V5 described the limit of the contaminated representation, not a general predictive ceiling.
+**Research impact.** The project rejected the idea that a more sophisticated algorithm or more frequent retraining would automatically fix the model.
 
-### Records
+**Change and verification.** V2 remained the reference. The next investigation shifted from model tuning to auditing what the player-history features actually represented.
 
-- [V5 ceiling audit](../research_records/reports/RQ1_V5_CEILING_AUDIT_REPORT.md)
-- [Role-aware audit](../research_records/reports/RQ1_ROLE_AWARE_INCOME_AUDIT_REPORT.md)
-- [Rebuild decision](../research_records/decisions/ROLE_AWARE_REBUILD_DECISION.json)
+**Records:** [research journey — V3](research_journey.md#v3--broad-complex-model-search), [research journey — V4](research_journey.md#v4--learning-strategy-lab)
 
-## F07 — accuracy and probability scores moved in opposite directions
+---
 
-### What happened
+# 4. Role definitions changed the scientific conclusion
 
-The V10 combined feature set increased thresholded classification accuracy but worsened the primary probability metrics.
+## F07 — role contamination invalidated the V5 predictive-ceiling claim
 
-### Evidence
+**What happened.** Histories intended for starting batters and starting pitchers included prior appearances from different roles. V5 had already used those histories to argue that the available BoxScore signal might be near a practical ceiling.
 
-Under the common strict 2025 holdout protocol:
+**Evidence.** The role audit found:
+
+- `25,870/33,121` experienced starting-batter rows included substitute history (`78.11%`);
+- `726/3,496` experienced starting-pitcher rows included relief history (`20.77%`);
+- among `614` pitchers with both roles, the median absolute all-role versus start-only difference was `149.14`, and the 90th percentile was `779.51`.
+
+The earlier V5 error-prediction models had ROC AUC around `0.497–0.510`, but they were evaluating the contaminated representation.
+
+**Diagnosis — confirmed defect and invalidated claim.** The history key separated season, player, and broad position type, but not game role. V5 therefore measured the limit of the old representation, not the limit of clean role-specific information.
+
+**Research impact.** The predictive-ceiling claim was withdrawn. Earlier models remained historical baselines, but they could no longer be described as clean role-specific models.
+
+**Change and verification.** Strict-prior histories were rebuilt by role, with start-only history for starting pitchers. Batter, starter, and relief blocks were then evaluated separately. The clean starter result in F08 demonstrated that the earlier ceiling did not apply to the corrected representation.
+
+**Records:** [role-scope audit](../research_records/key_results/ROLE_SCOPE_AUDIT_SUMMARY.csv), [role-aware audit report](../research_records/reports/RQ1_ROLE_AWARE_INCOME_AUDIT_REPORT.md), [V5 ceiling audit](../research_records/reports/RQ1_V5_CEILING_AUDIT_REPORT.md), [rebuild decision](../research_records/decisions/ROLE_AWARE_REBUILD_DECISION.json)
+
+## F08 — the corrective redesign showed that starter information carried the strongest role-specific signal
+
+**What happened.** V6 tested six official-record scoring families under the corrected role-aware history design. V7 then tested how to integrate the selected starter index.
+
+**Evidence.** Under one common 2025 temporal-OOF team-baseline protocol:
+
+| Added role block | Log loss | Difference from team baseline |
+|---|---:|---:|
+| Team baseline | `0.687049` | — |
+| Starting-lineup batter block | `0.687465` | `+0.000417` |
+| Clean start-only starter block | **`0.677648`** | **`−0.009401`** |
+| Player-level relief block | `0.688016` | `+0.000967` |
+
+V7 integration results under its common 2025 protocol were:
+
+| Integration method | Log loss |
+|---|---:|
+| V2 direct | `0.678417` |
+| Starter model direct | `0.670455` |
+| Fixed probability blend | `0.670051` |
+| Temporal OOF logit stack | **`0.669483`** |
+
+The stack-versus-V2 difference was `−0.008934`, with paired 95% interval `[−0.017472, −0.000544]`.
+
+**Diagnosis — supported explanation.** The corrected starter representation contained strong incremental signal, and its probability output complemented the stabilized V2 component better than direct feature concatenation.
+
+**Research impact.** The project abandoned a universal one-score-fits-all assumption. Role-specific models and modular probability integration became the main architecture.
+
+**Change and verification.** `KBO_CONSTRAINED` start-only scoring with a K=10 prior was frozen as the starter index. V2 and starter components were trained separately, and the meta model used temporal out-of-fold logits only. The initial V7 evaluation had omitted the first 2025 date; corrected V7 v1.1 restored all dates and is the authoritative result reported here.
+
+**Records:** [V6 role ablation](../research_records/key_results/V6_1_V2_CHALLENGER_AND_DOMAIN_ABLATION.csv), [V6 findings](../research_records/reports/RQ1_V6_CURRENT_FINDINGS_REPORT.md), [V7 application results](../research_records/key_results/V7_APPLICATION_METHOD_RESULTS.csv), [V7 bootstrap](../research_records/key_results/V7_PAIRED_DATE_BOOTSTRAP_ALL_PERIODS.csv)
+
+---
+
+# 5. Batter and relief-pitcher representation failures
+
+## F09 — the first batter index helped alone but harmed the integrated model
+
+**What happened.** The V8 batter index improved a standalone batter-domain model, but adding it to the stronger V7 starter architecture made the complete probability model worse.
+
+**Evidence.** Under the 2025 V8 protocol:
+
+| Comparison | Log loss |
+|---|---:|
+| Team baseline | `0.687435` |
+| Selected V8 batter index | `0.682866` |
+| V7 starter stack | **`0.669483`** |
+| V7 + V8 batter | `0.673388` |
+
+The index therefore showed domain signal but negative incremental value after the stronger components were already present.
+
+**Diagnosis — confirmed negative result with a supported explanation.** Standalone performance did not guarantee complementary information. Redundancy with team and starter variables, unstable rate-volume balance, and limitations of the first score design are plausible explanations.
+
+**Research impact.** The V8 batter block was rejected. The project did not generalize this result into the claim that batter information was useless.
+
+**Change and verification.** V11.1 rebuilt the batter index from official batting events without legacy batter scores. It searched `215` score candidates, multiple prior methods, lineup aggregations, and model families. On 698 games in 2025 validation, the new batter block improved Log loss from `0.668954` without the block to `0.665020`; the difference was `−0.003934`, but the interval `[−0.010585, 0.002925]` still crossed zero. In the later V12 2026 development ablation, the best observed model improved from `0.673157` without the batter block to `0.666135` with it; that larger gain is development evidence because 2026 was used during strategy comparison.
+
+**Records:** [V8 domain comparison](../research_records/key_results/V8_DOMAIN_BASELINE_AND_LEGACY_COMPARISON.csv), [V8 integration results](../research_records/key_results/V8_2025_PREDICTION_APPLICATION_RESULTS.csv), [V11.1 final report](../reports/frozen/RQ1_V11_1_FINAL_BATTER_INCOME_REPORT.md), [V11.1 comparison](../reports/frozen/V11_1_ROBUST_CANDIDATE_COMPARISON.csv), [V11.1 bootstrap](../reports/frozen/V11_1_ROBUST_CANDIDATE_BOOTSTRAP.csv), [V12 batter ablation](../reports/frozen/V12_2026_BATTER_ABLATION_RESULTS.csv), [V12 paired bootstrap](../reports/frozen/V12_2026_PAIRED_DATE_BOOTSTRAP.csv)
+
+## F10 — the player-level relief index failed because pregame deployment could not be represented reliably
+
+**What happened.** V8 built a strict-prior player-level relief-pitcher index. Because the actual target-game relievers are known only after the game, the feature had to approximate a candidate pool from earlier appearances.
+
+**Evidence.** The index failed both standalone and integrated comparisons:
+
+| Evaluation | Reference Log loss | With relief index | Difference |
+|---|---:|---:|---:|
+| 2025 standalone relief domain | `0.687435` | `0.687444` | `+0.000009` |
+| 2025 added to V7 | `0.669483` | `0.674253` | `+0.004770` |
+| 2026 post-hoc addition | `0.667785` | `0.668898` | `+0.001113` |
+
+Positive differences are worse. The standalone 2025 improvement probability was `49.95%`, effectively a null result.
+
+**Diagnosis — confirmed negative result with a supported explanation.** Relief pitching matters, but the tested pregame player-level representation was structurally noisy:
+
+- the actual relievers and their innings are unknown before first pitch;
+- deployment depends on score, inning, leverage, starter exit, handedness, and strategy;
+- using actual target-game relievers would leak postgame information;
+- a broad prior pool includes pitchers who may never enter;
+- workload, recovery, injury, and roster availability change from day to day.
+
+The study supports these mechanisms but did not isolate the individual contribution of each.
+
+**Research impact.** The player-level relief index was removed from the primary architecture. The conclusion was limited to the tested representation, not to the importance of relief pitching itself.
+
+**Change and verification.** V9 moved to a simpler team-level strict-prior measure: runs officially assigned to non-starting pitchers per team game. A recent-20 version changed the V7 architecture from `0.669483` to `0.669004` in 2025, but the difference `−0.000478` had interval `[−0.003102, 0.002145]`. It remained a challenger, not a proven replacement. This responsibility-run measure is not identical to physical runs scored after the starter exits; exact post-exit runs require play-by-play timelines.
+
+**Records:** [relief-index negative result](relief_pitcher_index_negative_result.md), [V8 integration results](../research_records/key_results/V8_2025_PREDICTION_APPLICATION_RESULTS.csv), [V9 candidate validation](../research_records/key_results/V9_2025_CANDIDATE_VALIDATION.csv), [V9 replacement results](../research_records/key_results/V9_2025_V7_REPLACEMENT_RESULTS.csv), [V9 bootstrap](../research_records/key_results/V9_V7_REPLACEMENT_BOOTSTRAP.csv)
+
+---
+
+# 6. Later feature and model-selection limits
+
+## F11 — richer pregame features improved Accuracy but worsened probability scores
+
+**What happened.** V10 added starter workload, pitch count, handedness matchup, batting-order structure, lineup continuity, and missing-regular proxies.
+
+**Evidence.** Under the common strict 2025 holdout protocol:
 
 | Model | Log loss | Brier score | Accuracy |
 |---|---:|---:|---:|
-| V9-style probability model | `0.667336` | `0.237412` | `58.31%` |
-| V10 combined model | `0.667817` | `0.237603` | `59.74%` |
+| V9-style model | **`0.667336`** | **`0.237412`** | `58.31%` |
+| V10 combined | `0.667817` | `0.237603` | **`59.74%`** |
 
-The paired-date 95% interval for the V10-minus-V9 Log-loss difference was `[−0.002909, 0.003879]`, and the estimated probability that V10 improved Log loss was `38.475%`.
+V10 improved Accuracy by `1.43` percentage points but worsened Log loss by `+0.000481` and Brier score by `+0.000191`. The estimated probability of Log-loss improvement was only `38.48%`.
 
-### Diagnosis — confirmed evaluation conflict
+**Diagnosis — evaluation conflict and confirmed negative result.** Accuracy evaluates a thresholded class decision; Log loss and Brier score evaluate the complete probability forecast, which was the primary objective.
 
-Accuracy scores only the class decision after applying a threshold. Log loss and Brier score evaluate the full probability assignment, which was the primary target of this study. The result does not, by itself, prove one unique calibration failure mechanism.
+**Research impact.** Selecting V10 by Accuracy alone would have silently changed the research task from probability forecasting to classification.
 
-### Research impact
+**Change and verification.** Log loss remained the primary selection metric, with Brier score and calibration as supporting metrics. V10 was preserved only as an accuracy-oriented challenger.
 
-Selecting V10 by accuracy alone would have changed the objective from probability forecasting to thresholded classification without stating that change.
+**Records:** [V10 holdout results](../research_records/key_results/V10_2025_UNTOUCHED_HOLDOUT_RESULTS.csv), [V10 bootstrap](../research_records/key_results/V10_PAIRED_DATE_BOOTSTRAP.csv), [V10 report](../research_records/reports/RQ1_V10_OFFICIAL_GAME_PAGE_FEATURE_REPORT.md)
 
-### Corrective action
+## F12 — complex model families and adaptive retraining did not beat static L2 logistic regression
 
-- Keep Log loss as the primary model-selection metric.
-- Use Brier score and calibration as supporting probability metrics.
-- Report accuracy as secondary evidence.
-- Retain V10 only as an accuracy-oriented challenger.
+**What happened.** V12 held the corrected batter and starter representations fixed and compared regularized linear models, tree and boosting families, training windows, decay, daily retraining, online updates, ensembles, and calibration.
 
-### Verification
+**Evidence.** In 2024–2025 temporal CV, L2 Logistic achieved the best family result:
 
-The simpler V9-style model remained the probability primary under the common 2024-selection/2025-holdout protocol.
-
-### Records
-
-- [V10 holdout results](../research_records/key_results/V10_2025_UNTOUCHED_HOLDOUT_RESULTS.csv)
-- [Paired-date bootstrap](../research_records/key_results/V10_PAIRED_DATE_BOOTSTRAP.csv)
-
-## F08 — reuse of validation and development periods
-
-### What happened
-
-The feature rows excluded target-game and same-date results, but some evaluation periods were inspected while the research design was still evolving.
-
-Two forms of reuse must be distinguished:
-
-1. **V11.1 batter design:** an initial candidate was developed with 2024 data, examined on 2025, and the prior-averaging structure was subsequently reviewed. The final 2025 result is therefore validation evidence, not an untouched final test.
-2. **V12 learning-strategy comparison:** 2026 outcomes were used while comparing model families, regularization values, static windows, adaptive strategies, calibration, and ensembles.
-
-### Evidence
-
-For the V12 frozen candidates:
-
-| Candidate | Selection status | 2026 development Log loss |
-|---|---|---:|
-| `L2_C0.03_ALL_EQUAL` | Selected by 2024–2025 temporal CV without using 2026 | `0.667390` |
-| `L2_C0.1_RECENT_720` | Best observed after comparing methods on 2026 | `0.666135` |
-
-The paired difference was `−0.001255`, with a 95% interval of `[−0.004790, 0.002336]` and a `74.61%` estimated probability favoring the recent-720 model.
-
-### Diagnosis — evaluation risk
-
-This is selection risk from reusing validation and development periods. It is not row-level target leakage: current-game, same-date, and future outcomes were excluded from each feature row.
-
-### Research impact
-
-The observed performance can support model development decisions, but it cannot establish a future-validated production champion or a final generalization claim.
-
-### Corrective action
-
-- Freeze both model specifications.
-- Stop tuning the batter formula, shrinkage rule, regularization value, and training window on the observed periods.
-- Introduce future ideas only as separately versioned challengers.
-- Compare frozen candidates on predictions recorded before first pitch.
-
-### Current status
-
-- `L2_C0.03_ALL_EQUAL` is reported as the cleaner CV-selected reference candidate.
-- `L2_C0.1_RECENT_720` is reported as the best observed development candidate.
-- Prospective evaluation is required before either is described as future validated.
-
-### Records
-
-- [Model-selection decision](../reports/frozen/V12_MODEL_SELECTION_DECISION.json)
-- [Paired date-cluster comparison](../reports/frozen/V12_2026_PAIRED_DATE_BOOTSTRAP.csv)
-- [Scientific status and allowed claims](scientific_status_and_claims.md)
-- [Prospective validation protocol](prospective_validation.md)
-
-## F09 — historical lineups were not independently timestamped pregame snapshots
-
-### What happened
-
-Historical starting lineups and starting pitchers were reconstructed from official completed-game records. The records identify who started, but the frozen historical dataset does not independently prove when every lineup snapshot was captured before first pitch.
-
-### Evidence
-
-The canonical data contain complete official starting-lineup structure:
-
-- starting-lineup rows: `33,552`;
-- exact starters per game: `18`;
-- exact starters per team: `9`.
-
-However, independent historical pregame capture timestamps are not available for every reconstructed game.
-
-### Diagnosis — evaluation risk
-
-The retrospective pipeline enforces strict date cutoffs and does not use target-game outcomes in player histories. Nevertheless, lineup availability is reconstructed from completed-game official records rather than demonstrated by an immutable historical pregame feed.
-
-### Research impact
-
-The historical study can evaluate a **reconstructed lineup-confirmed setting**, but it should not claim that every historical input was independently archived before first pitch.
-
-### Corrective action
-
-- Describe the historical experiment explicitly as retrospective reconstruction.
-- Do not use reconstructed lineup records as proof of historical capture timing.
-- In prospective operation, store prediction time, source cutoff time, official lineup and starter snapshots, source hashes, feature hashes, and model hashes before first pitch.
-
-### Current status
-
-The limitation is documented. Genuine timestamped pregame validation begins only with the immutable prospective ledger.
-
-### Records
-
-- [Data card](data_card.md)
-- [Limitations](limitations.md)
-- [Prospective validation protocol](prospective_validation.md)
-
----
-
-# C. Negative modeling results and research decisions
-
-These entries describe experiments that ran as intended but did not support adoption. They are not software failures. They are retained because rejecting unsupported complexity is part of the model-selection evidence.
-
-## F10 — instability in the 2026-only branch
-
-### What happened
-
-The initial 2026-only branch did not produce stable or strong enough pregame probabilities to justify continued search on the same sample.
-
-### Evidence
-
-- Completed games: `424`
-- Binary decision games after excluding ties: `416`
-- Temporal outer predictions: `281`
-- Strongest development candidate:
-  - Log loss: `0.685090`
-  - Brier score: `0.246008`
-  - ROC AUC: `0.573867`
-- Later 337-feature search Log loss: `0.693281`
-
-The `281` outer predictions came from the defined temporal evaluation folds; they were not presented as an independent 281-game random sample. The strongest candidate also produced probabilities concentrated near `0.5`.
-
-### Diagnosis — supported explanation
-
-The effective sample was small relative to the number of inspected features, transformations, models, and fold choices. Repeated observations of the same teams and game dates further reduced the amount of independent information. The evidence supports these factors collectively, but the study did not isolate one sole cause.
-
-### Research impact
-
-Continuing to add candidates after repeatedly observing the same period would increase model-selection risk without creating stronger evidence.
-
-### Corrective action
-
-Close the branch as a valid negative result and rebuild the study on official 2024–2026 multi-season data.
-
-### Verification
-
-The expanded foundation contained `1,824` decision games across three seasons. The Phase 1 result remained documented as a negative result and was not reinterpreted after the expansion.
-
-### Records
-
-- [Phase 1 and Phase 2 research history](research_journey.md#phase-1--2026-only-limited-sample-study)
-
-## F11 — broader complexity did not improve temporal performance
-
-### What happened
-
-The V3 search added substantially more features, model families, and configurations but performed worse than the stabilized V2 model.
-
-### Evidence
-
-V3 evaluated:
-
-- candidate columns: `763`;
-- selected features: `162`;
-- model families: `9`;
-- configurations: `37`;
-- approximate temporal fits: `610`.
-
-| Model | Log loss |
+| Family | CV Log loss |
 |---|---:|
-| V2 stabilized logistic model | `0.670610` |
-| V3 ensemble | `0.677185` |
+| L2 Logistic | **`0.668643`** |
+| Elastic Net | `0.669683` |
+| XGBoost | `0.675691` |
+| Random Forest | `0.675770` |
+| Gradient Boosting | `0.676440` |
 
+In the 2026 development comparison:
 
-### Diagnosis — supported explanation
+| Strategy | Log loss |
+|---|---:|
+| Static L2 C=`0.1`, recent 720 games | **`0.666135`** |
+| Mean ensemble of top six CV models | `0.667718` |
+| Platt-calibrated CV champion | `0.668225` |
+| Best daily retraining | `0.668838` |
+| Isotonic-calibrated CV champion | `0.725047` |
 
-Redundant predictors, limited independent signal, model-selection variance, and excess model capacity are all consistent with the result. Their individual causal contributions were not isolated.
+**Diagnosis — confirmed negative result with a supported explanation.** At this sample size and with these fixed features, strongly regularized logistic regression was more stable than the tested nonlinear and continuously adapting methods. Frequent refitting can follow short-term noise, but the experiment did not prove that this was the only cause.
 
-### Research impact
+**Research impact.** The project did not adopt complex models, calibration, ensembling, or daily retraining for presentation value alone.
 
-The experiment rejected the assumption that a larger feature space or a more complex learner was automatically preferable.
+**Change and verification.** Two static L2 candidates were frozen: a 2024–2025 CV-selected reference (`C=0.03`, all history) and the best-observed 2026 development model (`C=0.1`, recent 720). Their 2026 Log-loss difference was only `−0.001255`, with interval `[−0.004790, 0.002336]`, so the recent-720 model was not declared definitively superior.
 
-### Corrective action
-
-Require out-of-time improvement in probability quality before accepting additional complexity.
-
-### Verification
-
-V12 again compared regularized linear models, tree and boosting families, ensembles, calibration, adaptive retraining, and online updating. Strongly regularized L2 logistic regression remained the temporal-CV winner.
-
-### Records
-
-- [V3 research history](research_journey.md#v3--broad-complex-model-search)
-- [V12 model-family temporal CV](../reports/frozen/V12_MODEL_FAMILY_TEMPORAL_CV.csv)
-
-## F12 — the first batter index failed integrated evaluation
-
-### What happened
-
-The initial batter index improved a standalone batter-domain model but worsened the stronger V7 integrated model.
-
-### Evidence
-
-Under the V8 2025 protocol:
-
-- Standalone team baseline Log loss: `0.687435`
-- Standalone selected batter model: `0.682866`
-- V7 integrated model: `0.669483`
-- V7 plus the selected batter index: `0.673388`
-- Integrated difference: `+0.003905` (worse)
-
-### Diagnosis — supported explanation
-
-The first score design, prior averaging method, and lineup aggregation did not provide robust incremental information beyond the existing team and starting-pitcher components. Signal overlap is plausible, but it was not established as the only cause.
-
-### Research impact
-
-A favorable standalone result was not treated as sufficient evidence for inclusion in the final combined model.
-
-### Corrective action
-
-Reject the V8 batter addition and rebuild the batter index from official batting events without using the legacy batter score.
-
-The redesign compared:
-
-- official-event game-score candidates: `215`;
-- player prior-averaging methods: `20`;
-- lineup aggregation blocks: `6`.
-
-### Verification
-
-The selected V11.1 batter system produced:
-
-- 2025 validation Log loss with batter block: `0.665020`
-- 2025 validation Log loss without batter block: `0.668954`
-- Difference: `−0.003934`
-- 95% interval: `[−0.010585, 0.002925]`
-
-Under the best-observed 2026 development protocol, removing the batter block worsened Log loss by `0.007022`, with a 95% interval of `[0.000548, 0.013416]` in favor of retaining it. That result remains development evidence because 2026 was used during method comparison.
-
-### Records
-
-- [V8 integration results](../research_records/key_results/V8_2025_PREDICTION_APPLICATION_RESULTS.csv)
-- [V11.1 candidate comparison](../reports/frozen/V11_1_ROBUST_CANDIDATE_COMPARISON.csv)
-- [V12 batter ablation](../reports/frozen/V12_2026_BATTER_ABLATION_RESULTS.csv)
-
-## F13 — the player-level relief index added no reliable pregame signal
-
-### What happened
-
-The tested player-level relief-pitcher indices did not improve leakage-safe pregame probability forecasts.
-
-### Evidence
-
-- Preliminary V6 relief screen: Log-loss difference `+0.000967` (worse)
-- V8 selected relief index versus team baseline: `0.687444` versus `0.687435` (effectively null)
-- V7 model versus V7 plus relief index: `0.669483` versus `0.674253`
-- Integrated difference: `+0.004770` (worse)
-- 2026 post-hoc addition: Log-loss difference `+0.001113` (worse)
-
-### Diagnosis — supported explanation
-
-The actual relievers who will enter a game are unknown before first pitch. A leakage-safe player-level feature must approximate an available pool from prior appearances, workload, rest, and roster evidence. That pool can include pitchers who never appear and omit unobserved availability constraints. This is a plausible representation limit, not a uniquely proven cause.
-
-### Research impact
-
-The negative result applies to the tested pregame representation. It is not evidence that relief pitching is unimportant to baseball outcomes.
-
-### Corrective action
-
-- Reject the tested player-level relief index.
-- Retain team-level post-starter run-prevention context only as a challenger.
-- Defer stronger player-level claims until point-in-time roster and availability data are available.
-
-### Verification
-
-The V9 recent-20 team measure improved V7 Log loss by `−0.000478`, but its 95% interval `[−0.003102, 0.002145]` included zero. It was therefore not promoted as a confirmed replacement.
-
-### Records
-
-- [V6 role ablation](../research_records/key_results/V6_1_V2_CHALLENGER_AND_DOMAIN_ABLATION.csv)
-- [V8 domain comparison](../research_records/key_results/V8_DOMAIN_BASELINE_AND_LEGACY_COMPARISON.csv)
-- [Detailed relief-index analysis](relief_pitcher_index_negative_result.md)
-
-## F14 — adaptive retraining did not beat the best static window
-
-### What happened
-
-Expanding, rolling, decay-weighted daily retraining, and online updates did not improve on the strongest static recent-window model.
-
-### Evidence
-
-Under the V12 2026 development protocol:
-
-- Best adaptive daily method, `L2_C0.03 / EXPANDING_DAILY`: Log loss `0.668838`
-- Best static method, `L2_C0.1 / RECENT_720`: Log loss `0.666135`
-- Tested online SGD variants were substantially worse, with Log loss above `1.25`.
-
-### Diagnosis — supported explanation
-
-Frequent refitting can follow short-term noise when the effective sample is modest and the feature set already summarizes recent performance. The results support that explanation but do not isolate it as the only mechanism.
-
-### Research impact
-
-Automatically replacing the frozen model with a frequently updated version would add operational and statistical complexity without demonstrated probability improvement.
-
-### Corrective action
-
-Treat adaptive and online methods as separately versioned challengers rather than automatic replacements.
-
-### Verification
-
-The static CV-selected and recent-720 specifications were preserved for prospective comparison.
-
-### Records
-
-- [V12 adaptive-strategy results](../reports/frozen/V12_2026_ADAPTIVE_STRATEGY_RESULTS.csv)
+**Records:** [V12 report](../reports/frozen/RQ1_V12_TRAINING_STRATEGY_REPORT.md), [family champions](../reports/frozen/V12_FAMILY_CHAMPIONS.csv), [static strategies](../reports/frozen/V12_2026_STATIC_STRATEGY_RESULTS.csv), [adaptive strategies](../reports/frozen/V12_2026_ADAPTIVE_STRATEGY_RESULTS.csv), [calibration and ensembles](../reports/frozen/V12_2026_CALIBRATION_ENSEMBLE_RESULTS.csv), [paired bootstrap](../reports/frozen/V12_2026_PAIRED_DATE_BOOTSTRAP.csv)
 
 ---
 
-# Cross-cutting lessons
+# 7. Evaluation and reproducibility boundaries
 
-The failures and negative results changed the project in five durable ways:
+## F13 — leakage-safe feature rows did not make reused periods untouched tests
 
-1. **Aggregate coverage is not enough.** Quality checks must be separated by side, role, season, and data source so impossible asymmetries are visible.
-2. **Feature meaning must be audited before model complexity.** A precisely trained model cannot repair a history variable that mixes different player roles.
-3. **Standalone signal is not incremental signal.** A domain feature is accepted only if it improves the stronger combined model under temporal evaluation.
-4. **Probability forecasting requires probability metrics.** Accuracy remains useful, but it does not replace Log loss, Brier score, or calibration.
-5. **Reproducibility and scientific validity are separate requirements.** Exact metric replay, leakage-safe rows, honest development-period labels, and future prospective validation are all necessary.
+**What happened.** Current-game, same-date, and future outcomes were excluded from each feature row, but labeled evaluation periods were inspected while the method was still evolving.
 
-The ledger therefore supports the final research narrative: the project advanced not by hiding failed experiments, but by using audits and negative results to improve the data foundation, narrow the claims, redesign the player indices, and define a prospective test that the development data can no longer influence.
+**Evidence.** Two forms of reuse occurred:
+
+1. V11.1 examined a 2024-developed batter candidate on 2025 and then reviewed the prior-averaging structure; the final 2025 result is validation evidence.
+2. V12 used 2026 outcomes to compare regularization, windows, adaptive strategies, calibration, and ensembles; recent-720 is therefore development-selected.
+
+**Diagnosis — evaluation risk, not row-level leakage.** Each prediction used strict-prior information, but repeated method selection on a labeled period can make observed performance optimistic.
+
+**Research impact.** The project cannot call 2025 in V11.1 or 2026 in V12 a final untouched test. The recent-720 model is a development champion, not a future-validated production model.
+
+**Change and verification.** Both the CV-selected and development-selected models were frozen. Further adjustment of the batter formula, shrinkage rule, regularization, or training window using observed 2026 results was prohibited. Final comparison moved to an immutable prospective ledger.
+
+**Records:** [scientific status and claims](scientific_status_and_claims.md), [temporal validation and leakage](temporal_validation_and_leakage.md), [prospective validation](prospective_validation.md), [V12 selection decision](../reports/frozen/V12_MODEL_SELECTION_DECISION.json)
+
+## F14 — historical lineups did not have an immutable pregame timestamp for every game
+
+**What happened.** Official historical records identify the starting lineup and starting pitcher, but the archive does not contain an independent pre-first-pitch capture timestamp for every game.
+
+**Evidence.** The canonical foundation contains exact starting-lineup rows for all `1,864` games, but historical confirmation time is not independently archived for every row.
+
+**Diagnosis — evaluation risk.** The retrospective features are outcome-leakage controlled, but the historical input feed cannot be represented as an immutable timestamped pregame capture in the same way as future predictions.
+
+**Research impact.** Historical evaluation must be described as reconstructed lineup-confirmed pregame analysis, not as proof that every input was captured and sealed before first pitch.
+
+**Change and verification.** The prospective protocol requires prediction time, source cutoff time, lineup and starter snapshot hashes, model and feature hashes, and separate postgame settlement. The original prediction record cannot be edited after the result becomes known.
+
+**Records:** [data card](data_card.md), [limitations](limitations.md), [prospective validation](prospective_validation.md)
+
+## F15 — maintained repository code initially diverged from the frozen execution
+
+**What happened.** An early maintained reproduction path ran without an error but did not exactly reproduce the frozen V12 probabilities and metrics.
+
+**Evidence.** The maintained path forced `solver="liblinear"` and selected the recent training window using date-only ordering. The frozen execution used its original solver behavior and deterministic ordering by `game_date, game_id`.
+
+**Diagnosis — confirmed defect.** The repository implementation had drifted from the historical execution contract.
+
+**Research impact.** A reader could successfully run the code and still obtain values different from the frozen reports, weakening the reproducibility claim.
+
+**Change and verification.** The solver override was removed, deterministic two-key ordering was restored, and exact metric and model-replay tests were added. Reproduced metrics match within `1e-12`; maximum absolute probability replay error is `1.67e-16` for the CV model and `2.78e-16` for the development model.
+
+**Records:** [reproducibility](reproducibility.md), [change log](../CHANGELOG.md), [model-replay audit](../reports/frozen/V12_MODEL_BINARY_REPRODUCTION_AUDIT.json)
+
+---
+
+# What these failures changed
+
+1. The project expanded from a weak 2026-only study to a multi-season temporal design.
+2. Identity, parsing, and scoring audits became fail-closed prerequisites rather than cleanup steps.
+3. Role definitions became part of the model specification; starting, substitute, and relief appearances were no longer mixed.
+4. The starter index was retained because it improved a common baseline; the initial batter and player-level relief representations were rejected because they did not add incremental value.
+5. The batter role was redesigned rather than dismissed after its first failed representation.
+6. The relief result led to a team-level pregame proxy because actual reliever deployment is unknown without leakage.
+7. More complex models, richer feature sets, and more frequent retraining were not accepted unless they improved temporal probability metrics.
+8. Development evidence was separated from future generalization, and exact reproducibility became part of the scientific result.
