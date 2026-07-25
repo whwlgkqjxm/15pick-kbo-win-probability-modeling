@@ -27,9 +27,9 @@ Direct model comparisons below are made only within the same evaluation protocol
 
 ## F01 — the 2026-only study produced weak and unstable probabilities
 
-**What happened.** The project began with `424` completed 2026 games through July 9 and `416` non-tie decisions. It tested team, lineup, starter, player-index, price, rank, nonlinear, ensemble, and effect-shape branches.
+**What happened:** The project began with `424` completed 2026 games through July 9 and `416` non-tie decisions. It tested team, lineup, starter, player-index, price, rank, nonlinear, ensemble, and effect-shape branches.
 
-**Evidence.** The strongest development point estimate remained weak:
+**Evidence:** The strongest development point estimate remained weak:
 
 | Phase 1 model | Log loss | Brier score | ROC AUC | Accuracy |
 |---|---:|---:|---:|---:|
@@ -38,11 +38,11 @@ Direct model comparisons below are made only within the same evaluation protocol
 
 Most probabilities remained close to `0.5`, and the larger model performed approximately at the constant-probability benchmark.
 
-**Diagnosis — confirmed negative result with a supported explanation.** The tested models did not provide strong out-of-time probability forecasts. The limited temporal sample, repeated observations of the same teams and dates, and extensive candidate search plausibly increased selection variance. The study did not claim that sample size was the only cause.
+**Diagnosis — confirmed negative result with a supported explanation:** The tested models did not provide strong out-of-time probability forecasts. The limited temporal sample, repeated observations of the same teams and dates, and extensive candidate search plausibly increased selection variance. The study did not claim that sample size was the only cause.
 
-**Research impact.** Continuing to search the same inspected 2026 period would have increased selection risk without creating independent evidence.
+**Research impact:** Continuing to search the same inspected 2026 period would have increased selection risk without creating independent evidence.
 
-**Change and verification.** Phase 1 was closed as a valid negative result. The project then collected official 2024 and 2025 records and rebuilt the study on `1,864` completed games, `65,554` player-game occurrences, and `1,824` non-tie modeling rows.
+**Change and verification:** Phase 1 was closed as a valid negative result. The project then collected official 2024 and 2025 records and rebuilt the study on `1,864` completed games, `65,554` player-game occurrences, and `1,824` non-tie modeling rows.
 
 **Records:** [research journey](research_journey.md#phase-1--2026-only-limited-sample-study), [data lineage and quality](data_lineage_and_quality.md)
 
@@ -52,33 +52,33 @@ Most probabilities remained close to `0.5`, and the larger model performed appro
 
 ## F02 — starter identity was asymmetric between home and away teams
 
-**What happened.** The first 2026 starter-history pipeline processed home and away pitcher tokens through different eligibility paths.
+**What happened:** The first 2026 starter-history pipeline processed home and away pitcher tokens through different eligibility paths.
 
-**Evidence.** The audit found an impossible pattern:
+**Evidence:** The audit found an impossible pattern:
 
 - home starter history eligibility: `416/416`;
 - away starter history eligibility: `0/416`;
 - prior-start difference: positive `331`, zero `85`, negative `0`.
 
-**Diagnosis — confirmed defect.** Home starter tokens usually contained numeric KBO IDs, while away starter tokens often appeared as names. The original history-eligibility path accepted the former and rejected the latter.
+**Diagnosis — confirmed defect:** Home starter tokens usually contained numeric KBO IDs, while away starter tokens often appeared as names. The original history-eligibility path accepted the former and rejected the latter.
 
-**Research impact.** Starter-history variables could reflect source-token format rather than pitcher performance. All affected starter claims were discarded.
+**Research impact:** Starter-history variables could reflect source-token format rather than pitcher performance. All affected starter claims were discarded.
 
-**Change and verification.** Identity resolution was rebuilt with official IDs, season-team evidence, profile records, targeted daily records, and occurrence-level fingerprints. Source starters were resolved `848/848`; model-period starters became eligible home `416/416` and away `416/416`; final multi-season identity resolution reached `65,554/65,554`, with zero name-only forced merges.
+**Change and verification:** Identity resolution was rebuilt with official IDs, season-team evidence, profile records, targeted daily records, and occurrence-level fingerprints. Source starters were resolved `848/848`; model-period starters became eligible home `416/416` and away `416/416`; final multi-season identity resolution reached `65,554/65,554`, with zero name-only forced merges.
 
 **Records:** [research journey](research_journey.md#phase-1--2026-only-limited-sample-study), [data lineage and quality](data_lineage_and_quality.md)
 
 ## F03 — innings parsing failed on valid baseball notation
 
-**What happened.** An early structured-model run completed even though the intended starter-income and run-prevention domains were empty or constant. Later pitcher-feature preflight then encountered ambiguous innings fields and valid fractions such as `1/3`, `2/3`, `5 1/3`, and `5 2/3`.
+**What happened:** An early structured-model run completed even though the intended starter-income and run-prevention domains were empty or constant. Later pitcher-feature preflight then encountered ambiguous innings fields and valid fractions such as `1/3`, `2/3`, `5 1/3`, and `5 2/3`.
 
-**Evidence.** The first validator did not stop the empty critical domain, so that run was invalid for any starter-value claim. The later fail-closed preflight correctly stopped before model fitting because the schema resolver could not consistently distinguish raw innings notation from already-converted outs, and the parser did not cover every one-third and two-thirds representation.
+**Evidence:** The first validator did not stop the empty critical domain, so that run was invalid for any starter-value claim. The later fail-closed preflight correctly stopped before model fitting because the schema resolver could not consistently distinguish raw innings notation from already-converted outs, and the parser did not cover every one-third and two-thirds representation.
 
-**Diagnosis — confirmed defect.** The pipeline lacked one canonical internal unit. Baseball notation such as `5.1` cannot be interpreted as 5.1 decimal innings.
+**Diagnosis — confirmed defect:** The pipeline lacked one canonical internal unit. Baseball notation such as `5.1` cannot be interpreted as 5.1 decimal innings.
 
-**Research impact.** Workload, rate, and run-prevention variables from the affected path could not be trusted. These failed runs were treated as implementation diagnostics, not evidence that pitcher data lacked predictive value.
+**Research impact:** Workload, rate, and run-prevention variables from the affected path could not be trusted. These failed runs were treated as implementation diagnostics, not evidence that pitcher data lacked predictive value.
 
-**Change and verification.** All internal innings calculations were standardized as integer outs. Exact source-column resolution, fraction unit tests, actual-data preflight, and fail-closed minimum-coverage gates were added before model training. The earlier structured result remains preserved as an invalid implementation attempt, not a negative result about pitcher information.
+**Change and verification:** All internal innings calculations were standardized as integer outs. Exact source-column resolution, fraction unit tests, actual-data preflight, and fail-closed minimum-coverage gates were added before model training. The earlier structured result remains preserved as an invalid implementation attempt, not a negative result about pitcher information.
 
 **Records:** [data lineage and quality](data_lineage_and_quality.md), [research journey](research_journey.md#phase-1--2026-only-limited-sample-study)
 
