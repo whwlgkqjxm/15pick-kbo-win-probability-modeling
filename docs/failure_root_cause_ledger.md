@@ -175,7 +175,7 @@ The earlier V5 error-prediction models had ROC AUC around `0.497–0.510`, but t
 
 **Change and verification.** Strict-prior histories were rebuilt by role, with start-only history for starting pitchers. Batter, starter, and relief blocks were then evaluated separately. The clean starter result in F08 demonstrated that the earlier ceiling did not apply to the corrected representation.
 
-**Records:** [role-scope audit](../research_records/key_results/ROLE_SCOPE_AUDIT_SUMMARY.csv), [role-aware audit report](../research_records/reports/RQ1_ROLE_AWARE_INCOME_AUDIT_REPORT.md), [V5 ceiling audit](../research_records/reports/RQ1_V5_CEILING_AUDIT_REPORT.md), [rebuild decision](../research_records/decisions/ROLE_AWARE_REBUILD_DECISION.json)
+**Records:** [role-scope audit](../research_records/key_results/ROLE_SCOPE_AUDIT_SUMMARY.csv), [role-aware audit report](../research_records/reports/RQ1_ROLE_AWARE_INCOME_AUDIT_REPORT.md), [V5 ceiling audit](../research_records/reports/RQ1_V5_CEILING_AUDIT_REPORT.md), 
 
 ## F08 — the corrective redesign showed that starter information carried the strongest role-specific signal
 
