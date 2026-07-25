@@ -51,4 +51,4 @@ The derived data supports a study of pregame KBO home-win probabilities using co
 
 ## Known limitations
 
-Historical lineup confirmation is reconstructed from official game records rather than preserved timestamped screenshots for every game. Exact physical runs after a starter exits and historical daily roster availability require additional play-by-play and point-in-time roster sources. See `docs/limitations.md`.
+Exact physical runs after a starter exits and historical daily roster availability require additional play-by-play and point-in-time roster sources. See `docs/limitations.md`.
