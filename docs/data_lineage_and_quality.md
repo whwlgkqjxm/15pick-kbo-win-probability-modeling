@@ -1,6 +1,6 @@
 # Data lineage and quality assurance
 
-This page explains how official KBO records were converted into the verified data used in the analysis. It focuses on source coverage, normalized records, player identity, role separation, corrections, and the final modeling dataset. Model performance, index formulas, and temporal evaluation are documented elsewhere.
+This page explains how official KBO records were converted into the verified data used in the analysis. It focuses on source coverage, normalized records, player identity, role separation, corrections, and the final modeling dataset.
 
 ## Official source coverage
 
