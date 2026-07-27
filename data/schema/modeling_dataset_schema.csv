@@ -8,7 +8,7 @@ prior_win_pct_diff,conventional,strict-prior win-percentage difference
 prior_run_diff_per_game_diff,conventional,strict-prior run-differential-per-game difference
 prior_rank_advantage,conventional,strict-prior rank advantage
 bullpen_strength_diff,conventional,strict-prior team responsibility-run difference
-PS_R20_RA_G_diff,conventional,recent-20 post-starter team responsibility runs per game
+PS_R20_RA_G_diff,post_starter_team,recent-20 team post-starter responsibility runs per game
 K10_starter_value_diff,starter_performance_index,start-only shrunk performance-index difference
 K10_starter_count_diff,starter_performance_index,prior start-count difference
 K10_starter_reliability_diff,starter_performance_index,shrinkage reliability difference

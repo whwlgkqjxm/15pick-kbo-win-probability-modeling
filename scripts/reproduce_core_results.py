@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 from pathlib import Path
 
 import numpy as np
@@ -155,7 +156,9 @@ def main() -> None:
         output / "calibration_intercept_slope.csv", index=False
     )
     pd.DataFrame(coefficient_rows).to_csv(output / "standardized_coefficients.csv", index=False)
-    pd.DataFrame([audit]).to_json(output / "dataset_validation.json", orient="records", indent=2)
+    (output / "dataset_validation.json").write_text(
+        json.dumps(audit, indent=2) + "\n", encoding="utf-8"
+    )
     print(f"PASS: reproduced core results in {output}")
 
 

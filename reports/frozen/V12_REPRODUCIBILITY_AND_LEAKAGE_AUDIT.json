@@ -1,18 +1,49 @@
 {
-  "rows_total": 1824,
-  "rows_by_season": {
-    "2024": 710,
-    "2025": 698,
-    "2026": 416
+  "status": "PASS",
+  "audit_scope": "repository-recomputed from the released modeling table, frozen predictions, saved models, and frozen model metadata",
+  "checks": {
+    "dataset_validation_passed": true,
+    "prediction_rows_416": true,
+    "prediction_game_ids_match": true,
+    "prediction_probabilities_valid": true,
+    "model_schema_matches_14_features": true,
+    "selection_metadata_excludes_2026": true,
+    "saved_models_loadable": true,
+    "saved_predictions_replay": true,
+    "same_date_team_updates_excluded": true,
+    "same_date_player_results_excluded": true
   },
-  "decision_games_only": true,
-  "feature_count": 14,
-  "batter_lineup_rows": 33552,
-  "all_game_side_lineups_equal_9": true,
-  "player_id_missing": 0,
-  "probability_columns": 130,
-  "probability_out_of_bounds": 0,
-  "legacy_batter_income_feature_columns": [],
-  "same_date_adaptive_rule": "predict all games for a date before adding that date outcomes",
-  "status": "PASS"
+  "key_results": {
+    "rows_total": 1824,
+    "rows_by_season": {
+      "2024": 710,
+      "2025": 698,
+      "2026": 416
+    },
+    "feature_count": 14,
+    "feature_groups": {
+      "team_strength": 5,
+      "post_starter_team": 1,
+      "starting_pitcher_index": 4,
+      "batter_lineup_index": 4
+    },
+    "candidate_probability_columns": 130,
+    "probability_out_of_bounds": 0,
+    "cv_model_max_abs_prediction_error": 1.6653345369377348e-16,
+    "development_model_max_abs_prediction_error": 2.7755575615628914e-16,
+    "required_max_abs_prediction_error_below": 1e-12
+  },
+  "scientific_status": {
+    "2024_2025_temporal_cv": "model-family and hyperparameter selection without 2026",
+    "2026": "development evaluation; no within-game or same-date leakage, but already observed and therefore not final untouched test",
+    "future_prospective": "required for final generalization claim"
+  },
+  "evidence": {
+    "modeling_dataset": "data/derived/V12_MODELING_DATASET.csv",
+    "frozen_predictions": "reports/frozen/V12_2026_ALL_PREDICTIONS.csv",
+    "cv_model": "models/frozen/V12_CV_SELECTED_MODEL_REFIT_2024_2025.joblib",
+    "development_model": "models/frozen/V12_2026_BEST_OBSERVED_RECENT720_MODEL.joblib",
+    "model_schema": "reports/frozen/V12_MODEL_SCHEMA.json",
+    "selection_decision": "reports/frozen/V12_MODEL_SELECTION_DECISION.json"
+  }
 }

@@ -14,11 +14,22 @@ INCLUDED_ROOTS = [
     ROOT / "src",
     ROOT / "scripts",
     ROOT / "data" / "derived",
+    ROOT / "data" / "schema",
     ROOT / "models" / "frozen",
     ROOT / "reports" / "frozen",
+    ROOT / "reports" / "reproduced",
     ROOT / "research" / "authoritative",
     ROOT / "research_records",
 ]
+EXCLUDED_DIRECTORY_NAMES = {
+    ".git",
+    ".pytest_cache",
+    ".ruff_cache",
+    "__pycache__",
+    "build",
+    "dist",
+}
+EXCLUDED_SUFFIXES = {".pyc", ".pyo"}
 
 
 def sha256(path: Path) -> str:
@@ -29,15 +40,29 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def main() -> None:
-    files = sorted(
-        path
-        for base in INCLUDED_ROOTS
-        for path in base.rglob("*")
-        if path.is_file()
-        and "__pycache__" not in path.parts
-        and path.suffix not in {".pyc", ".pyo"}
+def is_portable_artifact(path: Path) -> bool:
+    relative = path.relative_to(ROOT)
+    if any(part in EXCLUDED_DIRECTORY_NAMES for part in relative.parts):
+        return False
+    if any(part.endswith(".egg-info") for part in relative.parts):
+        return False
+    return path.suffix not in EXCLUDED_SUFFIXES
+
+
+def collect_files() -> list[Path]:
+    return sorted(
+        {
+            path
+            for base in INCLUDED_ROOTS
+            if base.exists()
+            for path in base.rglob("*")
+            if path.is_file() and is_portable_artifact(path)
+        }
     )
+
+
+def main() -> None:
+    files = collect_files()
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     with OUTPUT.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=["relative_path", "size_bytes", "sha256"])
@@ -50,7 +75,7 @@ def main() -> None:
                     "sha256": sha256(path),
                 }
             )
-    print(f"wrote {len(files)} entries to {OUTPUT}")
+    print(f"PASS: wrote {len(files)} entries to {OUTPUT.relative_to(ROOT)}")
 
 
 if __name__ == "__main__":
