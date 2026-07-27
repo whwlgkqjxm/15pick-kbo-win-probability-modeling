@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the repository research-artifact SHA256 manifest."""
+"""Build the SHA256 manifest for immutable research artifacts."""
 
 from __future__ import annotations
 
@@ -9,6 +9,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "artifacts" / "RESEARCH_MANIFEST_SHA256.csv"
+# Regenerated outputs are intentionally excluded. They are verified by schema,
+# exact identifiers, and numeric tolerance in verify_research_artifacts.py.
 INCLUDED_ROOTS = [
     ROOT / "configs",
     ROOT / "src",
@@ -17,7 +19,6 @@ INCLUDED_ROOTS = [
     ROOT / "data" / "schema",
     ROOT / "models" / "frozen",
     ROOT / "reports" / "frozen",
-    ROOT / "reports" / "reproduced",
     ROOT / "research" / "authoritative",
     ROOT / "research_records",
 ]

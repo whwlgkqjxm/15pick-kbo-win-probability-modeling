@@ -164,7 +164,7 @@ The timing rules and published checks can be inspected in the following reposito
 - [computed audit implementation](../src/fifteenpick_prediction/audit.py);
 - [core-result reproduction script](../scripts/reproduce_core_results.py);
 - [research-artifact verification script](../scripts/verify_research_artifacts.py);
-- [authoritative date-batched adaptive prediction loop](../research/authoritative/v12/run_v12_training_strategy_lab.py);
+- [preserved historical date-batched adaptive prediction loop](../research/authoritative/v12/run_v12_training_strategy_lab.py) (historical execution evidence; maintained portable checks are under `src/`, `scripts/`, and `tests/`);
 - [portable dataset-validation result](../reports/reproduced/dataset_validation.json);
 - [final modeling and leakage audit](../reports/frozen/V12_REPRODUCIBILITY_AND_LEAKAGE_AUDIT.json);
 - [strict-prior and recent-window tests](../tests/test_temporal.py);

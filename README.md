@@ -161,7 +161,7 @@ make verify
 
 `make reproduce` reruns both frozen specifications across the same four feature sets: conventional pregame variables, batter index only, starting-pitcher index only, and both player indices. It regenerates metrics, game-level predictions, paired date-cluster bootstrap intervals, calibration tables, and standardized coefficients.
 
-`make verify` is fail-closed. It checks dataset row counts, deterministic temporal ordering, same-date exclusion flags, SHA256 artifacts, published metrics, bootstrap values, and saved-model replay with a maximum probability error below `1e-12`.
+`make verify` is fail-closed. It checks dataset row counts, deterministic temporal ordering, same-date exclusion flags, SHA256 integrity for immutable artifacts, all regenerated output schemas and identifiers, regenerated numeric values within an absolute tolerance of `1e-12`, published metrics, bootstrap values, and saved-model replay with a maximum probability error below `1e-12`.
 
 These commands reproduce the portable analysis from the included 1,824-game derived modeling dataset. They do not reconstruct the official raw KBO responses, which are not redistributed in this repository. See [reproducibility and artifact provenance](docs/reproducibility.md) for details.
 

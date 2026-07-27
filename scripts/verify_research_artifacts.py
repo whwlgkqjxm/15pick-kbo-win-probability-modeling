@@ -20,6 +20,7 @@ from fifteenpick_prediction.audit import (
     build_v11_audit,
     build_v12_audit,
 )
+from fifteenpick_prediction.reproduction import compare_reproduced_outputs
 from fifteenpick_prediction.validation import validate_modeling_dataset
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -76,6 +77,12 @@ def verify_manifest() -> dict[str, int]:
     )
     if forbidden.any():
         raise SystemExit(f"FAIL non-portable manifest entries: {paths[forbidden].tolist()}")
+    regenerated = paths.str.startswith("reports/reproduced/")
+    if regenerated.any():
+        raise SystemExit(
+            "FAIL regenerated outputs must use tolerance verification, not byte hashes: "
+            f"{paths[regenerated].tolist()}"
+        )
 
     manifest_paths = set(paths)
     expected_paths = {
@@ -101,7 +108,7 @@ def verify_manifest() -> dict[str, int]:
     return {"entries_verified": int(len(manifest))}
 
 
-def verify_reproduction() -> dict[str, int]:
+def verify_reproduction() -> dict[str, int | float]:
     with tempfile.TemporaryDirectory() as directory:
         target = Path(directory)
         subprocess.run(
@@ -128,14 +135,14 @@ def verify_reproduction() -> dict[str, int]:
                         f"FAIL reproduction {key} {metric}: {actual} != {expected}"
                     )
 
-        generated_dataset_audit = json.loads(
-            (target / "dataset_validation.json").read_text(encoding="utf-8")
-        )
-        committed_dataset_audit = json.loads(
-            (REPRODUCED / "dataset_validation.json").read_text(encoding="utf-8")
-        )
-        if generated_dataset_audit != committed_dataset_audit:
-            raise SystemExit("FAIL reproduced dataset_validation.json is stale")
+        try:
+            reproduced_summary = compare_reproduced_outputs(
+                target,
+                REPRODUCED,
+                absolute_tolerance=1e-12,
+            )
+        except ValueError as error:
+            raise SystemExit(f"FAIL reproduced output comparison: {error}") from error
 
         bootstrap = pd.read_csv(target / "player_index_ablation_bootstrap.csv").set_index(
             "protocol"
@@ -168,7 +175,14 @@ def verify_reproduction() -> dict[str, int]:
             ):
                 if not math.isclose(float(actual[column]), value, rel_tol=0, abs_tol=1e-12):
                     raise SystemExit(f"FAIL bootstrap {protocol} {column}")
-    return {"metric_specifications_verified": len(EXPECTED), "bootstrap_protocols_verified": 2}
+    return {
+        "metric_specifications_verified": len(EXPECTED),
+        "bootstrap_protocols_verified": 2,
+        "reproduced_files_verified": int(reproduced_summary["files_verified"]),
+        "numeric_absolute_tolerance": float(
+            reproduced_summary["numeric_absolute_tolerance"]
+        ),
+    }
 
 
 def _relative_evidence(payload: dict[str, object]) -> dict[str, object]:

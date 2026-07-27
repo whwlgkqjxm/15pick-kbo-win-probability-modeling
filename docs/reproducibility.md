@@ -21,7 +21,8 @@
 - unique game IDs;
 - deterministic `game_date, game_id` sorting;
 - same-date exclusion flags;
-- research artifact SHA256 manifest;
+- SHA256 integrity for immutable derived, frozen, historical, and source artifacts;
+- regenerated CSV schemas, row order, identifiers, and numeric values within an absolute tolerance of `1e-12`;
 - exact published metrics and bootstrap values;
 - saved CV/development model replay against frozen prediction columns.
 
@@ -39,4 +40,6 @@ The authoritative V12 run recorded Python 3.13.5, pandas 2.2.3, NumPy 2.3.5, sci
 
 ## Artifact manifest
 
-`artifacts/RESEARCH_MANIFEST_SHA256.csv` records relative path, byte size, and SHA256 for derived data, frozen models, frozen results, historical source, and research records.
+`artifacts/RESEARCH_MANIFEST_SHA256.csv` records relative path, byte size, and SHA256 for immutable derived data, maintained source, frozen models, frozen results, historical source, and research records.
+
+Files under `reports/reproduced/` are intentionally excluded from byte-level hashing. Re-running the same numerical pipeline on different supported platforms may change the final floating-point digits while leaving the scientific result unchanged. `make verify` therefore regenerates all seven portable outputs and compares their file set, column order, row order, text identifiers, and JSON payloads exactly, while comparing numeric CSV values with zero relative tolerance and an absolute tolerance of `1e-12`.
