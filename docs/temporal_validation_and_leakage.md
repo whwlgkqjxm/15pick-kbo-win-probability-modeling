@@ -34,9 +34,11 @@ Feature leakage and evaluation-period reuse are related but different problems.
 | Risk | Meaning | Status in this project |
 |---|---|---|
 | Feature leakage | Information from the target outcome, the same date, or the future enters a feature vector | Controlled through strict-prior and same-date exclusion rules |
-| Evaluation-period reuse | Observed outcomes are used to choose models, hyperparameters, or training strategies | Present in the 2026 training-strategy comparison |
+| Evaluation-period reuse | Observed outcomes are used to choose models, hyperparameters, or training strategies | Present in the V11.1 2025 validation and the V12 2026 training-strategy comparison |
 
 A prediction can be free of target-game leakage while still being evaluated on a period that is no longer an untouched test.
+
+Evaluation-period reuse occurred in two places. In V11.1, a batter candidate developed on 2024 data was examined on 2025, after which the prior-averaging design was reviewed; the final 2025 result is therefore validation evidence rather than an untouched final test. In V12, 2026 outcomes were inspected while regularization, training windows, adaptive strategies, calibration, and ensembles were compared.
 
 ## Hard rules
 
@@ -107,10 +109,10 @@ The correct interpretation is therefore:
 
 - **The 2026 predictions are controlled for target-game and same-date outcome leakage.**
 - **The 2026 period is not a final untouched test.**
-- **The `RECENT_720` specification is the best observed development model, not a future-validated champion.**
+- **The `L2_C0.1_RECENT_720` specification is the best observed development model, not a future-validated champion.**
 - **A final generalization claim requires predictions recorded before first pitch on games whose outcomes were unavailable during development.**
 
-The CV-selected reference model was chosen using the 2024–2025 temporal folds without using 2026 outcomes for model selection. Its later 2026 evaluation is scientifically cleaner than a specification selected through 2026 comparison, but 2026 is still an already observed period for the project as a whole.
+The `L2_C0.03_ALL_EQUAL` reference model was chosen using the 2024–2025 temporal folds without using 2026 outcomes for model selection. Its later 2026 evaluation is scientifically cleaner than a specification selected through 2026 comparison, but 2026 is still an already observed period for the project as a whole.
 
 Detailed model comparisons are documented in [model selection, ablation, and calibration](model_selection_ablation_and_calibration.md). Claim boundaries are summarized in [scientific status and allowed claims](scientific_status_and_claims.md), and the rules for future evidence are documented in [prospective validation](prospective_validation.md).
 
@@ -124,13 +126,13 @@ Model differences are evaluated with a paired date-cluster bootstrap:
 2. every game belonging to each sampled date is included;
 3. both models are evaluated on the same sampled games;
 4. the paired Log loss difference is calculated;
-5. the procedure is repeated to form a percentile interval and an improvement probability.
+5. the procedure is repeated to form a percentile interval and the proportion of bootstrap replicates with lower Log loss (`Δ Log loss < 0`).
 
-All games from a sampled date are concatenated rather than first reducing each date to a single average. This preserves game-level weighting when dates contain different numbers of games.
+All games from a sampled date are concatenated rather than first reducing each date to a single average. This preserves game-level weighting when dates contain different numbers of games. The returned `improvement_probability` field is this bootstrap replicate proportion; it is not a Bayesian posterior probability that the new model is truly superior.
 
 The implementation is available in [`src/fifteenpick_prediction/bootstrap.py`](../src/fifteenpick_prediction/bootstrap.py).
 
-These intervals quantify uncertainty in the observed paired performance difference under the stated resampling design. They do not remove uncertainty caused by model selection, repeated inspection of an evaluation period, future season shifts, or changes in team composition.
+These intervals quantify uncertainty in the observed paired performance difference under the stated resampling design. The date-cluster design accounts for dependence among games played on the same date, but it does not model serial dependence across adjacent dates. The intervals also do not remove uncertainty caused by model selection, repeated inspection of an evaluation period, future season shifts, or changes in team composition.
 
 ## Evidence and verification scope
 
