@@ -49,8 +49,9 @@ def build_v12_audit(
 ) -> dict[str, Any]:
     """Recompute the public V12 dataset, prediction, and saved-model checks."""
 
-    frame = stable_temporal_sort(pd.read_csv(data_path))
+    frame = pd.read_csv(data_path)
     dataset_audit = validate_modeling_dataset(frame)
+    frame = stable_temporal_sort(frame)
     test = frame.loc[frame["season"].eq(2026)].copy()
 
     predictions = pd.read_csv(predictions_path)
@@ -208,6 +209,10 @@ def build_v11_audit(
     if not reported_delta_matches:
         raise ValueError("V11.1 comparison and bootstrap deltas do not match")
 
+    bootstrap_ci_low = float(bootstrap_clean_row["ci_low"])
+    bootstrap_ci_high = float(bootstrap_clean_row["ci_high"])
+    bootstrap_interval_includes_zero = bootstrap_ci_low <= 0.0 <= bootstrap_ci_high
+
     schema_matches = model_schema.get("feature_columns") == ALL_FEATURES
     no_2026_training = (
         model_schema.get("training_seasons") == [2024, 2025]
@@ -220,7 +225,9 @@ def build_v11_audit(
         and formula.get("lineup_block") == "MEAN"
         and formula.get("legacy_income_used") is False
     )
-    model_feature_count = int(getattr(model, "n_features_in_", len(ALL_FEATURES)))
+    if not hasattr(model, "n_features_in_"):
+        raise ValueError("saved V11.1 model does not expose n_features_in_")
+    model_feature_count = int(model.n_features_in_)
     model_feature_count_matches = model_feature_count == len(ALL_FEATURES)
     scientific_status = str(decision.get("status", ""))
     prospective_confirmation_required = "prospective" in scientific_status.lower()
@@ -237,8 +244,9 @@ def build_v11_audit(
         "selected_formula_metadata_matches": formula_matches,
         "saved_model_loadable": True,
         "saved_model_feature_count_14": model_feature_count_matches,
-        "new_batter_beats_clean_no_batter": new_loss < clean_loss,
-        "new_batter_beats_v9_style": new_loss < v9_loss,
+        "observed_log_loss_lower_than_clean_no_batter": new_loss < clean_loss,
+        "observed_log_loss_lower_than_v9_style": new_loss < v9_loss,
+        "bootstrap_interval_includes_zero": bootstrap_interval_includes_zero,
         "prospective_confirmation_required": prospective_confirmation_required,
     }
     if not all(checks.values()):
@@ -247,12 +255,13 @@ def build_v11_audit(
     return {
         "status": "PASS",
         "audit_scope": {
-            "repository_recomputed": (
-                "comparison metrics, bootstrap consistency, frozen metadata, and model loading"
+            "repository_verified_from_released_artifacts": (
+                "comparison and bootstrap summary consistency, frozen metadata, "
+                "and saved-model loading"
             ),
             "source_pipeline_recorded_only": (
                 "row-level selected-prior lineup checks; the selected-prior table is not "
-                "redistributed"
+                "redistributed and cannot be recomputed from the public repository"
             ),
         },
         "checks": checks,
@@ -276,8 +285,9 @@ def build_v11_audit(
                 "new_model": str(bootstrap_clean_row["new_model"]),
                 "reference_model": str(bootstrap_clean_row["reference_model"]),
                 "delta_log_loss": float(bootstrap_clean_row["delta_log_loss"]),
-                "ci_low": float(bootstrap_clean_row["ci_low"]),
-                "ci_high": float(bootstrap_clean_row["ci_high"]),
+                "ci_low": bootstrap_ci_low,
+                "ci_high": bootstrap_ci_high,
+                "interval_includes_zero": bootstrap_interval_includes_zero,
                 "improvement_probability": float(
                     bootstrap_clean_row["improvement_probability"]
                 ),
@@ -286,9 +296,11 @@ def build_v11_audit(
         },
         "scientific_status": scientific_status,
         "reproducibility_note": (
-            "The public repository can recompute the released comparison, bootstrap, schema, "
-            "and model-loading checks. Row-level lineup construction remains a recorded source-"
-            "pipeline result because that intermediate table is outside the public release."
+            "The public repository can verify the released comparison and bootstrap summary "
+            "artifacts, model schema, frozen metadata, and saved-model loading. The observed "
+            "log-loss improvement is not treated as conclusive because the bootstrap interval "
+            "includes zero. Row-level lineup construction remains a recorded source-pipeline "
+            "result because the required intermediate table is outside the public release."
         ),
         "evidence": {
             "comparison": comparison_path.as_posix(),

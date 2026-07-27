@@ -53,8 +53,9 @@ def main() -> None:
     output = args.output_dir
     output.mkdir(parents=True, exist_ok=True)
 
-    frame = stable_temporal_sort(pd.read_csv(args.data))
+    frame = pd.read_csv(args.data)
     audit = validate_modeling_dataset(frame)
+    frame = stable_temporal_sort(frame)
     test = frame.loc[frame["season"].eq(2026)].copy()
     rng = np.random.default_rng(SEED)
 

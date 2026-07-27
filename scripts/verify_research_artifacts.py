@@ -14,8 +14,8 @@ from pathlib import Path
 
 import pandas as pd
 
+from build_manifest import collect_files
 from fifteenpick_prediction.audit import build_v11_audit, build_v12_audit
-from fifteenpick_prediction.temporal import stable_temporal_sort
 from fifteenpick_prediction.validation import validate_modeling_dataset
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -72,6 +72,19 @@ def verify_manifest() -> dict[str, int]:
     )
     if forbidden.any():
         raise SystemExit(f"FAIL non-portable manifest entries: {paths[forbidden].tolist()}")
+
+    manifest_paths = set(paths)
+    expected_paths = {
+        path.relative_to(ROOT).as_posix()
+        for path in collect_files()
+    }
+    missing_from_manifest = sorted(expected_paths - manifest_paths)
+    unexpected_manifest_entries = sorted(manifest_paths - expected_paths)
+    if missing_from_manifest or unexpected_manifest_entries:
+        raise SystemExit(
+            "FAIL manifest coverage mismatch: "
+            f"missing={missing_from_manifest}, unexpected={unexpected_manifest_entries}"
+        )
 
     for row in manifest.itertuples(index=False):
         path = ROOT / row.relative_path
@@ -165,7 +178,7 @@ def _relative_evidence(payload: dict[str, object]) -> dict[str, object]:
 
 
 def verify_linked_audits() -> dict[str, int]:
-    frame = stable_temporal_sort(pd.read_csv(DATA))
+    frame = pd.read_csv(DATA)
     expected_dataset = validate_modeling_dataset(frame)
     expected_v12 = _relative_evidence(
         build_v12_audit(

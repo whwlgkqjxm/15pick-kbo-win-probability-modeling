@@ -10,7 +10,6 @@ from pathlib import Path
 import pandas as pd
 
 from fifteenpick_prediction.audit import build_v11_audit, build_v12_audit
-from fifteenpick_prediction.temporal import stable_temporal_sort
 from fifteenpick_prediction.validation import validate_modeling_dataset
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -40,7 +39,7 @@ def _write_json(path: Path, payload: dict[str, object]) -> None:
 
 
 def build_all() -> dict[Path, dict[str, object]]:
-    frame = stable_temporal_sort(pd.read_csv(DATA))
+    frame = pd.read_csv(DATA)
     dataset_validation = validate_modeling_dataset(frame)
 
     v12 = build_v12_audit(

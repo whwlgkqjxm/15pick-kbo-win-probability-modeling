@@ -1,8 +1,8 @@
 {
   "status": "PASS",
   "audit_scope": {
-    "repository_recomputed": "comparison metrics, bootstrap consistency, frozen metadata, and model loading",
-    "source_pipeline_recorded_only": "row-level selected-prior lineup checks; the selected-prior table is not redistributed"
+    "repository_verified_from_released_artifacts": "comparison and bootstrap summary consistency, frozen metadata, and saved-model loading",
+    "source_pipeline_recorded_only": "row-level selected-prior lineup checks; the selected-prior table is not redistributed and cannot be recomputed from the public repository"
   },
   "checks": {
     "required_files_present": true,
@@ -16,8 +16,9 @@
     "selected_formula_metadata_matches": true,
     "saved_model_loadable": true,
     "saved_model_feature_count_14": true,
-    "new_batter_beats_clean_no_batter": true,
-    "new_batter_beats_v9_style": true,
+    "observed_log_loss_lower_than_clean_no_batter": true,
+    "observed_log_loss_lower_than_v9_style": true,
+    "bootstrap_interval_includes_zero": true,
     "prospective_confirmation_required": true
   },
   "source_pipeline_lineup_record": {
@@ -42,12 +43,13 @@
       "delta_log_loss": -0.0039338610205703,
       "ci_low": -0.0105848989723289,
       "ci_high": 0.0029249068925948,
+      "interval_includes_zero": true,
       "improvement_probability": 0.8784,
       "reps": 10000
     }
   },
   "scientific_status": "post-holdout development candidate; requires prospective confirmation",
-  "reproducibility_note": "The public repository can recompute the released comparison, bootstrap, schema, and model-loading checks. Row-level lineup construction remains a recorded source-pipeline result because that intermediate table is outside the public release.",
+  "reproducibility_note": "The public repository can verify the released comparison and bootstrap summary artifacts, model schema, frozen metadata, and saved-model loading. The observed log-loss improvement is not treated as conclusive because the bootstrap interval includes zero. Row-level lineup construction remains a recorded source-pipeline result because the required intermediate table is outside the public release.",
   "evidence": {
     "comparison": "reports/frozen/V11_1_ROBUST_CANDIDATE_COMPARISON.csv",
     "bootstrap": "reports/frozen/V11_1_ROBUST_CANDIDATE_BOOTSTRAP.csv",
