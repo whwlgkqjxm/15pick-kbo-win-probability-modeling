@@ -23,6 +23,63 @@ V11_EXPECTED_MODELS = {
 }
 
 
+_TOLERANT_AUDIT_FLOAT_PATHS = {
+    ("key_results", "cv_model_max_abs_prediction_error"),
+    ("key_results", "development_model_max_abs_prediction_error"),
+}
+
+
+def audit_payloads_equal(
+    left: Any,
+    right: Any,
+    *,
+    abs_tol: float = 1e-14,
+    _path: tuple[str | int, ...] = (),
+) -> bool:
+    """Compare audit payloads exactly except machine-precision replay diagnostics."""
+
+    if isinstance(left, dict) and isinstance(right, dict):
+        if left.keys() != right.keys():
+            return False
+        return all(
+            audit_payloads_equal(
+                left[key],
+                right[key],
+                abs_tol=abs_tol,
+                _path=(*_path, key),
+            )
+            for key in left
+        )
+
+    if isinstance(left, list) and isinstance(right, list):
+        if len(left) != len(right):
+            return False
+        return all(
+            audit_payloads_equal(
+                left_item,
+                right_item,
+                abs_tol=abs_tol,
+                _path=(*_path, index),
+            )
+            for index, (left_item, right_item) in enumerate(
+                zip(left, right, strict=True)
+            )
+        )
+
+    if _path in _TOLERANT_AUDIT_FLOAT_PATHS:
+        if isinstance(left, bool) or isinstance(right, bool):
+            return left is right
+        if isinstance(left, (int, float)) and isinstance(right, (int, float)):
+            return math.isclose(
+                float(left),
+                float(right),
+                rel_tol=0.0,
+                abs_tol=abs_tol,
+            )
+
+    return left == right
+
+
 def _read_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 

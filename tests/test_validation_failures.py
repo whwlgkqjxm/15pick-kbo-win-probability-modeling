@@ -4,14 +4,13 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from fifteenpick_prediction.temporal import stable_temporal_sort
 from fifteenpick_prediction.validation import validate_modeling_dataset
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 def load_frame():
-    return stable_temporal_sort(pd.read_csv(ROOT / "data/derived/V12_MODELING_DATASET.csv"))
+    return pd.read_csv(ROOT / "data/derived/V12_MODELING_DATASET.csv")
 
 
 def test_duplicate_game_id_fails():
@@ -52,4 +51,10 @@ def test_lineup_count_other_than_nine_fails():
     frame = load_frame()
     frame.loc[0, "home_lineup_count"] = 8
     with pytest.raises(ValueError, match="uniformly 9"):
+        validate_modeling_dataset(frame)
+
+def test_unsorted_dataset_fails():
+    frame = load_frame().iloc[::-1].reset_index(drop=True)
+
+    with pytest.raises(ValueError, match="deterministically sorted"):
         validate_modeling_dataset(frame)

@@ -13,9 +13,13 @@ import tempfile
 from pathlib import Path
 
 import pandas as pd
-
 from build_manifest import collect_files
-from fifteenpick_prediction.audit import build_v11_audit, build_v12_audit
+
+from fifteenpick_prediction.audit import (
+    audit_payloads_equal,
+    build_v11_audit,
+    build_v12_audit,
+)
 from fifteenpick_prediction.validation import validate_modeling_dataset
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -209,7 +213,7 @@ def verify_linked_audits() -> dict[str, int]:
     stale = []
     for path, expected in audits.items():
         committed = json.loads(path.read_text(encoding="utf-8"))
-        if committed != expected:
+        if not audit_payloads_equal(committed, expected):
             stale.append(path.relative_to(ROOT).as_posix())
     if stale:
         raise SystemExit(

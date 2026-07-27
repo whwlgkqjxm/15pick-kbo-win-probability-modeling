@@ -9,7 +9,11 @@ from pathlib import Path
 
 import pandas as pd
 
-from fifteenpick_prediction.audit import build_v11_audit, build_v12_audit
+from fifteenpick_prediction.audit import (
+    audit_payloads_equal,
+    build_v11_audit,
+    build_v12_audit,
+)
 from fifteenpick_prediction.validation import validate_modeling_dataset
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -80,7 +84,7 @@ def main() -> None:
         stale = []
         for path, payload in outputs.items():
             committed = json.loads(path.read_text(encoding="utf-8"))
-            if committed != payload:
+            if not audit_payloads_equal(committed, payload):
                 stale.append(path.relative_to(ROOT).as_posix())
         if stale:
             raise SystemExit(f"FAIL stale linked audits: {stale}")

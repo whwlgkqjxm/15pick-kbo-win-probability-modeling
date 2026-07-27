@@ -3,7 +3,11 @@ from pathlib import Path
 
 import pandas as pd
 
-from fifteenpick_prediction.audit import build_v11_audit, build_v12_audit
+from fifteenpick_prediction.audit import (
+    audit_payloads_equal,
+    build_v11_audit,
+    build_v12_audit,
+)
 from fifteenpick_prediction.temporal import stable_temporal_sort
 from fifteenpick_prediction.validation import validate_modeling_dataset
 
@@ -27,7 +31,7 @@ def test_dataset_validation_link_matches_recomputed_data():
     committed = json.loads(
         (ROOT / "reports/reproduced/dataset_validation.json").read_text(encoding="utf-8")
     )
-    assert actual == committed
+    assert audit_payloads_equal(actual, committed)
 
 
 def test_v12_link_matches_recomputed_artifacts():
@@ -45,7 +49,7 @@ def test_v12_link_matches_recomputed_artifacts():
             encoding="utf-8"
         )
     )
-    assert actual == committed
+    assert audit_payloads_equal(actual, committed)
 
 
 def test_v11_link_matches_publicly_verifiable_artifacts():
@@ -61,5 +65,52 @@ def test_v11_link_matches_publicly_verifiable_artifacts():
     committed = json.loads(
         (FROZEN / "V11_1_REPRODUCIBILITY_AUDIT.json").read_text(encoding="utf-8")
     )
-    assert actual == committed
+    assert audit_payloads_equal(actual, committed)
     assert actual["source_pipeline_lineup_record"]["public_repository_recomputation"] is False
+
+
+def test_audit_payload_comparison_tolerates_machine_precision_replay_drift():
+    committed = {
+        "key_results": {
+            "cv_model_max_abs_prediction_error": 1.1102230246251565e-16,
+            "required_max_abs_prediction_error_below": 1e-12,
+        }
+    }
+    recomputed = {
+        "key_results": {
+            "cv_model_max_abs_prediction_error": 1.6653345369377348e-16,
+            "required_max_abs_prediction_error_below": 1e-12,
+        }
+    }
+
+    assert audit_payloads_equal(committed, recomputed)
+
+
+def test_audit_payload_comparison_rejects_material_replay_drift():
+    committed = {
+        "key_results": {
+            "cv_model_max_abs_prediction_error": 0.0,
+        }
+    }
+    recomputed = {
+        "key_results": {
+            "cv_model_max_abs_prediction_error": 2e-14,
+        }
+    }
+
+    assert not audit_payloads_equal(committed, recomputed)
+
+
+def test_audit_payload_comparison_keeps_threshold_exact():
+    committed = {
+        "key_results": {
+            "required_max_abs_prediction_error_below": 1e-12,
+        }
+    }
+    recomputed = {
+        "key_results": {
+            "required_max_abs_prediction_error_below": 1.000000000001e-12,
+        }
+    }
+
+    assert not audit_payloads_equal(committed, recomputed)
