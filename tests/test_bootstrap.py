@@ -184,3 +184,34 @@ def test_point_estimate_preserves_game_level_weighting_across_dates():
 
     assert result["delta_log_loss"] == pytest.approx(row_deltas.mean())
     assert result["delta_log_loss"] != pytest.approx(equal_date_weighted)
+
+
+def test_bootstrap_rejects_non_dataframe_input() -> None:
+    with pytest.raises(TypeError, match="pandas DataFrame"):
+        paired_date_bootstrap(  # type: ignore[arg-type]
+            [],
+            new_probability_col="new",
+            reference_probability_col="ref",
+        )
+
+
+def test_bootstrap_rejects_duplicate_column_names() -> None:
+    frame = sample_frame()
+    frame.columns = ["game_date", "home_win", "new", "new"]
+
+    with pytest.raises(ValueError, match="column names must be unique"):
+        paired_date_bootstrap(
+            frame,
+            new_probability_col="new",
+            reference_probability_col="ref",
+        )
+
+
+def test_bootstrap_rejects_invalid_rng_type() -> None:
+    with pytest.raises(TypeError, match="numpy.random.Generator"):
+        paired_date_bootstrap(
+            sample_frame(),
+            new_probability_col="new",
+            reference_probability_col="ref",
+            rng=np.random.RandomState(7),  # type: ignore[arg-type]
+        )

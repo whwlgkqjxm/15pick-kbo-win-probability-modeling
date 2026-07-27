@@ -88,7 +88,7 @@ In every fold:
 | 4 | 2024-03-23 to 2025-06-19 | 2025-06-20 to 2025-08-14 | 1,059 | 180 |
 | 5 | 2024-03-23 to 2025-08-14 | 2025-08-15 to 2025-10-02 | 1,239 | 167 |
 
-Across the five folds, **984 games** receive out-of-fold validation predictions. The earliest **422 games** form the initial training block, and the two decision games on 2025-10-04 fall outside the published validation blocks. After model selection, the CV-selected reference model is refitted on all **1,408 decision games** from 2024–2025.
+Across the five folds, **984 games** receive out-of-fold validation predictions. The earliest **422 games** form the initial training block, and the two decision games on 2025-10-04 fall outside the published validation blocks. Those two games remain outside out-of-fold validation because the frozen historical fold generator used an exclusive final boundary; the public release preserves that historical protocol rather than retroactively changing the model-selection evidence. After model selection, the CV-selected reference model is refitted on all **1,408 decision games** from 2024–2025.
 
 The machine-readable fold definition is published in [`data/derived/V12_TEMPORAL_FOLD_DEFINITION.csv`](../data/derived/V12_TEMPORAL_FOLD_DEFINITION.csv).
 
@@ -157,9 +157,14 @@ This contract does not establish that:
 The timing rules and published checks can be inspected in the following repository files:
 
 - [temporal fold definition](../data/derived/V12_TEMPORAL_FOLD_DEFINITION.csv);
+- [temporal-fold regression tests](../tests/test_temporal_fold_definition.py);
 - [temporal ordering and strict-prior helpers](../src/fifteenpick_prediction/temporal.py);
 - [fail-closed dataset validation](../src/fifteenpick_prediction/validation.py);
 - [paired date-cluster bootstrap](../src/fifteenpick_prediction/bootstrap.py);
+- [computed audit implementation](../src/fifteenpick_prediction/audit.py);
+- [core-result reproduction script](../scripts/reproduce_core_results.py);
+- [research-artifact verification script](../scripts/verify_research_artifacts.py);
+- [authoritative date-batched adaptive prediction loop](../research/authoritative/v12/run_v12_training_strategy_lab.py);
 - [portable dataset-validation result](../reports/reproduced/dataset_validation.json);
 - [final modeling and leakage audit](../reports/frozen/V12_REPRODUCIBILITY_AND_LEAKAGE_AUDIT.json);
 - [strict-prior and recent-window tests](../tests/test_temporal.py);
