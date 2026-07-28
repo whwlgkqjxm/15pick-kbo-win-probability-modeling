@@ -166,7 +166,7 @@ The timing rules and published checks can be inspected in the following reposito
 - [portable dataset-validation result](../reports/reproduced/dataset_validation.json);
 - [final modeling and leakage audit](../reports/frozen/V12_REPRODUCIBILITY_AND_LEAKAGE_AUDIT.json);
 - [strict-prior and recent-window tests](../tests/test_temporal.py);
-- [deterministic temporal-order tests](../tests/test_temporal_v16.py);
+- [deterministic temporal-order tests](../tests/test_temporal_determinism.py);
 - [dataset-contract tests](../tests/test_dataset_validation.py);
 - [fail-closed validation tests](../tests/test_validation_failures.py);
 - [bootstrap tests](../tests/test_bootstrap.py).

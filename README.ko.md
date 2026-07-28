@@ -143,7 +143,8 @@ V12 주요 모델은 **팀 단위 불펜 전력과 선발 이후 실점 방지 �
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
-pip install -e ".[dev]"
+pip install -r requirements-reproduce-lock.txt
+pip install -e . --no-deps
 make reproduce
 make verify
 ```
@@ -165,6 +166,10 @@ make verify
 7. [`docs/reproducibility.md`](docs/reproducibility.md)
 8. [`docs/scientific_status_and_claims.md`](docs/scientific_status_and_claims.md)
 9. [`docs/prospective_validation.md`](docs/prospective_validation.md)
+
+## 데이터 및 공개 범위
+
+이 private review build에는 핵심 결과 재현에 필요한 연구 코드와 파생 모델링 산출물이 포함돼 있다. 공식 KBO raw response와 15Pick 운영 서비스 데이터는 재배포하지 않는다. 파생 테이블과 경기 단위 결과를 unrestricted public repository에 포함하려면 [`docs/data_release_policy.md`](docs/data_release_policy.md)의 공개 gate를 먼저 완료해야 한다. 그 전에는 저장소를 private로 유지하거나 해당 문서의 data-minimized 공개안을 사용한다.
 
 ## 작성자
 

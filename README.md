@@ -154,7 +154,8 @@ See [model selection, role comparison, and calibration](docs/model_selection_abl
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
-pip install -e ".[dev]"
+pip install -r requirements-reproduce-lock.txt
+pip install -e . --no-deps
 make reproduce
 make verify
 ```
@@ -173,6 +174,7 @@ These commands reproduce the portable analysis from the included 1,824-game deri
 ├── models/frozen/             # saved CV and development model binaries
 ├── reports/frozen/            # authoritative V11.1/V12 result tables
 ├── reports/reproduced/        # outputs regenerated from the portable pipeline
+├── requirements-reproduce-lock.txt # exact versions for core reproduction
 ├── research/authoritative/    # preserved V11.1/V12 historical execution code
 ├── research_records/          # historical decisions, audits, reports, and result tables
 ├── scripts/                   # reproduction, verification, figures, manifests
@@ -194,7 +196,7 @@ These commands reproduce the portable analysis from the included 1,824-game deri
 
 ## Data and licensing
 
-This repository includes the research code and derived modeling artifacts required to reproduce the published results. Official raw KBO responses and 15Pick operational-service data are not redistributed. The repository’s data-release boundaries are documented in [`docs/data_release_policy.md`](docs/data_release_policy.md).
+This private review build includes the research code and derived modeling artifacts required to reproduce the published results. Official raw KBO responses and 15Pick operational-service data are not redistributed. Unrestricted public release of the derived table and row-level outputs remains subject to the explicit release gate in [`docs/data_release_policy.md`](docs/data_release_policy.md); until that gate is completed, keep the repository private or publish the data-minimized variant described there.
 
 ## Author
 

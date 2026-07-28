@@ -1,5 +1,13 @@
 # Changelog
 
+## Reproducibility documentation and release controls
+
+- added an exact version lock for the maintained core reproduction path;
+- clarified the public verifier's temporal and V11.1 audit scope;
+- expanded the SHA256 manifest to cover tests, CI, and execution-contract files;
+- replaced ambiguous `v16` test filenames with descriptive contract names;
+- converted the data-release page into an explicit private-review/public-release gate.
+
 ## 2.0.0 — 2026-07-21
 
 - Added the verified V11.1 and V12 research source and frozen artifacts.

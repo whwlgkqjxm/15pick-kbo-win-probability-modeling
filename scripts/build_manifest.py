@@ -21,6 +21,14 @@ INCLUDED_ROOTS = [
     ROOT / "reports" / "frozen",
     ROOT / "research" / "authoritative",
     ROOT / "research_records",
+    ROOT / "tests",
+    ROOT / ".github" / "workflows",
+]
+INCLUDED_FILES = [
+    ROOT / "pyproject.toml",
+    ROOT / "requirements-reproduce-lock.txt",
+    ROOT / "requirements-research-lock.txt",
+    ROOT / "Makefile",
 ]
 EXCLUDED_DIRECTORY_NAMES = {
     ".git",
@@ -51,15 +59,17 @@ def is_portable_artifact(path: Path) -> bool:
 
 
 def collect_files() -> list[Path]:
-    return sorted(
-        {
-            path
-            for base in INCLUDED_ROOTS
-            if base.exists()
-            for path in base.rglob("*")
-            if path.is_file() and is_portable_artifact(path)
-        }
+    files = {
+        path
+        for base in INCLUDED_ROOTS
+        if base.exists()
+        for path in base.rglob("*")
+        if path.is_file() and is_portable_artifact(path)
+    }
+    files.update(
+        path for path in INCLUDED_FILES if path.is_file() and is_portable_artifact(path)
     )
+    return sorted(files)
 
 
 def main() -> None:
