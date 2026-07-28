@@ -146,7 +146,7 @@ The first candidate was selected without using 2026 outcomes for model selection
 
 The remaining validation asks whether the player-index improvement persists on future games predicted before first pitch, which candidate performs better prospectively, and whether calibration remains stable over time. Until that stage is complete, neither candidate is described as a future-validated production model.
 
-See [model selection, ablation, and calibration](docs/model_selection_ablation_and_calibration.md) for the completed model comparison. The unresolved questions, immutable pregame ledger, and future results are documented in [prospective validation](docs/prospective_validation.md).
+See [model selection, role comparison, and calibration](docs/model_selection_ablation_and_calibration.md) for the completed model comparison. The unresolved questions, immutable pregame ledger, and future results are documented in [prospective validation](docs/prospective_validation.md).
 
 ## Reproduce and verify the core results
 

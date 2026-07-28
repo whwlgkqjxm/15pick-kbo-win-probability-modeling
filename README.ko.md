@@ -135,7 +135,7 @@ V12 주요 모델은 **팀 단위 불펜 전력과 선발 이후 실점 방지 �
 
 앞으로 확인해야 할 핵심은 역할별 선수 지표의 성능 개선이 경기 시작 전에 예측한 미래 경기에서도 유지되는지, 두 후보 중 어느 모델이 prospective evaluation에서 더 좋은지, 그리고 calibration이 시간에 따라 안정적으로 유지되는지다. 이 검증이 끝나기 전에는 어느 후보도 미래 성능이 검증된 production model로 표현하지 않는다.
 
-완료된 모델 비교와 선정 과정은 [model selection, ablation, and calibration](docs/model_selection_ablation_and_calibration.md)에 정리돼 있다. 아직 검증되지 않은 질문, immutable pregame ledger, 향후 결과는 [prospective validation](docs/prospective_validation.md)에 기록한다.
+완료된 모델 비교와 선정 과정은 [model selection, role comparison, and calibration](docs/model_selection_ablation_and_calibration.md)에 정리돼 있다. 아직 검증되지 않은 질문, immutable pregame ledger, 향후 결과는 [prospective validation](docs/prospective_validation.md)에 기록한다.
 
 ## 핵심 결과 재현 및 검증
 

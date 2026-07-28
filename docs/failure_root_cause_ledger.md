@@ -322,7 +322,7 @@ In the 2026 development comparison:
 
 **Change and verification:** Two static L2 candidates were frozen: a 2024–2025 CV-selected reference (`C=0.03`, all history) and the best-observed 2026 development model (`C=0.1`, recent 720). Their 2026 Log-loss difference was only `−0.001255`, with interval `[−0.004790, 0.002336]`, so the recent-720 model was not declared definitively superior.
 
-**Supporting material:** [model-selection summary](model_selection_ablation_and_calibration.md) · [reproduction code](../scripts/reproduce_core_results.py)
+**Supporting material:** [model selection, role comparison, and calibration](model_selection_ablation_and_calibration.md) · [reproduction code](../scripts/reproduce_core_results.py)
 
 ---
 

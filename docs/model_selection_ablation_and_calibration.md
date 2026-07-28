@@ -1,19 +1,23 @@
 # Model selection, role comparison, and calibration
 
-This chapter explains how the final model candidates were chosen and what each player-role feature block contributed to the predictions. The batter and starting-pitcher representations were fixed before the comparisons reported here. The remaining analysis addressed three questions:
+This chapter explains how the two retained model candidates were selected and how much additional predictive information came from the batter and starting-pitcher feature blocks. The player-index definitions were fixed before the comparisons reported here.
+
+The prediction target is the probability of a home-team win before first pitch. Tied games are excluded from binary modeling, leaving 416 non-tie games from March 28 through July 9, 2026, in the development evaluation.
+
+The analysis addressed three questions:
 
 1. Which model family produced the best probability estimates under chronological validation?
 2. Did changing the training window, retraining schedule, ensemble method, or calibration method improve performance?
 3. How much additional predictive information came from the batter and starting-pitcher feature blocks?
 
-The model-family comparison used 2024–2025 expanding temporal cross-validation. The later training-strategy and role comparisons used 416 decision games from 2026. Every 2026 prediction followed the strict-prior and same-date exclusion rules, but 2026 outcomes were inspected during method comparison. The 2026 results are therefore development evidence rather than an untouched final test.
+The model-family comparison used 2024–2025 expanding temporal cross-validation. The later training-strategy and role comparisons used the 416 development games from 2026. Every 2026 prediction used only records from earlier dates, and all same-day results were excluded. However, 2026 outcomes were inspected during method comparison. These results are therefore development evidence rather than an untouched final test.
 
 ## Evaluation map
 
 | Analysis | Data used | Purpose |
 |---|---|---|
 | Model-family selection | Five expanding temporal folds across 2024–2025; 984 out-of-fold predictions | Select the model family and regularization strength |
-| Training-strategy comparison | 416 decision games from 2026 | Compare static windows, weighting, daily retraining, online updating, ensembles, and calibration |
+| Training-strategy comparison | 416 non-tie games from 2026 | Compare static windows, weighting, daily retraining, online updating, ensembles, and calibration |
 | Role comparison | The same 416 games under two frozen logistic-regression specifications | Measure the additional information from batter and starting-pitcher features |
 | Calibration and feature diagnostics | The same 2026 predictions | Describe probability calibration and model reliance; not used as causal evidence |
 
@@ -21,7 +25,15 @@ The model-family comparison used 2024–2025 expanding temporal cross-validation
 
 Forty-two configurations across nine model families were evaluated with five expanding temporal folds. In each fold, the training period occurred entirely before the validation period, and preprocessing was refitted using only the corresponding training rows.
 
-The best configuration was L2-regularized logistic regression with `C=0.03`. Elastic net was close, while the tree and boosting families produced higher Log loss. For this dataset and feature set, added nonlinear complexity did not improve temporal probability quality.
+Configurations were ranked using pooled Log loss plus a small stability penalty:
+
+```text
+selection score = pooled Log loss + 0.05 × fold-level Log-loss standard deviation
+```
+
+The selected configuration was L2-regularized logistic regression with `C=0.03`. In logistic regression, `C` is the inverse regularization strength, so smaller values apply stronger shrinkage. The selected model ranked first by the stability-adjusted score and also had the lowest pooled Log loss.
+
+Elastic net was close, while the tree and boosting families produced higher Log loss. For this dataset and feature set, added nonlinear complexity did not improve temporal probability quality.
 
 | Model family | Best Log loss ↓ | Brier ↓ | ROC AUC ↑ |
 |---|---:|---:|---:|
@@ -41,19 +53,19 @@ The complete 42-configuration table is available in the [temporal cross-validati
 
 ## Training-strategy comparison
 
-After selecting the regularized logistic model as the main family, 130 model-and-training combinations were compared on the 2026 development period. The comparison included full-history and recent-window training, season weighting, time decay, daily expanding and rolling refits, online updates, model averaging, stacking, and separate calibration.
+After selecting regularized logistic regression as the main model family, 130 model-and-training combinations were compared on the 2026 development period. The comparison included full-history and recent-window training, season weighting, time decay, daily expanding and rolling refits, online updates, model averaging, stacking, and separate calibration.
 
-The lowest observed Log loss came from a static L2 logistic model with `C=0.1`, trained on the 720 most recent decision games before the 2026 season. Frequent retraining, model averaging, and post-hoc calibration did not improve on that result. Isotonic calibration was especially unstable in this sample.
+The lowest observed Log loss came from a static L2 logistic model with `C=0.1`, trained on the 720 most recent non-tie games before the 2026 season. Frequent retraining, model averaging, and post-hoc calibration did not improve on that result. Isotonic calibration was especially unstable in this sample.
 
-| Representative method | Training rows or fits | Log loss ↓ | Brier ↓ | ROC AUC ↑ |
-|---|---:|---:|---:|---:|
+| Representative method | Training scope | Log loss ↓ | Brier ↓ | ROC AUC ↑ |
+|---|---|---:|---:|---:|
 | Static model, most recent 720 games (`C=0.1`) | 720 games | **0.666135** | **0.236498** | 0.635275 |
 | Static model, all 2024–2025 games (`C=0.01`) | 1,408 games | 0.666894 | 0.236835 | **0.637545** |
 | Cross-validation-selected static reference (`C=0.03`) | 1,408 games | 0.667390 | 0.237034 | 0.631568 |
-| Mean of six cross-validation-selected models | 6 models | 0.667718 | 0.237184 | 0.631429 |
-| Platt-calibrated reference model | 1 calibrated model | 0.668225 | 0.237539 | 0.631568 |
-| Daily expanding retraining (`C=0.03`) | 88 refits | 0.668838 | 0.237708 | 0.629807 |
-| Isotonic-calibrated reference model | 1 calibrated model | 0.725047 | 0.238443 | 0.626958 |
+| Mean of six cross-validation-selected models | Six component models | 0.667718 | 0.237184 | 0.631429 |
+| Platt-calibrated reference model | One calibrated model | 0.668225 | 0.237539 | 0.631568 |
+| Daily expanding retraining (`C=0.03`) | 88 date-level refits | 0.668838 | 0.237708 | 0.629807 |
+| Isotonic-calibrated reference model | One calibrated model | 0.725047 | 0.238443 | 0.626958 |
 
 ![Representative training strategies](../reports/figures/training_strategy_comparison.png)
 
@@ -63,18 +75,28 @@ The complete comparison is available in the [learning-method result table](../re
 
 The lowest observed 2026 result and the model selected without consulting 2026 outcomes are not the same specification. Both were therefore frozen rather than replacing one with the other.
 
-| Candidate | Selection basis | Training data | 2026 Log loss | Scientific role |
+| Candidate | Selection basis | Training data | 2026 Log loss | Status |
 |---|---|---|---:|---|
-| Cross-validation-selected reference | Chosen from the 2024–2025 expanding folds | All 1,408 decision games from 2024–2025; L2 `C=0.03` | 0.667390 | Cleaner reference for future comparison |
+| Cross-validation-selected reference | Chosen from the 2024–2025 expanding folds | All 1,408 non-tie games from 2024–2025; L2 `C=0.03` | 0.667390 | Selected without using 2026 outcomes |
 | Best observed development model | Chosen after comparing training strategies on 2026 results | Most recent 720 pre-2026 games, 2024-09-24 through 2025-10-04; L2 `C=0.1` | **0.666135** | Lowest observed development result |
 
-The recent-720 model improved Log loss by `0.001255` relative to the cross-validation-selected reference. The paired date-cluster bootstrap interval was `[-0.004790, 0.002336]`, with lower Log loss in `74.61%` of bootstrap replicates. Because the interval includes zero, the observed difference does not establish clear superiority between the two candidates.
+The recent-720 model improved Log loss by `0.001255` relative to the cross-validation-selected reference. A paired date-cluster bootstrap, which resamples whole game dates rather than individual games, produced an interval of `[-0.004790, 0.002336]`, with lower Log loss in `74.61%` of bootstrap replicates. Because the interval includes zero, the observed difference does not establish clear superiority between the two candidates.
 
 ## Role-specific comparison
 
-The same model was retrained after adding predefined feature blocks to a six-variable conventional pregame model. The conventional block contains team-strength measures, team-level bullpen strength, and recent post-starter run prevention. The batter block contains four official-starting-lineup aggregates, and the starting-pitcher block contains four strict-prior starter features.
+Under each frozen specification, the logistic-regression pipeline was refitted separately for four predefined feature sets. The blocks were fixed before this comparison.
 
-| Feature set | Number of features | Cross-validation-selected reference Log loss | Best observed development Log loss |
+| Feature block | Included information |
+|---|---|
+| Conventional pregame variables | Elo, prior win percentage, prior run differential, standings advantage, team-level bullpen strength, and recent post-starter run prevention |
+| Batter block | Starting-lineup performance mean, lineup-history coverage, average prior-game count, and minimum team coverage |
+| Starting-pitcher block | Prior start-only performance, prior-start count, reliability, and a both-starters-covered indicator |
+
+The exact player-index formulas and prior calculations are documented in [role-specific player-index design](player_index_design.md).
+
+All values below are 2026 Log loss.
+
+| Feature set | Features | CV-selected reference | Best observed development |
 |---|---:|---:|---:|
 | Conventional pregame variables | 6 | 0.683516 | 0.683942 |
 | Conventional + batter features | 10 | 0.679916 | 0.678611 |
@@ -89,10 +111,12 @@ The ordering was consistent under both frozen specifications:
 
 This pattern supports complementary information from the two roles rather than an improvement driven by only one feature block.
 
-| Combined model versus conventional model | Log-loss difference | 95% paired date-cluster interval | Bootstrap replicates with lower Log loss |
+| Combined model versus conventional model | Log-loss difference | 95% paired date-cluster interval | Bootstrap replicates favoring the combined model |
 |---|---:|---:|---:|
 | Cross-validation-selected reference | −0.016127 | [−0.032066, 0.000425] | 97.17% |
 | Best observed development model | **−0.017807** | **[−0.033154, −0.002114]** | **98.69%** |
+
+These percentages are the shares of 20,000 date-cluster bootstrap replicates in which the combined model had lower Log loss. They are not posterior probabilities that the model is truly superior.
 
 The interval for the cross-validation-selected reference narrowly includes zero. The interval for the best observed development specification does not, but that specification was selected after reviewing 2026 outcomes. The stronger development result should therefore not be presented as independent final confirmation.
 
@@ -102,7 +126,7 @@ Machine-readable metrics and bootstrap results are available in the [role-compar
 
 ## Relief-pitcher result
 
-A player-level relief-pitcher feature block was evaluated separately in an earlier experiment. Adding it increased Log loss from `0.669483` to `0.674253` in the 2025 temporal out-of-fold evaluation and from `0.667785` to `0.668898` in the 2026 post-hoc evaluation. It was therefore not retained.
+A player-level relief-pitcher feature block was evaluated separately in an earlier experiment. In the standalone 2025 relief-domain comparison, the result was effectively null: Log loss changed from `0.687435` to `0.687444`. When the same feature block was added to the stronger integrated model, Log loss increased from `0.669483` to `0.674253` in the 2025 temporal out-of-fold evaluation and from `0.667785` to `0.668898` in the 2026 post-hoc evaluation. It was therefore not retained.
 
 The relief-pitcher experiment used a different historical protocol from the role comparison above, so its values are reported separately rather than placed in the same ranking table. The retained conventional block still includes team-level pregame bullpen strength and post-starter run-prevention measures.
 
@@ -121,7 +145,7 @@ Calibration intercept and slope summarize whether the probabilities were systema
 | Cross-validation-selected reference | 0.0379 | 0.9782 |
 | Best observed development model | 0.0435 | 1.0109 |
 
-Both candidates were close to the ideal overall slope in the 2026 development period. The reliability plot should still be interpreted cautiously: each decile contains only 41 or 42 games, so observed win rates can vary substantially within individual bins. These results do not establish that calibration will remain stable in future seasons.
+The point estimates for both calibration intercept and slope were close to their ideal values in the 2026 development period. These are descriptive estimates, not independent confirmation of future calibration. Each decile contains only 41 or 42 games, so observed win rates can vary substantially within individual bins.
 
 ![Reliability diagram for the two frozen candidates](../reports/figures/calibration_reliability.png)
 
@@ -129,7 +153,7 @@ The underlying bins and summary estimates are available in the [calibration-deci
 
 ## Feature diagnostics
 
-Permutation importance was calculated for the cross-validation-selected reference model on the 2026 development games. It measures the increase in Log loss after one feature is shuffled while the fitted model is held fixed.
+Permutation importance was calculated for the cross-validation-selected reference model on the 416 development games from 2026. It measures the increase in Log loss after one feature is shuffled while the fitted model is held fixed.
 
 | Feature | Mean importance | Standard deviation |
 |---|---:|---:|
@@ -138,6 +162,8 @@ Permutation importance was calculated for the cross-validation-selected referenc
 | Starting-lineup batter performance difference | 0.005651 | 0.004420 |
 | Recent post-starter run-prevention difference | 0.005611 | 0.003659 |
 | Pregame standings advantage | 0.003110 | 0.001562 |
+
+Importance values are averages over 30 permutations. The reported standard deviations describe variation across those shuffles and are not confidence intervals.
 
 The starting-pitcher performance feature was the strongest individual diagnostic. Batter performance and lineup history depth also contributed. These values are descriptive rather than causal, and correlated features can divide or mask importance. The role-block comparisons above provide more direct evidence about the incremental value of a role than any one-feature ranking.
 

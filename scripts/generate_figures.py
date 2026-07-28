@@ -126,8 +126,8 @@ def ablation_plot() -> None:
         0.0,
         1.035,
         (
-            f"Reference model Log loss: {baseline_log_loss:.6f}  |  "
-            "2026 development evaluation: 416 games"
+            f"Conventional pregame model Log loss: {baseline_log_loss:.6f}  |  "
+            "Best observed development specification: 416 games in 2026"
         ),
         transform=ax.transAxes,
         fontsize=9.5,
@@ -458,7 +458,7 @@ def importance_plot() -> None:
     ax.text(
         0.0,
         1.025,
-        "Evaluated on 416 development games from 2026; error bars show one standard deviation",
+        "Evaluated on 416 development games from 2026; error bars show SD across 30 permutations",
         transform=ax.transAxes,
         fontsize=9.5,
         color="#444444",

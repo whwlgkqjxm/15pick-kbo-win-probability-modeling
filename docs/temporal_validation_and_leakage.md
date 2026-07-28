@@ -112,7 +112,7 @@ The correct interpretation is therefore:
 
 The `L2_C0.03_ALL_EQUAL` reference model was chosen using the 2024–2025 temporal folds without using 2026 outcomes for model selection. Its later 2026 evaluation is scientifically cleaner than a specification selected through 2026 comparison, but 2026 is still an already observed period for the project as a whole.
 
-Detailed model comparisons are documented in [model selection, ablation, and calibration](model_selection_ablation_and_calibration.md). Claim boundaries are summarized in [scientific status and allowed claims](scientific_status_and_claims.md), and the rules for future evidence are documented in [prospective validation](prospective_validation.md).
+Detailed model comparisons are documented in [model selection, role comparison, and calibration](model_selection_ablation_and_calibration.md). Claim boundaries are summarized in [scientific status and allowed claims](scientific_status_and_claims.md), and the rules for future evidence are documented in [prospective validation](prospective_validation.md).
 
 ## Paired date-cluster uncertainty
 
