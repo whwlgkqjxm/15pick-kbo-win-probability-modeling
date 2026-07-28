@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 
 import numpy as np
@@ -19,8 +20,32 @@ class BatterIndexConfig:
     lower_clip: float = -500.0
     upper_clip: float = 3000.0
 
+    def __post_init__(self) -> None:
+        """Reject invalid scaling metadata before an index is calculated."""
+
+        values = {
+            "plate_appearance_normalizer": self.plate_appearance_normalizer,
+            "reference_mean": self.reference_mean,
+            "reference_sd": self.reference_sd,
+            "center": self.center,
+            "scale": self.scale,
+            "lower_clip": self.lower_clip,
+            "upper_clip": self.upper_clip,
+        }
+        if not all(math.isfinite(float(value)) for value in values.values()):
+            raise ValueError("batter index configuration values must be finite")
+        if self.plate_appearance_normalizer <= 0:
+            raise ValueError("plate_appearance_normalizer must be positive")
+        if self.reference_sd <= 0:
+            raise ValueError("reference_sd must be positive")
+        if self.scale <= 0:
+            raise ValueError("scale must be positive")
+        if self.lower_clip >= self.upper_clip:
+            raise ValueError("lower_clip must be smaller than upper_clip")
+
 
 DEFAULT_BATTER_INDEX_CONFIG = BatterIndexConfig()
+
 
 def batter_game_performance_index(
     *,
@@ -39,7 +64,9 @@ def batter_game_performance_index(
     """Calculate the selected standardized batter game-performance index.
 
     Official event counts are converted to a 4.2-plate-appearance rate and
-    standardized against the frozen early-2024 reference distribution.
+    standardized against the frozen early-2024 reference distribution. The
+    caller supplies singles after deriving them from official hits as
+    ``max(0, H - 2B - 3B - HR)``.
     """
 
     pa_approx = float(at_bats) + float(walks) + float(hit_by_pitch)
@@ -89,7 +116,11 @@ def starter_game_performance_index(
 def strict_prior_shrunk_mean(
     *, prior_sum: float, prior_count: float, center: float, k: float
 ) -> float:
-    """Return a K-shrunk mean computed only from dates before the target date."""
+    """Return a K-shrunk mean from caller-supplied strict-prior aggregates.
+
+    The caller must construct ``prior_sum`` and ``prior_count`` using only
+    observations dated strictly before the target game.
+    """
 
     if prior_count < 0 or k < 0:
         raise ValueError("prior_count and k must be non-negative")

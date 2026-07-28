@@ -60,6 +60,7 @@ def build_all() -> dict[Path, dict[str, object]]:
         decision_path=FROZEN / "V11_1_PROSPECTIVE_CANDIDATE_DECISION.json",
         model_schema_path=FROZEN / "V11_1_PROSPECTIVE_MODEL_SCHEMA.json",
         formula_path=FROZEN / "V11_1_SELECTED_BATTER_INCOME_FORMULA.json",
+        batter_config_path=ROOT / "configs/batter_index.json",
         model_path=MODELS / "V11_1_PROSPECTIVE_REFIT_MODEL_2024_2025.joblib",
     )
 

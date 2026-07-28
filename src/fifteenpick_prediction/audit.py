@@ -21,6 +21,29 @@ V11_EXPECTED_MODELS = {
     "CLEAN_NO_BATTER",
     "TEAM_BASELINE",
 }
+V11_EXPECTED_BATTER_WEIGHTS = {
+    "singles": 0.50,
+    "doubles": 0.95,
+    "triples": 1.35,
+    "home_runs": 1.85,
+    "walks": 0.42,
+    "hit_by_pitch": 0.42,
+    "stolen_bases": 0.22,
+    "strikeouts": -0.08,
+    "double_play": -0.32,
+}
+V11_EXPECTED_FORMULA_WEIGHTS = {
+    **V11_EXPECTED_BATTER_WEIGHTS,
+    "runs": 0.0,
+    "rbi": 0.0,
+    "game_winning_hit": 0.0,
+}
+V11_EXPECTED_LINEUP_FEATURES = [
+    "mean",
+    "coverage",
+    "count_mean",
+    "coverage_min",
+]
 
 
 _TOLERANT_AUDIT_FLOAT_PATHS = {
@@ -82,6 +105,43 @@ def audit_payloads_equal(
 
 def _read_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _numeric_mapping_matches(
+    actual: object,
+    expected: dict[str, float],
+    *,
+    abs_tol: float = 1e-12,
+) -> bool:
+    """Return whether a JSON object contains the expected finite numeric values."""
+
+    if not isinstance(actual, dict) or set(actual) != set(expected):
+        return False
+    for key, expected_value in expected.items():
+        actual_value = actual[key]
+        if isinstance(actual_value, bool) or not isinstance(actual_value, (int, float)):
+            return False
+        if not math.isfinite(float(actual_value)) or not math.isclose(
+            float(actual_value), expected_value, rel_tol=0.0, abs_tol=abs_tol
+        ):
+            return False
+    return True
+
+
+def _finite_number_matches(
+    actual: object,
+    expected: float,
+    *,
+    abs_tol: float = 1e-12,
+) -> bool:
+    """Return whether one JSON value matches the expected finite number."""
+
+    return (
+        not isinstance(actual, bool)
+        and isinstance(actual, (int, float))
+        and math.isfinite(float(actual))
+        and math.isclose(float(actual), expected, rel_tol=0.0, abs_tol=abs_tol)
+    )
 
 
 def _probability_columns(frame: pd.DataFrame) -> list[str]:
@@ -211,6 +271,7 @@ def build_v11_audit(
     decision_path: Path,
     model_schema_path: Path,
     formula_path: Path,
+    batter_config_path: Path,
     model_path: Path,
 ) -> dict[str, Any]:
     """Verify the V11.1 artifacts that can be checked from the public repository."""
@@ -221,6 +282,7 @@ def build_v11_audit(
         decision_path,
         model_schema_path,
         formula_path,
+        batter_config_path,
         model_path,
     ]
     required_files_present = all(path.is_file() for path in required_paths)
@@ -233,6 +295,7 @@ def build_v11_audit(
     decision = _read_json(decision_path)
     model_schema = _read_json(model_schema_path)
     formula = _read_json(formula_path)
+    batter_config = _read_json(batter_config_path)
     model = joblib.load(model_path)
 
     comparison_models_present = set(comparison.index) == V11_EXPECTED_MODELS
@@ -276,10 +339,45 @@ def build_v11_audit(
         and model_schema.get("excluded_from_training") == [2026]
         and decision.get("no_2026_tuning") is True
     )
+    formula_weights = formula.get("weights")
+    config_clip = batter_config.get("clip")
+    config_metadata_matches = (
+        batter_config.get("index_id") == "BATTER_POWER_OBP_RATE100"
+        and batter_config.get("role") == "batter"
+        and _numeric_mapping_matches(
+            batter_config.get("weights"), V11_EXPECTED_BATTER_WEIGHTS
+        )
+        and _finite_number_matches(
+            batter_config.get("plate_appearance_normalizer"), 4.2
+        )
+        and _finite_number_matches(
+            batter_config.get("reference_mean"), 0.738432383380831
+        )
+        and _finite_number_matches(
+            batter_config.get("reference_sd"), 0.9411772120687678
+        )
+        and _finite_number_matches(batter_config.get("standardized_center"), 1000.0)
+        and _finite_number_matches(batter_config.get("standardized_scale"), 250.0)
+        and isinstance(config_clip, list)
+        and len(config_clip) == 2
+        and _finite_number_matches(config_clip[0], -500.0)
+        and _finite_number_matches(config_clip[1], 3000.0)
+        and _finite_number_matches(batter_config.get("strict_prior_shrinkage_k"), 5.0)
+        and _finite_number_matches(batter_config.get("cold_start_center"), 1000.0)
+    )
     formula_matches = (
         formula.get("score_id") == "POWER_OBP__RATE100"
+        and _numeric_mapping_matches(formula_weights, V11_EXPECTED_FORMULA_WEIGHTS)
+        and _finite_number_matches(formula.get("rate_share"), 1.0)
+        and _finite_number_matches(
+            formula.get("early_mean_raw"), 0.738432383380831
+        )
+        and _finite_number_matches(
+            formula.get("early_sd_raw"), 0.9411772120687678
+        )
         and formula.get("history_method") == "S_K5"
         and formula.get("lineup_block") == "MEAN"
+        and formula.get("lineup_features") == V11_EXPECTED_LINEUP_FEATURES
         and formula.get("legacy_income_used") is False
     )
     if not hasattr(model, "n_features_in_"):
@@ -298,6 +396,7 @@ def build_v11_audit(
         "reported_delta_matches": reported_delta_matches,
         "model_schema_matches_14_features": schema_matches,
         "model_schema_excludes_2026_from_training": no_2026_training,
+        "batter_config_metadata_matches": config_metadata_matches,
         "selected_formula_metadata_matches": formula_matches,
         "saved_model_loadable": True,
         "saved_model_feature_count_14": model_feature_count_matches,
@@ -348,6 +447,10 @@ def build_v11_audit(
                 "improvement_probability": float(
                     bootstrap_clean_row["improvement_probability"]
                 ),
+                "improvement_probability_definition": (
+                    "fraction of paired date-cluster bootstrap replicates with lower "
+                    "Log loss; not a posterior probability of model superiority"
+                ),
                 "reps": int(bootstrap_clean_row["reps"]),
             },
         },
@@ -365,6 +468,7 @@ def build_v11_audit(
             "candidate_decision": decision_path.as_posix(),
             "model_schema": model_schema_path.as_posix(),
             "selected_formula": formula_path.as_posix(),
+            "batter_config": batter_config_path.as_posix(),
             "saved_model": model_path.as_posix(),
         },
     }

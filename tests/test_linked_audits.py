@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 
 import pandas as pd
+import pytest
 
 from fifteenpick_prediction.audit import (
     audit_payloads_equal,
@@ -59,6 +60,7 @@ def test_v11_link_matches_publicly_verifiable_artifacts():
         decision_path=FROZEN / "V11_1_PROSPECTIVE_CANDIDATE_DECISION.json",
         model_schema_path=FROZEN / "V11_1_PROSPECTIVE_MODEL_SCHEMA.json",
         formula_path=FROZEN / "V11_1_SELECTED_BATTER_INCOME_FORMULA.json",
+        batter_config_path=ROOT / "configs/batter_index.json",
         model_path=MODELS / "V11_1_PROSPECTIVE_REFIT_MODEL_2024_2025.joblib",
     )
     actual = relative_evidence(actual)
@@ -67,6 +69,28 @@ def test_v11_link_matches_publicly_verifiable_artifacts():
     )
     assert audit_payloads_equal(actual, committed)
     assert actual["source_pipeline_lineup_record"]["public_repository_recomputation"] is False
+
+
+def test_v11_audit_rejects_numeric_formula_drift(tmp_path):
+    formula = json.loads(
+        (FROZEN / "V11_1_SELECTED_BATTER_INCOME_FORMULA.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    formula["weights"]["home_runs"] = 1.86
+    drifted_formula = tmp_path / "drifted_formula.json"
+    drifted_formula.write_text(json.dumps(formula), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="V11.1 audit failed"):
+        build_v11_audit(
+            comparison_path=FROZEN / "V11_1_ROBUST_CANDIDATE_COMPARISON.csv",
+            bootstrap_path=FROZEN / "V11_1_ROBUST_CANDIDATE_BOOTSTRAP.csv",
+            decision_path=FROZEN / "V11_1_PROSPECTIVE_CANDIDATE_DECISION.json",
+            model_schema_path=FROZEN / "V11_1_PROSPECTIVE_MODEL_SCHEMA.json",
+            formula_path=drifted_formula,
+            batter_config_path=ROOT / "configs/batter_index.json",
+            model_path=MODELS / "V11_1_PROSPECTIVE_REFIT_MODEL_2024_2025.joblib",
+        )
 
 
 def test_audit_payload_comparison_tolerates_machine_precision_replay_drift():

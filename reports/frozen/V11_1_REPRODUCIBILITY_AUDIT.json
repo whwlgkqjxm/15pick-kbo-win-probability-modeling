@@ -13,6 +13,7 @@
     "reported_delta_matches": true,
     "model_schema_matches_14_features": true,
     "model_schema_excludes_2026_from_training": true,
+    "batter_config_metadata_matches": true,
     "selected_formula_metadata_matches": true,
     "saved_model_loadable": true,
     "saved_model_feature_count_14": true,
@@ -45,6 +46,7 @@
       "ci_high": 0.0029249068925948,
       "interval_includes_zero": true,
       "improvement_probability": 0.8784,
+      "improvement_probability_definition": "fraction of paired date-cluster bootstrap replicates with lower Log loss; not a posterior probability of model superiority",
       "reps": 10000
     }
   },
@@ -56,6 +58,7 @@
     "candidate_decision": "reports/frozen/V11_1_PROSPECTIVE_CANDIDATE_DECISION.json",
     "model_schema": "reports/frozen/V11_1_PROSPECTIVE_MODEL_SCHEMA.json",
     "selected_formula": "reports/frozen/V11_1_SELECTED_BATTER_INCOME_FORMULA.json",
+    "batter_config": "configs/batter_index.json",
     "saved_model": "models/frozen/V11_1_PROSPECTIVE_REFIT_MODEL_2024_2025.joblib"
   }
 }
