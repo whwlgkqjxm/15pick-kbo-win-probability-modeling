@@ -1,7 +1,5 @@
 # Temporal validation and leakage-control contract
 
-This page defines when information may enter a prediction, how chronological evaluation was constructed, and why the 2026 results are development evidence rather than a final untouched test.
-
 ## Prediction setting
 
 The intended prediction point is **after the official starting lineups and starting pitchers are known, but before first pitch**.
