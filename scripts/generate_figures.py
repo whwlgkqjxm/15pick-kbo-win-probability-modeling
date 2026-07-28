@@ -215,7 +215,10 @@ def ablation_plot() -> None:
     ax.text(
         0.0,
         1.04,
-        "V8 evaluation results; each bar shows the performance change after adding the index.",
+        (
+            "Earlier relief-pitcher experiment; each bar shows the change after "
+            "adding the feature block."
+        ),
         transform=ax.transAxes,
         fontsize=9.5,
         color="#444444",
@@ -240,8 +243,8 @@ def ablation_plot() -> None:
         0.5,
         0.015,
         (
-            "Reported separately because the historical V8 and V12 protocols are not "
-            "directly comparable."
+            "Reported separately because the earlier relief-pitcher experiment and the current "
+            "role comparison used different evaluation protocols."
         ),
         ha="center",
         fontsize=9,
@@ -252,56 +255,220 @@ def ablation_plot() -> None:
     plt.close()
 
 
+def _annotated_horizontal_points(
+    data: pd.DataFrame,
+    *,
+    label_col: str,
+    value_col: str,
+    title: str,
+    subtitle: str,
+    xlabel: str,
+    name: str,
+    figsize: tuple[float, float],
+) -> None:
+    ordered = data.sort_values(value_col, ascending=False).reset_index(drop=True)
+    y = list(range(len(ordered)))
+    values = ordered[value_col].astype(float)
+    span = float(values.max() - values.min())
+    margin = max(span * 0.18, 0.0007)
+
+    fig, ax = plt.subplots(figsize=figsize)
+    ax.scatter(values, y, s=58, zorder=3)
+    ax.set_yticks(y, ordered[label_col])
+    ax.set_xlim(float(values.min()) - margin, float(values.max()) + margin * 1.45)
+    ax.set_xlabel(xlabel)
+    ax.set_title(title, pad=24, fontweight="bold")
+    ax.text(
+        0.0,
+        1.025,
+        subtitle,
+        transform=ax.transAxes,
+        fontsize=9.5,
+        color="#444444",
+        va="bottom",
+    )
+    ax.grid(axis="x", alpha=0.22)
+    ax.set_axisbelow(True)
+
+    for index, value in enumerate(values):
+        ax.text(
+            float(value) + margin * 0.08,
+            index,
+            f"{float(value):.6f}",
+            va="center",
+            fontsize=8.7,
+        )
+
+    plt.tight_layout(rect=(0, 0, 1, 0.98))
+    plt.savefig(FIGURES / name, dpi=220, bbox_inches="tight")
+    plt.close()
+
+
 def model_family_plot() -> None:
-    data = pd.read_csv(FROZEN / "V12_MODEL_FAMILY_TEMPORAL_CV.csv").nsmallest(15, "log_loss")
-    _dot_plot(
+    data = pd.read_csv(FROZEN / "V12_FAMILY_CHAMPIONS.csv").copy()
+    family_labels = {
+        "L2_LOGISTIC": "L2 logistic regression",
+        "ELASTIC_NET": "Elastic net logistic regression",
+        "XGBOOST": "XGBoost",
+        "RANDOM_FOREST": "Random forest",
+        "GRADIENT_BOOSTING": "Gradient boosting",
+        "CATBOOST": "CatBoost",
+        "EXTRA_TREES": "Extra Trees",
+        "LIGHTGBM": "LightGBM",
+        "HIST_GRADIENT_BOOSTING": "Histogram gradient boosting",
+    }
+    data["display"] = data["family"].map(family_labels)
+    _annotated_horizontal_points(
         data,
-        label_col="model_id",
+        label_col="display",
         value_col="log_loss",
-        title="Top model configurations under 2024–2025 temporal CV",
+        title="Best temporal-CV result from each model family",
+        subtitle="984 out-of-fold predictions across five expanding folds in 2024–2025",
         xlabel="Temporal-CV Log loss (lower is better)",
         name="model_family_temporal_cv.png",
+        figsize=(10.2, 5.7),
     )
 
 
 def strategy_plot() -> None:
-    data = pd.read_csv(
-        FROZEN / "V12_2026_ALL_LEARNING_METHOD_RESULTS.csv"
-    ).nsmallest(18, "log_loss")
-    data["display"] = data["model_id"].astype(str) + " / " + data["training_strategy"].astype(str)
-    _dot_plot(
+    all_results = pd.read_csv(FROZEN / "V12_2026_ALL_LEARNING_METHOD_RESULTS.csv")
+
+    def one(model_id: str, training_strategy: str) -> float:
+        rows = all_results.loc[
+            all_results["model_id"].eq(model_id)
+            & all_results["training_strategy"].eq(training_strategy),
+            "log_loss",
+        ]
+        if len(rows) != 1:
+            raise ValueError(
+                f"Expected one row for {model_id} / {training_strategy}; found {len(rows)}"
+            )
+        return float(rows.iloc[0])
+
+    data = pd.DataFrame(
+        {
+            "display": [
+                "Static — recent 720 games",
+                "Static — all history (C=0.01)",
+                "Static reference — all history (C=0.03)",
+                "Mean ensemble — six models",
+                "Platt-calibrated reference",
+                "Daily expanding retraining",
+            ],
+            "log_loss": [
+                one("L2_C0.1", "RECENT_720"),
+                one("L2_C0.01", "ALL_EQUAL"),
+                one("L2_C0.03", "ALL_EQUAL"),
+                one(
+                    "OOF_TOP6_MEAN",
+                    "unweighted ensemble selected by 2024-2025 CV",
+                ),
+                one(
+                    "CV_CHAMPION_PLATT",
+                    "OOF Platt calibration of L2_C0.03",
+                ),
+                one("L2_C0.03", "EXPANDING_DAILY"),
+            ],
+        }
+    )
+    _annotated_horizontal_points(
         data,
         label_col="display",
         value_col="log_loss",
-        title="Best observed learning strategies",
-        xlabel="2026 development Log loss (lower is better)",
+        title="Representative training strategies",
+        subtitle="2026 development evaluation: 416 games; lower Log loss is better",
+        xlabel="2026 development Log loss",
         name="training_strategy_comparison.png",
+        figsize=(10.6, 4.8),
     )
 
 
 def calibration_plot() -> None:
-    data = pd.read_csv(FROZEN / "V12_2026_CALIBRATION_DECILES.csv")
-    plt.figure(figsize=(6, 6))
-    plt.plot([0, 1], [0, 1], linestyle="--", label="Perfect calibration")
-    for model_id, group in data.groupby("model_id"):
+    data = pd.read_csv(REPRODUCED / "calibration_deciles.csv")
+    labels = {
+        "CV_SELECTED": "Cross-validation-selected reference",
+        "BEST_DEVELOPMENT": "Best observed development model",
+    }
+
+    fig, ax = plt.subplots(figsize=(7.2, 6.2))
+    ax.plot([0.25, 0.80], [0.25, 0.80], linestyle="--", label="Perfect calibration")
+    for protocol, group in data.groupby("protocol", sort=False):
         ordered = group.sort_values("predicted_mean")
-        plt.plot(ordered["predicted_mean"], ordered["actual_rate"], marker="o", label=model_id)
-    plt.xlabel("Mean predicted probability")
-    plt.ylabel("Observed home-win rate")
-    plt.title("Reliability diagram — 2026 development evaluation")
-    plt.legend(fontsize=8)
-    save_current("calibration_reliability.png")
+        ax.plot(
+            ordered["predicted_mean"],
+            ordered["actual_rate"],
+            marker="o",
+            label=labels[protocol],
+        )
+    ax.set_xlim(0.25, 0.80)
+    ax.set_ylim(0.25, 0.80)
+    ax.set_xlabel("Mean predicted home-win probability")
+    ax.set_ylabel("Observed home-win rate")
+    ax.set_title("Calibration of the two frozen candidates", pad=24, fontweight="bold")
+    ax.text(
+        0.0,
+        1.025,
+        "2026 development evaluation; 41–42 games per probability decile",
+        transform=ax.transAxes,
+        fontsize=9.5,
+        color="#444444",
+        va="bottom",
+    )
+    ax.legend(fontsize=8.5, loc="upper left")
+    ax.grid(alpha=0.20)
+    plt.tight_layout(rect=(0, 0, 1, 0.98))
+    plt.savefig(FIGURES / "calibration_reliability.png", dpi=220, bbox_inches="tight")
+    plt.close()
 
 
 def importance_plot() -> None:
-    data = pd.read_csv(FROZEN / "V12_2026_PERMUTATION_IMPORTANCE_CV_CHAMPION.csv")
+    data = pd.read_csv(FROZEN / "V12_2026_PERMUTATION_IMPORTANCE_CV_CHAMPION.csv").copy()
+    feature_labels = {
+        "elo_diff": "Elo difference",
+        "prior_win_pct_diff": "Prior win-percentage difference",
+        "prior_run_diff_per_game_diff": "Prior run-differential difference",
+        "prior_rank_advantage": "Pregame standings advantage",
+        "bullpen_strength_diff": "Bullpen strength difference",
+        "K10_starter_value_diff": "Starting-pitcher performance difference",
+        "K10_starter_count_diff": "Starting-pitcher history-depth difference",
+        "K10_starter_reliability_diff": "Starting-pitcher reliability difference",
+        "K10_both_starters_covered": "Both starting pitchers covered",
+        "PS_R20_RA_G_diff": "Recent post-starter run-prevention difference",
+        "mean": "Starting-lineup batter performance difference",
+        "coverage": "Lineup history-coverage difference",
+        "count_mean": "Average lineup history depth",
+        "coverage_min": "Minimum lineup coverage",
+    }
+    data["display"] = data["feature"].map(feature_labels)
     data = data.sort_values("importance_mean_neg_logloss")
-    plt.figure(figsize=(8, 5.5))
-    plt.barh(data["feature"], data["importance_mean_neg_logloss"], xerr=data["importance_sd"])
-    plt.xlabel("Permutation importance (decrease in negative Log loss)")
-    plt.title("Feature importance — CV-selected model evaluated on 2026")
-    save_current("permutation_importance.png")
 
+    fig, ax = plt.subplots(figsize=(10.4, 6.5))
+    ax.barh(
+        data["display"],
+        data["importance_mean_neg_logloss"],
+        xerr=data["importance_sd"],
+    )
+    ax.axvline(0, linewidth=1.0)
+    ax.set_xlabel("Permutation importance: increase in Log loss after shuffling")
+    ax.set_title(
+        "Feature diagnostics for the cross-validation-selected reference",
+        pad=24,
+        fontweight="bold",
+    )
+    ax.text(
+        0.0,
+        1.025,
+        "Evaluated on 416 development games from 2026; error bars show one standard deviation",
+        transform=ax.transAxes,
+        fontsize=9.5,
+        color="#444444",
+        va="bottom",
+    )
+    ax.grid(axis="x", alpha=0.22)
+    ax.set_axisbelow(True)
+    plt.tight_layout(rect=(0, 0, 1, 0.98))
+    plt.savefig(FIGURES / "permutation_importance.png", dpi=220, bbox_inches="tight")
+    plt.close()
 
 def main() -> None:
     ablation_plot()
