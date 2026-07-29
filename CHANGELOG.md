@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Scientific claim boundaries
+
+- replaced broad result language with development-bounded claims and exact supporting values;
+- clarified the status of both frozen candidates, the V11.1 and V12 evaluation periods, historical lineup timing, and bootstrap interpretation;
+- added the identity, role-contamination, and player-level relief evidence needed to support the permitted conclusions.
+
 ### Reproducibility documentation and release controls
 
 - added an exact version lock for the maintained core reproduction path;
