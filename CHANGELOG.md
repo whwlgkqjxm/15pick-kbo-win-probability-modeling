@@ -6,6 +6,8 @@
 
 - replaced broad result language with development-bounded claims and exact supporting values;
 - clarified the status of both frozen candidates, the V11.1 and V12 evaluation periods, historical lineup timing, and bootstrap interpretation;
+- distinguished permitted current-game pregame inputs from prohibited target-game outcomes and same-date results;
+- stated the role-audit denominators and contamination rates in reader-facing terms;
 - added the identity, role-contamination, and player-level relief evidence needed to support the permitted conclusions.
 
 ### Reproducibility documentation and release controls
