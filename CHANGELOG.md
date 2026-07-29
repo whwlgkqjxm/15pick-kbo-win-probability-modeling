@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### Data release controls
+
+- classified the repository explicitly as a private review build until a documented retention or data-minimization path is completed;
+- added the exact restricted row-level artifact inventory and clarified that the software license does not grant data redistribution rights;
+- added public-history, release-archive, model-binary, CI, and manifest requirements for a data-minimized release;
+- aligned the README, reproducibility, data-card, lineage, limitations, and directory-level notices with the release policy.
+
 ### Scientific claim boundaries
 
 - replaced broad result language with development-bounded claims and exact supporting values;

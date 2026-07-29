@@ -5,3 +5,5 @@
 - `figures/`: plots generated from frozen or reproduced tables.
 
 The verification command compares reproduced metrics and bootstraps against frozen values and replays the saved model binaries against frozen game-level probabilities.
+
+The frozen and reproduced directories mix aggregate summaries with row-level prediction files. The specific restricted files are listed in [`docs/data_release_policy.md`](../docs/data_release_policy.md); do not treat every report artifact as cleared for unrestricted public redistribution.

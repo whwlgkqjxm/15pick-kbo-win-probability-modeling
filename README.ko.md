@@ -169,7 +169,7 @@ make verify
 
 ## 데이터 및 공개 범위
 
-이 private review build에는 핵심 결과 재현에 필요한 연구 코드와 파생 모델링 산출물이 포함돼 있다. 공식 KBO raw response와 15Pick 운영 서비스 데이터는 재배포하지 않는다. 파생 테이블과 경기 단위 결과를 unrestricted public repository에 포함하려면 [`docs/data_release_policy.md`](docs/data_release_policy.md)의 공개 gate를 먼저 완료해야 한다. 그 전에는 저장소를 private로 유지하거나 해당 문서의 data-minimized 공개안을 사용한다.
+이 저장소는 현재 **private review build**다. 정확한 결과 재현에는 공개 재배포 근거가 문서화될 때까지 제한 대상으로 취급하는 1,824경기 파생 테이블과 경기 단위 예측 파일이 사용된다. 공식 KBO raw response와 15Pick 운영 서비스 데이터는 포함하지 않는다. MIT 라이선스는 프로젝트가 작성한 소프트웨어와 문서에 적용되며, 제한된 KBO 파생 데이터의 재배포 권한까지 자동으로 부여하지 않는다. unrestricted public release 전에는 [`docs/data_release_policy.md`](docs/data_release_policy.md)의 데이터 유지 절차 또는 data-minimized 절차를 완료해야 한다.
 
 ## 작성자
 

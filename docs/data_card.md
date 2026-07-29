@@ -33,9 +33,9 @@ The derived data supports a study of pregame KBO home-win probabilities using co
 - cold starts: 1,959
 - temporal violations: 0
 
-## Included table
+## Included table — private review build
 
-`data/derived/V12_MODELING_DATASET.csv` contains 71 columns and 1,824 decision-game rows. It includes identifiers and outcomes needed for audit plus the 14 frozen model features. It is deterministically ordered by `game_date, game_id`.
+`data/derived/V12_MODELING_DATASET.csv` contains 71 columns and 1,824 decision-game rows. It includes identifiers and outcomes needed for audit plus the 14 frozen model features. It is deterministically ordered by `game_date, game_id`. The table is a restricted review artifact and is not cleared for unrestricted public redistribution by its inclusion here; see the [data release policy](data_release_policy.md).
 
 ## Quality controls
 

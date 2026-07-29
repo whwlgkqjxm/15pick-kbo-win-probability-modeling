@@ -3,12 +3,12 @@
 ## What this page establishes
 
 This repository provides a maintained, portable path for reproducing the core V12
-player-index comparisons from the released derived modeling table. It also preserves the
-frozen reports, fitted model binaries, historical V11.1/V12 execution scripts, environment
-records, and integrity checks needed to trace the reported results back to their released
-artifacts.
+player-index comparisons from the derived modeling table included in this private review build.
+It also preserves the frozen reports, fitted model binaries, historical V11.1/V12 execution scripts, environment
+records, and integrity checks needed to trace the reported results back to the included
+review artifacts.
 
-Reproduction here has a deliberately limited meaning. It confirms that the released code can
+Reproduction here has a deliberately limited meaning. It confirms that the maintained code can
 regenerate the reported development-period calculations from the included inputs. It does not
 reconstruct the private raw KBO archive, make the already observed 2026 period an untouched
 test, or replace the need for future pregame prospective validation.
@@ -39,7 +39,7 @@ files, verifies three linked audits, and validates every entry in the current re
 
 The portable analysis starts from
 [`data/derived/V12_MODELING_DATASET.csv`](../data/derived/V12_MODELING_DATASET.csv), a frozen
-1,824-game decision table with 71 columns. The released table contains 710 games from 2024,
+1,824-game decision table with 71 columns. The included review table contains 710 games from 2024,
 698 from 2025, and 416 from the observed 2026 development period. It includes the target,
 pregame team features, the clean starting-pitcher block, and the selected batter-lineup block.
 
@@ -53,23 +53,25 @@ From that table, the maintained pipeline reproduces:
 - paired date-cluster bootstrap comparisons;
 - calibration deciles and calibration intercept/slope;
 - standardized logistic-regression coefficients, including any imputer-generated missingness indicators; and
-- the released dataset-validation audit.
+- the included dataset-validation audit.
 
 The two specifications are the 2024–2025 temporal-CV-selected L2 model and the best observed
 2026 development training strategy. Their scientific roles and selection history are described
 in [model selection, role comparison, and calibration](model_selection_ablation_and_calibration.md).
 
-The released repository does **not** reproduce the following from first principles:
+This repository does **not** reproduce the following from first principles:
 
 - the complete raw KBO HTTP-response and BoxScore archive;
-- the private canonical-data construction process that preceded the released modeling table;
+- the private canonical-data construction process that preceded the included modeling table;
 - row-level historical lineup-prior intermediates that are not redistributed;
 - operational 15Pick service databases, user, betting, pricing, or settlement data; or
 - an independent prospective test on games that had not yet occurred when the methods were
   selected.
 
 These boundaries are intentional. See the [data-release policy](data_release_policy.md) and
-[data lineage and quality](data_lineage_and_quality.md) for the release scope.
+[data lineage and quality](data_lineage_and_quality.md) for the release scope. The exact commands
+above assume the private review build. A data-minimized public build must not claim exact
+1,824-game reproduction unless the restricted inputs have been separately cleared and included.
 
 ## Portable reproduction outputs
 
@@ -97,7 +99,7 @@ linked groups of checks.
 
 ### Dataset and temporal controls
 
-The released table must contain exactly 1,824 unique decision-game IDs and the expected season
+The included review table must contain exactly 1,824 unique decision-game IDs and the expected season
 counts. The target must be binary, ties must be absent, all 14 model features must be present,
 and no feature may contain an infinite value. Every home and away lineup must contain nine
 starters, named starting-pitcher IDs must be present, and the committed audit must record that
@@ -120,17 +122,17 @@ training window, temporal order, model definition, or result calculation.
 
 ### Linked audits and immutable artifacts
 
-Three committed audit payloads are recomputed from the released supporting evidence and frozen
+Three committed audit payloads are recomputed from the included supporting evidence and frozen
 metadata available in this repository and must match:
 
 - [`reports/reproduced/dataset_validation.json`](../reports/reproduced/dataset_validation.json);
 - [`reports/frozen/V12_REPRODUCIBILITY_AND_LEAKAGE_AUDIT.json`](../reports/frozen/V12_REPRODUCIBILITY_AND_LEAKAGE_AUDIT.json); and
 - [`reports/frozen/V11_1_REPRODUCIBILITY_AUDIT.json`](../reports/frozen/V11_1_REPRODUCIBILITY_AUDIT.json).
 
-The V11.1 repository audit verifies released summaries, frozen metadata, formula consistency, and model
+The V11.1 repository audit verifies included summaries, frozen metadata, formula consistency, and model
 loading. Its row-level lineup-prior construction remains recorded provenance rather than a result
-recomputed from released row-level intermediates, because those private intermediates are not
-redistributed.
+recomputed from row-level intermediates in this repository, because those private intermediates
+are not redistributed.
 
 The verifier then checks every entry in
 [`artifacts/RESEARCH_MANIFEST_SHA256.csv`](../artifacts/RESEARCH_MANIFEST_SHA256.csv). The manifest
@@ -146,7 +148,7 @@ numeric threshold instead of requiring byte-identical CSV serialization.
 
 ## Saved-model replay
 
-The repository does not rely only on refitting new models. It also loads the two released V12
+The repository does not rely only on refitting new models. It also loads the two included V12
 model binaries and replays their probabilities on the 416-row 2026 table:
 
 - [`V12_CV_SELECTED_MODEL_REFIT_2024_2025.joblib`](../models/frozen/V12_CV_SELECTED_MODEL_REFIT_2024_2025.joblib);
@@ -156,7 +158,7 @@ model binaries and replays their probabilities on the 416-row 2026 table:
 
 The recorded maximum absolute replay errors are on the order of `1e-16`, below the required
 `1e-12` threshold. The executable check is in
-[`tests/test_saved_model_replay.py`](../tests/test_saved_model_replay.py), and the released audit
+[`tests/test_saved_model_replay.py`](../tests/test_saved_model_replay.py), and the included audit
 is [`V12_MODEL_BINARY_REPRODUCTION_AUDIT.json`](../reports/frozen/V12_MODEL_BINARY_REPRODUCTION_AUDIT.json).
 
 This replay check was added after an earlier maintained path drifted from the frozen execution by
@@ -168,22 +170,22 @@ resolution are documented as F15 in the
 
 ## Artifact and provenance map
 
-The released evidence can be read as the following chain:
+The included evidence can be read as the following chain:
 
 ```text
 official historical records
     -> private raw and canonical research archive
-    -> released 1,824-game derived modeling table
+    -> included 1,824-game derived modeling table
     -> maintained portable reproduction code
     -> reports/reproduced portable outputs
     -> frozen reports, saved models, and linked audits
     -> SHA256 manifest and fail-closed verification
 ```
 
-The released table is therefore a derived input, not a substitute for the private raw
+The included review table is therefore a derived input, not a substitute for the private raw
 archive. The frozen reports and model binaries preserve the reviewed research state, while the
 portable code demonstrates that the central V12 role-ablation, calibration, and coefficient
-results can be regenerated from that released input.
+results can be regenerated from that included input.
 
 ## Historical execution evidence and environment
 
@@ -211,8 +213,8 @@ Neither file pins the operating system, CPU libraries, or Python interpreter bin
 
 ## Interpretation and remaining limitation
 
-A successful reproduction establishes computational consistency between the released data, code,
-portable outputs, frozen metrics, saved models, and audits. It does not establish that the model
+A successful reproduction establishes computational consistency between the included review data,
+maintained code, portable outputs, frozen metrics, saved models, and audits. It does not establish that the model
 will generalize to future seasons, eliminate uncertainty from method selection, or convert 2026
 into an independent prospective test. The allowed scientific claims are stated in
 [scientific status and claims](scientific_status_and_claims.md), and the remaining generalization

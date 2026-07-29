@@ -62,7 +62,7 @@ batter index =
            / 0.9411772120687678)
 ```
 
-The final game index is clipped to `[-500, 3000]`. These constants are fixed in [`configs/batter_index.json`](../configs/batter_index.json), and the public implementation is in [`src/fifteenpick_prediction/indices.py`](../src/fifteenpick_prediction/indices.py).
+The final game index is clipped to `[-500, 3000]`. These constants are fixed in [`configs/batter_index.json`](../configs/batter_index.json), and the maintained implementation is in [`src/fifteenpick_prediction/indices.py`](../src/fifteenpick_prediction/indices.py).
 
 ### Batter prior: S_K5
 
@@ -145,4 +145,4 @@ These indices are predictive representations, not estimates of causal player val
 
 The design does not use target-game outcomes, same-date results, legacy batter metrics, relief appearances in starter history, or the identities of pitchers who later enter the target game in relief. The separate player-level relief experiment is documented in the [relief-pitcher negative-result record](relief_pitcher_index_negative_result.md).
 
-The released repository verifies the frozen formulas, model inputs, saved-model compatibility, and aggregate results. Some row-level historical lineup-prior intermediates are recorded in the source research archive but are not included in this repository; this limitation is stated in the [`V11.1` reproducibility audit](../reports/frozen/V11_1_REPRODUCIBILITY_AUDIT.json).
+This repository verifies the frozen formulas, model inputs, saved-model compatibility, and aggregate results. Some row-level historical lineup-prior intermediates are recorded in the source research archive but are not included in this repository; this limitation is stated in the [`V11.1` reproducibility audit](../reports/frozen/V11_1_REPRODUCIBILITY_AUDIT.json).

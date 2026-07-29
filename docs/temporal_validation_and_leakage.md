@@ -86,7 +86,7 @@ In every fold:
 | 4 | 2024-03-23 to 2025-06-19 | 2025-06-20 to 2025-08-14 | 1,059 | 180 |
 | 5 | 2024-03-23 to 2025-08-14 | 2025-08-15 to 2025-10-02 | 1,239 | 167 |
 
-Across the five folds, **984 games** receive out-of-fold validation predictions. The earliest **422 games** form the initial training block, and the two decision games on 2025-10-04 fall outside the published validation blocks. Those two games remain outside out-of-fold validation because the frozen historical fold generator used an exclusive final boundary; the public release preserves that historical protocol rather than retroactively changing the model-selection evidence. After model selection, the CV-selected reference model is refitted on all **1,408 decision games** from 2024–2025.
+Across the five folds, **984 games** receive out-of-fold validation predictions. The earliest **422 games** form the initial training block, and the two decision games on 2025-10-04 fall outside the published validation blocks. Those two games remain outside out-of-fold validation because the frozen historical fold generator used an exclusive final boundary; the repository preserves that frozen historical protocol rather than retroactively changing the model-selection evidence. After model selection, the CV-selected reference model is refitted on all **1,408 decision games** from 2024–2025.
 
 The machine-readable fold definition is published in [`data/derived/V12_TEMPORAL_FOLD_DEFINITION.csv`](../data/derived/V12_TEMPORAL_FOLD_DEFINITION.csv).
 
@@ -134,7 +134,7 @@ These intervals quantify uncertainty in the observed paired performance differen
 
 ## Evidence and verification scope
 
-The public release directly verifies:
+This repository directly verifies:
 
 - deterministic ordering by `game_date, game_id`;
 - one row per binary decision game;

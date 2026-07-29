@@ -196,7 +196,7 @@ These commands reproduce the portable analysis from the included 1,824-game deri
 
 ## Data and licensing
 
-This private review build includes the research code and derived modeling artifacts required to reproduce the published results. Official raw KBO responses and 15Pick operational-service data are not redistributed. Unrestricted public release of the derived table and row-level outputs remains subject to the explicit release gate in [`docs/data_release_policy.md`](docs/data_release_policy.md); until that gate is completed, keep the repository private or publish the data-minimized variant described there.
+This repository is currently a **private review build**. Exact reproduction uses a derived 1,824-game table and row-level prediction files that remain restricted pending a documented redistribution decision. Official raw KBO responses and 15Pick operational-service data are not included. The MIT license covers project-authored software and documentation; it does not by itself grant rights to the restricted KBO-derived data artifacts. Before an unrestricted public release, complete either the documented-retention path or the data-minimized path in [`docs/data_release_policy.md`](docs/data_release_policy.md).
 
 ## Author
 
