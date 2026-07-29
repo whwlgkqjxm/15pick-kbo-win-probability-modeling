@@ -59,7 +59,7 @@ The two specifications are the 2024–2025 temporal-CV-selected L2 model and the
 2026 development training strategy. Their scientific roles and selection history are described
 in [model selection, role comparison, and calibration](model_selection_ablation_and_calibration.md).
 
-The public repository does **not** reproduce the following from first principles:
+The released repository does **not** reproduce the following from first principles:
 
 - the complete raw KBO HTTP-response and BoxScore archive;
 - the private canonical-data construction process that preceded the released modeling table;
@@ -69,7 +69,7 @@ The public repository does **not** reproduce the following from first principles
   selected.
 
 These boundaries are intentional. See the [data-release policy](data_release_policy.md) and
-[data lineage and quality](data_lineage_and_quality.md) for the public-release scope.
+[data lineage and quality](data_lineage_and_quality.md) for the release scope.
 
 ## Portable reproduction outputs
 
@@ -103,7 +103,7 @@ and no feature may contain an infinite value. Every home and away lineup must co
 starters, named starting-pitcher IDs must be present, and the committed audit must record that
 same-date team updates and same-date player results were excluded. Ordering is deterministic by
 `game_date, game_id`. Because the row-level historical source tables are not redistributed, the
-public verifier confirms the frozen exclusion flags and linked-audit consistency; it does not
+repository verifier confirms the frozen exclusion flags and linked-audit consistency; it does not
 independently reconstruct every contributing source date from the private raw event archive.
 
 ### Regenerated results
@@ -120,15 +120,17 @@ training window, temporal order, model definition, or result calculation.
 
 ### Linked audits and immutable artifacts
 
-Three committed audit payloads are rebuilt from their underlying evidence and must match:
+Three committed audit payloads are recomputed from the released supporting evidence and frozen
+metadata available in this repository and must match:
 
 - [`reports/reproduced/dataset_validation.json`](../reports/reproduced/dataset_validation.json);
 - [`reports/frozen/V12_REPRODUCIBILITY_AND_LEAKAGE_AUDIT.json`](../reports/frozen/V12_REPRODUCIBILITY_AND_LEAKAGE_AUDIT.json); and
 - [`reports/frozen/V11_1_REPRODUCIBILITY_AUDIT.json`](../reports/frozen/V11_1_REPRODUCIBILITY_AUDIT.json).
 
-The V11.1 public audit verifies released summaries, frozen metadata, formula consistency, and model
-loading. Its row-level lineup-prior construction remains recorded provenance rather than a publicly
-recomputed result because those private intermediates are not redistributed.
+The V11.1 repository audit verifies released summaries, frozen metadata, formula consistency, and model
+loading. Its row-level lineup-prior construction remains recorded provenance rather than a result
+recomputed from released row-level intermediates, because those private intermediates are not
+redistributed.
 
 The verifier then checks every entry in
 [`artifacts/RESEARCH_MANIFEST_SHA256.csv`](../artifacts/RESEARCH_MANIFEST_SHA256.csv). The manifest
@@ -178,7 +180,7 @@ official historical records
     -> SHA256 manifest and fail-closed verification
 ```
 
-The public table is therefore a released derived input, not a substitute for the private raw
+The released table is therefore a derived input, not a substitute for the private raw
 archive. The frozen reports and model binaries preserve the reviewed research state, while the
 portable code demonstrates that the central V12 role-ablation, calibration, and coefficient
 results can be regenerated from that released input.
@@ -203,7 +205,9 @@ NumPy 2.3.5, scikit-learn 1.8.0, XGBoost 3.1.3, LightGBM 4.6.0, CatBoost 1.2.8, 
 also listed in [`requirements-research-lock.txt`](../requirements-research-lock.txt). That historical
 file is an environment record for the principal packages, whereas
 `requirements-reproduce-lock.txt` is the exact version set used by the maintained portable core
-path. Neither file pins the operating system, CPU libraries, or Python interpreter binary itself.
+path. The [validation workflow](../.github/workflows/validate.yml) keeps Python 3.11 compatibility
+checks separate from a Python 3.13 locked-reproduction job that installs this exact version set.
+Neither file pins the operating system, CPU libraries, or Python interpreter binary itself.
 
 ## Interpretation and remaining limitation
 

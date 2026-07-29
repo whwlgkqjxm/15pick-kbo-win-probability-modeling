@@ -142,7 +142,7 @@ The public release directly verifies:
 - the published temporal-fold definition;
 - the paired date-cluster bootstrap implementation.
 
-The source pipeline additionally recorded **0 current-game uses**, **0 same-date result uses**, and **0 temporal-order violations** during historical feature construction. The intermediate row-level history tables needed to reconstruct every contributing source date are not fully redistributed in the public repository.
+The source pipeline additionally recorded **0 current-game uses**, **0 same-date result uses**, and **0 temporal-order violations** during historical feature construction. The intermediate row-level history tables needed to reconstruct every contributing source date are not included in this repository.
 
 This contract does not establish that:
 
