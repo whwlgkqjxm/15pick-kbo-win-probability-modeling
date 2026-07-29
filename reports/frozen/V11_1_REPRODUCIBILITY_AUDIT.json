@@ -1,8 +1,8 @@
 {
   "status": "PASS",
   "audit_scope": {
-    "repository_verified_from_released_artifacts": "comparison and bootstrap summary consistency, frozen metadata, and saved-model loading",
-    "source_pipeline_recorded_only": "row-level selected-prior lineup checks; the selected-prior table is not redistributed and cannot be recomputed from the public repository"
+    "repository_verified_from_included_artifacts": "comparison and bootstrap summary consistency, frozen metadata, and saved-model loading",
+    "source_pipeline_recorded_only": "row-level selected-prior lineup checks; the selected-prior table is not included in this review build and cannot be recomputed from this repository"
   },
   "checks": {
     "required_files_present": true,
@@ -28,7 +28,7 @@
     "rows_per_game": 18,
     "rows_per_side": 9,
     "player_id_missing": 0,
-    "public_repository_recomputation": false
+    "recomputation_from_included_artifacts": false
   },
   "key_results": {
     "n_2025_validation": 698,
@@ -51,7 +51,7 @@
     }
   },
   "scientific_status": "post-holdout development candidate; requires prospective confirmation",
-  "reproducibility_note": "The public repository can verify the released comparison and bootstrap summary artifacts, model schema, frozen metadata, and saved-model loading. The observed log-loss improvement is not treated as conclusive because the bootstrap interval includes zero. Row-level lineup construction remains a recorded source-pipeline result because the required intermediate table is outside the public release.",
+  "reproducibility_note": "The repository verifier can verify the included comparison and bootstrap summary artifacts, model schema, frozen metadata, and saved-model loading. The observed log-loss improvement is not treated as conclusive because the bootstrap interval includes zero. Row-level lineup construction remains a recorded source-pipeline result because the required intermediate table is not included in this review build.",
   "evidence": {
     "comparison": "reports/frozen/V11_1_ROBUST_CANDIDATE_COMPARISON.csv",
     "bootstrap": "reports/frozen/V11_1_ROBUST_CANDIDATE_BOOTSTRAP.csv",

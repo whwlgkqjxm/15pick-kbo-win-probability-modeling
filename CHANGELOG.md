@@ -8,6 +8,8 @@
 - added the exact restricted row-level artifact inventory and clarified that the software license does not grant data redistribution rights;
 - added public-history, release-archive, model-binary, CI, and manifest requirements for a data-minimized release;
 - aligned the README, reproducibility, data-card, lineage, limitations, and directory-level notices with the release policy.
+- clarified that Path A records an independently verified license or written permission rather than creating data rights;
+- aligned the V11.1 audit payload and regression test with the private-review repository terminology.
 
 ### Scientific claim boundaries
 

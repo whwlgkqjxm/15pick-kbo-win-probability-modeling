@@ -53,7 +53,7 @@ def test_v12_link_matches_recomputed_artifacts():
     assert audit_payloads_equal(actual, committed)
 
 
-def test_v11_link_matches_publicly_verifiable_artifacts():
+def test_v11_link_matches_repository_verifiable_artifacts():
     actual = build_v11_audit(
         comparison_path=FROZEN / "V11_1_ROBUST_CANDIDATE_COMPARISON.csv",
         bootstrap_path=FROZEN / "V11_1_ROBUST_CANDIDATE_BOOTSTRAP.csv",
@@ -68,7 +68,7 @@ def test_v11_link_matches_publicly_verifiable_artifacts():
         (FROZEN / "V11_1_REPRODUCIBILITY_AUDIT.json").read_text(encoding="utf-8")
     )
     assert audit_payloads_equal(actual, committed)
-    assert actual["source_pipeline_lineup_record"]["public_repository_recomputation"] is False
+    assert actual["source_pipeline_lineup_record"]["recomputation_from_included_artifacts"] is False
 
 
 def test_v11_audit_rejects_numeric_formula_drift(tmp_path):

@@ -59,8 +59,9 @@ recorded here.
 The MIT license in [`LICENSE`](../LICENSE) applies to the project-authored software and associated
 project documentation within its stated scope. It does not by itself grant rights to KBO-origin
 records, official identifiers, third-party material, or the restricted derived and row-level output
-files listed above. No public data license is granted for those files unless Path A is completed and
-the resulting decision is recorded explicitly.
+files listed above. This repository does not grant a public data license for those files. Path A may
+retain them in an unrestricted public release only when an applicable license or written permission
+has been verified and the permitted scope is recorded explicitly.
 
 ## Public-data release gate
 

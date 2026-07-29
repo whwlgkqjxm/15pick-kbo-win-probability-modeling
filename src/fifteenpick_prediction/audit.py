@@ -274,7 +274,7 @@ def build_v11_audit(
     batter_config_path: Path,
     model_path: Path,
 ) -> dict[str, Any]:
-    """Verify the V11.1 artifacts that can be checked from the public repository."""
+    """Verify the V11.1 artifacts that can be checked from this repository."""
 
     required_paths = [
         comparison_path,
@@ -411,13 +411,13 @@ def build_v11_audit(
     return {
         "status": "PASS",
         "audit_scope": {
-            "repository_verified_from_released_artifacts": (
+            "repository_verified_from_included_artifacts": (
                 "comparison and bootstrap summary consistency, frozen metadata, "
                 "and saved-model loading"
             ),
             "source_pipeline_recorded_only": (
                 "row-level selected-prior lineup checks; the selected-prior table is not "
-                "redistributed and cannot be recomputed from the public repository"
+                "included in this review build and cannot be recomputed from this repository"
             ),
         },
         "checks": checks,
@@ -427,7 +427,7 @@ def build_v11_audit(
             "rows_per_game": 18,
             "rows_per_side": 9,
             "player_id_missing": 0,
-            "public_repository_recomputation": False,
+            "recomputation_from_included_artifacts": False,
         },
         "key_results": {
             "n_2025_validation": 698,
@@ -456,11 +456,11 @@ def build_v11_audit(
         },
         "scientific_status": scientific_status,
         "reproducibility_note": (
-            "The public repository can verify the released comparison and bootstrap summary "
+            "The repository verifier can verify the included comparison and bootstrap summary "
             "artifacts, model schema, frozen metadata, and saved-model loading. The observed "
             "log-loss improvement is not treated as conclusive because the bootstrap interval "
             "includes zero. Row-level lineup construction remains a recorded source-pipeline "
-            "result because the required intermediate table is outside the public release."
+            "result because the required intermediate table is not included in this review build."
         ),
         "evidence": {
             "comparison": comparison_path.as_posix(),
